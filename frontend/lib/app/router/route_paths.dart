@@ -1,0 +1,46 @@
+/// Constantes des chemins de navigation go_router.
+abstract final class RoutePaths {
+  // Écran d'accueil (splash, ~30s au lancement — voir SplashScreen)
+  static const String splash = '/splash';
+
+  // Public
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String forgotPassword = '/forgot-password';
+
+  // Shell principal (bottom nav / sidebar)
+  static const String dashboard = '/dashboard';
+  static const String orientation = '/orientation';
+  static const String ecosysteme = '/ecosysteme';
+  static const String profile = '/profile';
+
+  // Universities
+  static const String universities = '/universities';
+  static const String universityDetail = '/universities/:id';
+  static const String universitiesCompare = '/universities/compare';
+  static String universityDetailPath(String id) => '/universities/$id';
+
+  // Orientation
+  static const String orientationRecommendations =
+      '/orientation/recommendations';
+  static const String orientationSimulation = '/orientation/simulation';
+
+  // Chat / IA
+  static const String chat = '/chat';
+  static const String chatHistory = '/chat/history';
+
+  // Jobs
+  static const String jobs = '/jobs';
+  static const String jobDetail = '/jobs/:id';
+  static const String jobsFavorites = '/jobs/favorites';
+  static String jobDetailPath(String id) => '/jobs/$id';
+
+  // News
+  static const String news = '/news';
+
+  // Admin
+  static const String admin = '/admin';
+  static const String adminSources = '/admin/sources';
+  static const String adminUsers = '/admin/users';
+  static const String adminNews = '/admin/news';
+}
