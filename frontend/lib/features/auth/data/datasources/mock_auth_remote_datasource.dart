@@ -1,5 +1,6 @@
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/storage/secure_storage_service.dart';
+import '../../../profile/data/datasources/mock_profile_remote_datasource.dart';
 import '../../domain/entities/user.dart';
 import '../models/user_model.dart';
 import 'auth_remote_datasource.dart';
@@ -11,6 +12,13 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       : _storage = storage;
 
   final SecureStorageService _storage;
+
+  /// Référence en mémoire de la session active, tenue à jour par
+  /// [_persistSession] — évite de relire le secure storage juste après
+  /// l'avoir écrit dans [completeProfile] (flutter_secure_storage_web peut
+  /// lever un `OperationError` sur une lecture trop rapprochée d'une
+  /// écriture, dans la même session de page).
+  static UserModel? _currentSessionUser;
 
   static final Map<String, String> _passwords = {
     'moussa.diop@ucad.edu.sn': 'password',
@@ -27,6 +35,8 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   // Comptes alignés sur UtilisateurSeeder.php / AdminUsersSeeder.php côté
   // Laravel — mêmes emails, mêmes rôles, pour que le mode mock (par défaut,
   // kUseMock=true) reflète fidèlement ce que renverrait le vrai backend.
+  // Tous les comptes de démo ont déjà un profil complété : seul un compte
+  // fraîchement créé via [register] passe par [completeProfile].
   static final Map<String, UserModel> _users = {
     'moussa.diop@ucad.edu.sn': UserModel(
       id: 'usr_1',
@@ -35,6 +45,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       email: 'moussa.diop@ucad.edu.sn',
       role: UserRole.lyceen,
       region: 'Dakar',
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 12),
     ),
     'lyceen@demo.sn': UserModel(
@@ -44,6 +55,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       email: 'lyceen@demo.sn',
       role: UserRole.lyceen,
       region: 'Dakar',
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 1),
     ),
     'etudiant@demo.sn': UserModel(
@@ -53,6 +65,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       email: 'etudiant@demo.sn',
       role: UserRole.etudiant,
       region: 'Thiès',
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 1),
     ),
     'superadmin@demo.sn': UserModel(
@@ -61,6 +74,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       prenom: 'Fatou',
       email: 'superadmin@demo.sn',
       role: UserRole.superAdmin,
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 1),
     ),
     'admin.ucad@demo.sn': UserModel(
@@ -69,6 +83,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       prenom: 'Ibrahima',
       email: 'admin.ucad@demo.sn',
       role: UserRole.adminEtablissement,
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 1),
     ),
     'paya@ndimbeul-etudiant.sn': UserModel(
@@ -77,6 +92,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       prenom: 'Paya',
       email: 'paya@ndimbeul-etudiant.sn',
       role: UserRole.superAdmin,
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 1),
     ),
     'khady@ndimbeul-etudiant.sn': UserModel(
@@ -85,6 +101,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       prenom: 'Khady',
       email: 'khady@ndimbeul-etudiant.sn',
       role: UserRole.superAdmin,
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 1),
     ),
     'coumba@ndimbeul-etudiant.sn': UserModel(
@@ -93,6 +110,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       prenom: 'Coumba',
       email: 'coumba@ndimbeul-etudiant.sn',
       role: UserRole.superAdmin,
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 1),
     ),
     'fatou@ndimbeul-etudiant.sn': UserModel(
@@ -101,6 +119,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       prenom: 'Fatou',
       email: 'fatou@ndimbeul-etudiant.sn',
       role: UserRole.superAdmin,
+      profilComplete: true,
       dateInscription: DateTime(2026, 1, 1),
     ),
   };
@@ -134,16 +153,17 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     required String prenom,
     required String email,
     required String password,
-    required UserRole role,
   }) async {
     await Future.delayed(const Duration(milliseconds: 700));
     final normalized = email.trim().toLowerCase();
+    // `role` reste null et `profilComplete` à false : le statut est choisi
+    // séparément via [completeProfile] (CompleteProfileScreen, forcé par le
+    // redirect du router tant que ce n'est pas fait).
     final user = UserModel(
       id: 'usr_${DateTime.now().millisecondsSinceEpoch}',
       nom: nom,
       prenom: prenom,
       email: normalized,
-      role: role,
       dateInscription: DateTime.now(),
     );
     _users[normalized] = user;
@@ -153,8 +173,25 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
+  Future<UserModel> completeProfile({
+    required UserRole statut,
+    required Map<String, dynamic> fields,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    final current = _currentSessionUser ?? await getCurrentUser();
+    if (current == null) throw const UnauthorizedException();
+
+    final updated = current.copyWith(role: statut, profilComplete: true);
+    _users[current.email] = updated;
+    _currentSessionUser = updated;
+    MockProfileRemoteDataSource.completeAs(statut, fields);
+    return updated;
+  }
+
+  @override
   Future<void> logout() async {
     await Future.delayed(const Duration(milliseconds: 200));
+    _currentSessionUser = null;
     await _storage.clear();
   }
 
@@ -162,8 +199,8 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   Future<UserModel?> getCurrentUser() async {
     final hasSession = await _storage.hasSession;
     if (!hasSession) return null;
-    final email = await _storage.accessToken;
-    final match = _users.values.where((u) => u.id == email);
+    final id = await _storage.accessToken;
+    final match = _users.values.where((u) => u.id == id);
     return match.isNotEmpty ? match.first : _users.values.first;
   }
 
@@ -173,10 +210,11 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   Future<void> _persistSession(UserModel user) async {
+    _currentSessionUser = user;
     await _storage.saveTokens(
       accessToken: user.id,
       refreshToken: '${user.id}_refresh',
     );
-    await _storage.saveRole(user.role.name);
+    if (user.role != null) await _storage.saveRole(user.role!.name);
   }
 }

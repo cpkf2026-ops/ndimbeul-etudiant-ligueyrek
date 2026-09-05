@@ -8,12 +8,21 @@ import '../models/user_model.dart';
 abstract interface class AuthRemoteDataSource {
   Future<UserModel> login({required String email, required String password});
 
+  /// Inscription minimale : identité + mot de passe. Le statut (lycéen,
+  /// étudiant, diplômé…) est choisi séparément via [completeProfile], voir
+  /// CompleteProfileScreen.
   Future<UserModel> register({
     required String nom,
     required String prenom,
     required String email,
     required String password,
-    required UserRole role,
+  });
+
+  /// `POST /profile/complete` — fixe le statut de l'utilisateur et enregistre
+  /// les champs spécifiques à ce statut ; passe `profilComplete` à true.
+  Future<UserModel> completeProfile({
+    required UserRole statut,
+    required Map<String, dynamic> fields,
   });
 
   Future<void> logout();
@@ -49,7 +58,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final accessToken = data['access_token'] as String;
       await _storage.saveTokens(accessToken: accessToken, refreshToken: accessToken);
       final user = UserModel.fromJson(data['utilisateur'] as Map<String, dynamic>);
-      await _storage.saveRole(user.role.name);
+      if (user.role != null) await _storage.saveRole(user.role!.name);
       return user;
     } on DioException catch (e) {
       // Laravel renvoie volontairement un 401 générique ("Identifiants
@@ -71,7 +80,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String prenom,
     required String email,
     required String password,
-    required UserRole role,
   }) async {
     try {
       final response = await _dio.post(
@@ -82,15 +90,30 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'email': email,
           'mot_de_passe': password,
           'mot_de_passe_confirmation': password,
-          // Inscription publique : seuls lyceen/etudiant sont acceptés côté backend.
-          'role': role.name,
         },
       );
       final data = response.data as Map<String, dynamic>;
       final accessToken = data['access_token'] as String;
       await _storage.saveTokens(accessToken: accessToken, refreshToken: accessToken);
+      return UserModel.fromJson(data['utilisateur'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _mapError(e);
+    }
+  }
+
+  @override
+  Future<UserModel> completeProfile({
+    required UserRole statut,
+    required Map<String, dynamic> fields,
+  }) async {
+    try {
+      final response = await _dio.post(
+        ApiEndpoints.profileComplete,
+        data: {'statut': _statutToJson(statut), ...fields},
+      );
+      final data = response.data as Map<String, dynamic>;
       final user = UserModel.fromJson(data['utilisateur'] as Map<String, dynamic>);
-      await _storage.saveRole(user.role.name);
+      if (user.role != null) await _storage.saveRole(user.role!.name);
       return user;
     } on DioException catch (e) {
       throw _mapError(e);
@@ -131,6 +154,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       throw _mapError(e);
     }
   }
+
+  String _statutToJson(UserRole statut) => switch (statut) {
+        UserRole.lyceen => 'lyceen',
+        UserRole.etudiant => 'etudiant',
+        UserRole.diplome => 'diplome',
+        UserRole.adminEtablissement => 'admin_etablissement',
+        UserRole.superAdmin => 'super_admin',
+      };
 
   Exception _mapError(DioException e) {
     if (e.type == DioExceptionType.connectionError ||

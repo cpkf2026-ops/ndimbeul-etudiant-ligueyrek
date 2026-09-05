@@ -193,7 +193,7 @@ class _AdminNavList extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      user?.role.label ?? '',
+                      user?.role?.label ?? '',
                       style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.textSecondary,

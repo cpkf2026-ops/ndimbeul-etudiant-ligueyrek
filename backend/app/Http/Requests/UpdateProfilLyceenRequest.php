@@ -15,6 +15,8 @@ class UpdateProfilLyceenRequest extends FormRequest
     {
         return [
             'serie_bac' => ['sometimes', 'string', 'max:10'],
+            'niveau' => ['sometimes', 'nullable', 'in:seconde,premiere,terminale'],
+            'etablissement' => ['sometimes', 'nullable', 'string', 'max:255'],
             'moyenne_generale' => ['sometimes', 'nullable', 'numeric', 'between:0,20'],
             'passions' => ['sometimes', 'nullable', 'array'],
             'metiers_envisages' => ['sometimes', 'nullable', 'array'],

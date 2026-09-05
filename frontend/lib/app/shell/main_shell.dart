@@ -50,7 +50,8 @@ class MainShell extends ConsumerWidget {
               onTap: onTap,
               compact: context.isTablet,
               userName: user?.nomComplet ?? 'Invité',
-              userSubtitle: user?.role.label ?? '',
+              userSubtitle: user?.role?.label ?? '',
+              role: user?.role,
               onLogout: () async {
                 await ref.read(authProvider.notifier).logout();
                 if (context.mounted) context.go(RoutePaths.login);
@@ -68,6 +69,7 @@ class MainShell extends ConsumerWidget {
       bottomNavigationBar: BottomNavBar(
         currentIndex: navigationShell.currentIndex,
         onTap: onTap,
+        role: user?.role,
       ),
       floatingActionButton: const AiFloatingButton(),
     );

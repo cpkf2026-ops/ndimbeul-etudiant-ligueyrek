@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../core/constants/app_constants.dart';
+import '../../features/auth/domain/entities/user.dart';
 import 'app_logo_button.dart';
 import 'bottom_nav_bar.dart';
 
@@ -63,6 +64,13 @@ const List<NavDestination> kSidebarNavDestinations = [
   ),
 ];
 
+/// Entrées visibles pour [role] — même règle que [mainNavDestinationsFor]
+/// (Orientation masquée pour les statuts qui n'en ont pas l'usage).
+List<NavDestination> sidebarNavDestinationsFor(UserRole? role) => [
+      for (final dest in kSidebarNavDestinations)
+        if (dest.branchIndex != 1 || (role?.voitOrientation ?? true)) dest,
+    ];
+
 /// Sidebar web/desktop (>= 1024px) — logo, navigation verticale, bloc
 /// profil utilisateur + déconnexion en bas, façon maquette Figma. Sur
 /// tablette (600-1023px), passe en mode [compact] : rail étroit, icônes
@@ -77,6 +85,7 @@ class SidebarNav extends StatelessWidget {
     required this.userSubtitle,
     required this.onLogout,
     this.compact = false,
+    this.role,
   });
 
   final int currentIndex;
@@ -85,6 +94,7 @@ class SidebarNav extends StatelessWidget {
   final String userSubtitle;
   final VoidCallback onLogout;
   final bool compact;
+  final UserRole? role;
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +103,7 @@ class SidebarNav extends StatelessWidget {
         currentIndex: currentIndex,
         onTap: onTap,
         onLogout: onLogout,
+        role: role,
       );
     }
 
@@ -124,9 +135,9 @@ class SidebarNav extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: kSidebarNavDestinations.length,
+              itemCount: sidebarNavDestinationsFor(role).length,
               itemBuilder: (context, index) {
-                final dest = kSidebarNavDestinations[index];
+                final dest = sidebarNavDestinationsFor(role)[index];
                 final selected = dest.branchIndex == currentIndex;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 4),
@@ -235,11 +246,13 @@ class _CompactSidebarNav extends StatelessWidget {
     required this.currentIndex,
     required this.onTap,
     required this.onLogout,
+    this.role,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
   final VoidCallback onLogout;
+  final UserRole? role;
 
   @override
   Widget build(BuildContext context) {
@@ -255,9 +268,9 @@ class _CompactSidebarNav extends StatelessWidget {
           const SizedBox(height: 12),
           Expanded(
             child: ListView.builder(
-              itemCount: kSidebarNavDestinations.length,
+              itemCount: sidebarNavDestinationsFor(role).length,
               itemBuilder: (context, index) {
-                final dest = kSidebarNavDestinations[index];
+                final dest = sidebarNavDestinationsFor(role)[index];
                 final selected = dest.branchIndex == currentIndex;
                 return Padding(
                   padding: const EdgeInsets.symmetric(

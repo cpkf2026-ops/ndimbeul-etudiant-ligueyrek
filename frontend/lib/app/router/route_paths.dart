@@ -8,6 +8,9 @@ abstract final class RoutePaths {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
 
+  // Complétion de profil obligatoire (connecté, mais profilComplete == false)
+  static const String completeProfile = '/complete-profile';
+
   // Shell principal (bottom nav / sidebar)
   static const String dashboard = '/dashboard';
   static const String orientation = '/orientation';

@@ -81,7 +81,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
     if (!mounted) return;
     final user = ref.read(authProvider).valueOrNull;
-    context.go((user?.role.isAdmin ?? false) ? RoutePaths.admin : RoutePaths.dashboard);
+    context.go((user?.role?.isAdmin ?? false) ? RoutePaths.admin : RoutePaths.dashboard);
   }
 
   @override

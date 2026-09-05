@@ -7,6 +7,7 @@ import '../../data/datasources/mock_auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../domain/usecases/complete_profile.dart';
 import '../../domain/usecases/login.dart';
 import '../../domain/usecases/logout.dart';
 import '../../domain/usecases/refresh_token.dart';
@@ -32,6 +33,8 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 final loginUseCaseProvider = Provider((ref) => Login(ref.watch(authRepositoryProvider)));
 final registerUseCaseProvider =
     Provider((ref) => Register(ref.watch(authRepositoryProvider)));
+final completeProfileUseCaseProvider =
+    Provider((ref) => CompleteProfile(ref.watch(authRepositoryProvider)));
 final logoutUseCaseProvider = Provider((ref) => Logout(ref.watch(authRepositoryProvider)));
 final restoreSessionUseCaseProvider =
     Provider((ref) => RestoreSession(ref.watch(authRepositoryProvider)));
@@ -83,23 +86,34 @@ class AuthNotifier extends AsyncNotifier<User?> {
     required String prenom,
     required String email,
     required String password,
-    required UserRole role,
   }) async {
     state = const AsyncValue.loading();
     final result = await ref.read(registerUseCaseProvider).call(
-          RegisterParams(
-            nom: nom,
-            prenom: prenom,
-            email: email,
-            password: password,
-            role: role,
-          ),
+          RegisterParams(nom: nom, prenom: prenom, email: email, password: password),
         );
     return result.fold(
       (failure) {
         state = AsyncValue.data(state.valueOrNull);
         return failure;
       },
+      (user) {
+        state = AsyncValue.data(user);
+        return null;
+      },
+    );
+  }
+
+  /// Étape "Compléter mon profil" : fixe le statut choisi et les champs
+  /// spécifiques associés.
+  Future<Failure?> completeProfile({
+    required UserRole statut,
+    required Map<String, dynamic> fields,
+  }) async {
+    final result = await ref
+        .read(completeProfileUseCaseProvider)
+        .call(CompleteProfileParams(statut: statut, fields: fields));
+    return result.fold(
+      (failure) => failure,
       (user) {
         state = AsyncValue.data(user);
         return null;

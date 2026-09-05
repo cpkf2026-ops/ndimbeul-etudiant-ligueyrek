@@ -15,6 +15,8 @@ class ProfilLyceenResource extends JsonResource
 
         return [
             'serie_bac' => $this->serie_bac,
+            'niveau' => $this->niveau,
+            'etablissement' => $this->etablissement,
             'moyenne_generale' => $this->moyenne_generale,
             'passions' => $this->passions,
             'metiers_envisages' => $this->metiers_envisages,

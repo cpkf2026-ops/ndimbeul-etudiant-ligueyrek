@@ -22,32 +22,38 @@ mixin _$ProfilAcademique {
   TResult when<TResult extends Object?>({
     required TResult Function(ProfilLyceen profil) lyceen,
     required TResult Function(ProfilEtudiant profil) etudiant,
+    required TResult Function(ProfilDiplome profil) diplome,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(ProfilLyceen profil)? lyceen,
     TResult? Function(ProfilEtudiant profil)? etudiant,
+    TResult? Function(ProfilDiplome profil)? diplome,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(ProfilLyceen profil)? lyceen,
     TResult Function(ProfilEtudiant profil)? etudiant,
+    TResult Function(ProfilDiplome profil)? diplome,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(ProfilAcademiqueLyceen value) lyceen,
     required TResult Function(ProfilAcademiqueEtudiant value) etudiant,
+    required TResult Function(ProfilAcademiqueDiplome value) diplome,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ProfilAcademiqueLyceen value)? lyceen,
     TResult? Function(ProfilAcademiqueEtudiant value)? etudiant,
+    TResult? Function(ProfilAcademiqueDiplome value)? diplome,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ProfilAcademiqueLyceen value)? lyceen,
     TResult Function(ProfilAcademiqueEtudiant value)? etudiant,
+    TResult Function(ProfilAcademiqueDiplome value)? diplome,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
 }
@@ -162,6 +168,7 @@ class _$ProfilAcademiqueLyceenImpl implements ProfilAcademiqueLyceen {
   TResult when<TResult extends Object?>({
     required TResult Function(ProfilLyceen profil) lyceen,
     required TResult Function(ProfilEtudiant profil) etudiant,
+    required TResult Function(ProfilDiplome profil) diplome,
   }) {
     return lyceen(profil);
   }
@@ -171,6 +178,7 @@ class _$ProfilAcademiqueLyceenImpl implements ProfilAcademiqueLyceen {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(ProfilLyceen profil)? lyceen,
     TResult? Function(ProfilEtudiant profil)? etudiant,
+    TResult? Function(ProfilDiplome profil)? diplome,
   }) {
     return lyceen?.call(profil);
   }
@@ -180,6 +188,7 @@ class _$ProfilAcademiqueLyceenImpl implements ProfilAcademiqueLyceen {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(ProfilLyceen profil)? lyceen,
     TResult Function(ProfilEtudiant profil)? etudiant,
+    TResult Function(ProfilDiplome profil)? diplome,
     required TResult orElse(),
   }) {
     if (lyceen != null) {
@@ -193,6 +202,7 @@ class _$ProfilAcademiqueLyceenImpl implements ProfilAcademiqueLyceen {
   TResult map<TResult extends Object?>({
     required TResult Function(ProfilAcademiqueLyceen value) lyceen,
     required TResult Function(ProfilAcademiqueEtudiant value) etudiant,
+    required TResult Function(ProfilAcademiqueDiplome value) diplome,
   }) {
     return lyceen(this);
   }
@@ -202,6 +212,7 @@ class _$ProfilAcademiqueLyceenImpl implements ProfilAcademiqueLyceen {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ProfilAcademiqueLyceen value)? lyceen,
     TResult? Function(ProfilAcademiqueEtudiant value)? etudiant,
+    TResult? Function(ProfilAcademiqueDiplome value)? diplome,
   }) {
     return lyceen?.call(this);
   }
@@ -211,6 +222,7 @@ class _$ProfilAcademiqueLyceenImpl implements ProfilAcademiqueLyceen {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ProfilAcademiqueLyceen value)? lyceen,
     TResult Function(ProfilAcademiqueEtudiant value)? etudiant,
+    TResult Function(ProfilAcademiqueDiplome value)? diplome,
     required TResult orElse(),
   }) {
     if (lyceen != null) {
@@ -321,6 +333,7 @@ class _$ProfilAcademiqueEtudiantImpl implements ProfilAcademiqueEtudiant {
   TResult when<TResult extends Object?>({
     required TResult Function(ProfilLyceen profil) lyceen,
     required TResult Function(ProfilEtudiant profil) etudiant,
+    required TResult Function(ProfilDiplome profil) diplome,
   }) {
     return etudiant(profil);
   }
@@ -330,6 +343,7 @@ class _$ProfilAcademiqueEtudiantImpl implements ProfilAcademiqueEtudiant {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(ProfilLyceen profil)? lyceen,
     TResult? Function(ProfilEtudiant profil)? etudiant,
+    TResult? Function(ProfilDiplome profil)? diplome,
   }) {
     return etudiant?.call(profil);
   }
@@ -339,6 +353,7 @@ class _$ProfilAcademiqueEtudiantImpl implements ProfilAcademiqueEtudiant {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(ProfilLyceen profil)? lyceen,
     TResult Function(ProfilEtudiant profil)? etudiant,
+    TResult Function(ProfilDiplome profil)? diplome,
     required TResult orElse(),
   }) {
     if (etudiant != null) {
@@ -352,6 +367,7 @@ class _$ProfilAcademiqueEtudiantImpl implements ProfilAcademiqueEtudiant {
   TResult map<TResult extends Object?>({
     required TResult Function(ProfilAcademiqueLyceen value) lyceen,
     required TResult Function(ProfilAcademiqueEtudiant value) etudiant,
+    required TResult Function(ProfilAcademiqueDiplome value) diplome,
   }) {
     return etudiant(this);
   }
@@ -361,6 +377,7 @@ class _$ProfilAcademiqueEtudiantImpl implements ProfilAcademiqueEtudiant {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ProfilAcademiqueLyceen value)? lyceen,
     TResult? Function(ProfilAcademiqueEtudiant value)? etudiant,
+    TResult? Function(ProfilAcademiqueDiplome value)? diplome,
   }) {
     return etudiant?.call(this);
   }
@@ -370,6 +387,7 @@ class _$ProfilAcademiqueEtudiantImpl implements ProfilAcademiqueEtudiant {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ProfilAcademiqueLyceen value)? lyceen,
     TResult Function(ProfilAcademiqueEtudiant value)? etudiant,
+    TResult Function(ProfilAcademiqueDiplome value)? diplome,
     required TResult orElse(),
   }) {
     if (etudiant != null) {
@@ -390,5 +408,170 @@ abstract class ProfilAcademiqueEtudiant implements ProfilAcademique {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ProfilAcademiqueEtudiantImplCopyWith<_$ProfilAcademiqueEtudiantImpl>
+  get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ProfilAcademiqueDiplomeImplCopyWith<$Res> {
+  factory _$$ProfilAcademiqueDiplomeImplCopyWith(
+    _$ProfilAcademiqueDiplomeImpl value,
+    $Res Function(_$ProfilAcademiqueDiplomeImpl) then,
+  ) = __$$ProfilAcademiqueDiplomeImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({ProfilDiplome profil});
+
+  $ProfilDiplomeCopyWith<$Res> get profil;
+}
+
+/// @nodoc
+class __$$ProfilAcademiqueDiplomeImplCopyWithImpl<$Res>
+    extends _$ProfilAcademiqueCopyWithImpl<$Res, _$ProfilAcademiqueDiplomeImpl>
+    implements _$$ProfilAcademiqueDiplomeImplCopyWith<$Res> {
+  __$$ProfilAcademiqueDiplomeImplCopyWithImpl(
+    _$ProfilAcademiqueDiplomeImpl _value,
+    $Res Function(_$ProfilAcademiqueDiplomeImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of ProfilAcademique
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? profil = null}) {
+    return _then(
+      _$ProfilAcademiqueDiplomeImpl(
+        null == profil
+            ? _value.profil
+            : profil // ignore: cast_nullable_to_non_nullable
+                  as ProfilDiplome,
+      ),
+    );
+  }
+
+  /// Create a copy of ProfilAcademique
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ProfilDiplomeCopyWith<$Res> get profil {
+    return $ProfilDiplomeCopyWith<$Res>(_value.profil, (value) {
+      return _then(_value.copyWith(profil: value));
+    });
+  }
+}
+
+/// @nodoc
+
+class _$ProfilAcademiqueDiplomeImpl implements ProfilAcademiqueDiplome {
+  const _$ProfilAcademiqueDiplomeImpl(this.profil);
+
+  @override
+  final ProfilDiplome profil;
+
+  @override
+  String toString() {
+    return 'ProfilAcademique.diplome(profil: $profil)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ProfilAcademiqueDiplomeImpl &&
+            (identical(other.profil, profil) || other.profil == profil));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, profil);
+
+  /// Create a copy of ProfilAcademique
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ProfilAcademiqueDiplomeImplCopyWith<_$ProfilAcademiqueDiplomeImpl>
+  get copyWith =>
+      __$$ProfilAcademiqueDiplomeImplCopyWithImpl<
+        _$ProfilAcademiqueDiplomeImpl
+      >(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(ProfilLyceen profil) lyceen,
+    required TResult Function(ProfilEtudiant profil) etudiant,
+    required TResult Function(ProfilDiplome profil) diplome,
+  }) {
+    return diplome(profil);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(ProfilLyceen profil)? lyceen,
+    TResult? Function(ProfilEtudiant profil)? etudiant,
+    TResult? Function(ProfilDiplome profil)? diplome,
+  }) {
+    return diplome?.call(profil);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(ProfilLyceen profil)? lyceen,
+    TResult Function(ProfilEtudiant profil)? etudiant,
+    TResult Function(ProfilDiplome profil)? diplome,
+    required TResult orElse(),
+  }) {
+    if (diplome != null) {
+      return diplome(profil);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(ProfilAcademiqueLyceen value) lyceen,
+    required TResult Function(ProfilAcademiqueEtudiant value) etudiant,
+    required TResult Function(ProfilAcademiqueDiplome value) diplome,
+  }) {
+    return diplome(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ProfilAcademiqueLyceen value)? lyceen,
+    TResult? Function(ProfilAcademiqueEtudiant value)? etudiant,
+    TResult? Function(ProfilAcademiqueDiplome value)? diplome,
+  }) {
+    return diplome?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ProfilAcademiqueLyceen value)? lyceen,
+    TResult Function(ProfilAcademiqueEtudiant value)? etudiant,
+    TResult Function(ProfilAcademiqueDiplome value)? diplome,
+    required TResult orElse(),
+  }) {
+    if (diplome != null) {
+      return diplome(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ProfilAcademiqueDiplome implements ProfilAcademique {
+  const factory ProfilAcademiqueDiplome(final ProfilDiplome profil) =
+      _$ProfilAcademiqueDiplomeImpl;
+
+  @override
+  ProfilDiplome get profil;
+
+  /// Create a copy of ProfilAcademique
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ProfilAcademiqueDiplomeImplCopyWith<_$ProfilAcademiqueDiplomeImpl>
   get copyWith => throw _privateConstructorUsedError;
 }

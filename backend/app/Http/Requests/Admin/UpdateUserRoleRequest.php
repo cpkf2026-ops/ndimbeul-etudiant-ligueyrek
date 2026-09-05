@@ -14,7 +14,7 @@ class UpdateUserRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => ['required', 'in:lyceen,etudiant,admin_etablissement,super_admin'],
+            'role' => ['required', 'in:lyceen,etudiant,diplome,admin_etablissement,super_admin'],
         ];
     }
 }

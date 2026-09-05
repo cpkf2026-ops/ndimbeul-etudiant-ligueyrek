@@ -5,10 +5,8 @@ import '../../../../app/router/route_paths.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../shared/extensions/context_extensions.dart';
-import '../../domain/entities/user.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_form_field.dart';
-import '../widgets/role_selector.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key, this.prefilledEmail});
@@ -31,7 +29,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   );
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
-  UserRole _role = UserRole.lyceen;
   bool _isSubmitting = false;
 
   @override
@@ -52,7 +49,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           prenom: _prenomController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text,
-          role: _role,
         );
     if (!mounted) return;
     setState(() => _isSubmitting = false);
@@ -89,11 +85,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       style: context.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 24),
-                    RoleSelector(
-                      value: _role,
-                      onChanged: (r) => setState(() => _role = r),
-                    ),
-                    const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(

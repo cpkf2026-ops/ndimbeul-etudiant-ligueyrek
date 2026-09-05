@@ -6,10 +6,12 @@ import '../../data/datasources/mock_profile_remote_datasource.dart';
 import '../../data/datasources/profile_remote_datasource.dart';
 import '../../data/repositories/profile_repository_impl.dart';
 import '../../domain/entities/profil_academique.dart';
+import '../../domain/entities/profil_diplome.dart';
 import '../../domain/entities/profil_etudiant.dart';
 import '../../domain/entities/profil_lyceen.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../../domain/usecases/get_profile.dart';
+import '../../domain/usecases/update_profil_diplome.dart';
 import '../../domain/usecases/update_profil_etudiant.dart';
 import '../../domain/usecases/update_profil_lyceen.dart';
 
@@ -27,6 +29,8 @@ final updateProfilLyceenUseCaseProvider =
     Provider((ref) => UpdateProfilLyceen(ref.watch(profileRepositoryProvider)));
 final updateProfilEtudiantUseCaseProvider =
     Provider((ref) => UpdateProfilEtudiant(ref.watch(profileRepositoryProvider)));
+final updateProfilDiplomeUseCaseProvider =
+    Provider((ref) => UpdateProfilDiplome(ref.watch(profileRepositoryProvider)));
 
 class ProfileNotifier extends AsyncNotifier<ProfilAcademique> {
   @override
@@ -61,6 +65,21 @@ class ProfileNotifier extends AsyncNotifier<ProfilAcademique> {
       return failure;
     }, (updated) {
       state = AsyncValue.data(ProfilAcademique.etudiant(updated));
+      return null;
+    });
+  }
+
+  Future<Failure?> saveDiplome(ProfilDiplome profil) async {
+    final previous = state;
+    state = AsyncValue.data(ProfilAcademique.diplome(profil));
+    final result = await ref.read(updateProfilDiplomeUseCaseProvider).call(
+          UpdateProfilDiplomeParams(profil),
+        );
+    return result.fold((failure) {
+      state = previous;
+      return failure;
+    }, (updated) {
+      state = AsyncValue.data(ProfilAcademique.diplome(updated));
       return null;
     });
   }

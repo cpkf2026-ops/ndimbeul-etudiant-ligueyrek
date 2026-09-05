@@ -5,6 +5,7 @@ part 'user.freezed.dart';
 enum UserRole {
   lyceen,
   etudiant,
+  diplome,
   adminEtablissement,
   superAdmin;
 
@@ -14,6 +15,8 @@ enum UserRole {
         return 'Lycéen';
       case UserRole.etudiant:
         return 'Étudiant';
+      case UserRole.diplome:
+        return 'Diplômé / En poste / En stage';
       case UserRole.adminEtablissement:
         return 'Admin établissement';
       case UserRole.superAdmin:
@@ -23,6 +26,11 @@ enum UserRole {
 
   bool get isAdmin =>
       this == UserRole.adminEtablissement || this == UserRole.superAdmin;
+
+  /// Le module Orientation (recommandations, simulation de bac) ne concerne
+  /// que les profils encore en cours d'études — voir plan "Séparation
+  /// inscription / complétion de profil" §4.
+  bool get voitOrientation => this == UserRole.lyceen || this == UserRole.etudiant;
 }
 
 @freezed
@@ -32,8 +40,11 @@ sealed class User with _$User {
     required String nom,
     required String prenom,
     required String email,
-    required UserRole role,
+    // Null tant que l'utilisateur n'a pas complété son profil (choix du
+    // statut) — voir profilComplete et CompleteProfileScreen.
+    UserRole? role,
     String? region,
+    @Default(false) bool profilComplete,
     required DateTime dateInscription,
   }) = _User;
 

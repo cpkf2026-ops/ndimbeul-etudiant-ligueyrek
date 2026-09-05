@@ -27,9 +27,11 @@ mixin _$UserModel {
   String get email =>
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson)
-  UserRole get role => throw _privateConstructorUsedError;
+  UserRole? get role => throw _privateConstructorUsedError;
   String? get region =>
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'profil_complete')
+  bool get profilComplete => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'date_inscription')
   DateTime get dateInscription => throw _privateConstructorUsedError;
 
@@ -53,8 +55,9 @@ abstract class $UserModelCopyWith<$Res> {
     String nom,
     String prenom,
     String email,
-    @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) UserRole role,
+    @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) UserRole? role,
     String? region,
+    @JsonKey(name: 'profil_complete') bool profilComplete,
     @JsonKey(name: 'date_inscription') DateTime dateInscription,
   });
 }
@@ -78,8 +81,9 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? nom = null,
     Object? prenom = null,
     Object? email = null,
-    Object? role = null,
+    Object? role = freezed,
     Object? region = freezed,
+    Object? profilComplete = null,
     Object? dateInscription = null,
   }) {
     return _then(
@@ -100,14 +104,18 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
                       as String,
-            role: null == role
+            role: freezed == role
                 ? _value.role
                 : role // ignore: cast_nullable_to_non_nullable
-                      as UserRole,
+                      as UserRole?,
             region: freezed == region
                 ? _value.region
                 : region // ignore: cast_nullable_to_non_nullable
                       as String?,
+            profilComplete: null == profilComplete
+                ? _value.profilComplete
+                : profilComplete // ignore: cast_nullable_to_non_nullable
+                      as bool,
             dateInscription: null == dateInscription
                 ? _value.dateInscription
                 : dateInscription // ignore: cast_nullable_to_non_nullable
@@ -132,8 +140,9 @@ abstract class _$$UserModelImplCopyWith<$Res>
     String nom,
     String prenom,
     String email,
-    @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) UserRole role,
+    @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) UserRole? role,
     String? region,
+    @JsonKey(name: 'profil_complete') bool profilComplete,
     @JsonKey(name: 'date_inscription') DateTime dateInscription,
   });
 }
@@ -156,8 +165,9 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? nom = null,
     Object? prenom = null,
     Object? email = null,
-    Object? role = null,
+    Object? role = freezed,
     Object? region = freezed,
+    Object? profilComplete = null,
     Object? dateInscription = null,
   }) {
     return _then(
@@ -178,14 +188,18 @@ class __$$UserModelImplCopyWithImpl<$Res>
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
                   as String,
-        role: null == role
+        role: freezed == role
             ? _value.role
             : role // ignore: cast_nullable_to_non_nullable
-                  as UserRole,
+                  as UserRole?,
         region: freezed == region
             ? _value.region
             : region // ignore: cast_nullable_to_non_nullable
                   as String?,
+        profilComplete: null == profilComplete
+            ? _value.profilComplete
+            : profilComplete // ignore: cast_nullable_to_non_nullable
+                  as bool,
         dateInscription: null == dateInscription
             ? _value.dateInscription
             : dateInscription // ignore: cast_nullable_to_non_nullable
@@ -203,8 +217,9 @@ class _$UserModelImpl extends _UserModel {
     required this.nom,
     required this.prenom,
     required this.email,
-    @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) required this.role,
+    @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) this.role,
     this.region,
+    @JsonKey(name: 'profil_complete') this.profilComplete = false,
     @JsonKey(name: 'date_inscription') required this.dateInscription,
   }) : super._();
 
@@ -222,9 +237,13 @@ class _$UserModelImpl extends _UserModel {
   // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson)
-  final UserRole role;
+  final UserRole? role;
   @override
   final String? region;
+  // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'profil_complete')
+  final bool profilComplete;
   // ignore: invalid_annotation_target
   @override
   @JsonKey(name: 'date_inscription')
@@ -232,7 +251,7 @@ class _$UserModelImpl extends _UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, nom: $nom, prenom: $prenom, email: $email, role: $role, region: $region, dateInscription: $dateInscription)';
+    return 'UserModel(id: $id, nom: $nom, prenom: $prenom, email: $email, role: $role, region: $region, profilComplete: $profilComplete, dateInscription: $dateInscription)';
   }
 
   @override
@@ -246,6 +265,8 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.email, email) || other.email == email) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.region, region) || other.region == region) &&
+            (identical(other.profilComplete, profilComplete) ||
+                other.profilComplete == profilComplete) &&
             (identical(other.dateInscription, dateInscription) ||
                 other.dateInscription == dateInscription));
   }
@@ -260,6 +281,7 @@ class _$UserModelImpl extends _UserModel {
     email,
     role,
     region,
+    profilComplete,
     dateInscription,
   );
 
@@ -283,9 +305,9 @@ abstract class _UserModel extends UserModel {
     required final String nom,
     required final String prenom,
     required final String email,
-    @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson)
-    required final UserRole role,
+    @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) final UserRole? role,
     final String? region,
+    @JsonKey(name: 'profil_complete') final bool profilComplete,
     @JsonKey(name: 'date_inscription') required final DateTime dateInscription,
   }) = _$UserModelImpl;
   const _UserModel._() : super._();
@@ -303,9 +325,12 @@ abstract class _UserModel extends UserModel {
   String get email; // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson)
-  UserRole get role;
+  UserRole? get role;
   @override
   String? get region; // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'profil_complete')
+  bool get profilComplete; // ignore: invalid_annotation_target
   @override
   @JsonKey(name: 'date_inscription')
   DateTime get dateInscription;

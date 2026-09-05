@@ -21,7 +21,7 @@ class UserAdminController extends Controller
     public function index(Request $request): JsonResponse
     {
         $request->validate([
-            'role' => ['sometimes', 'in:lyceen,etudiant,admin_etablissement,super_admin'],
+            'role' => ['sometimes', 'in:lyceen,etudiant,diplome,admin_etablissement,super_admin'],
             'statut' => ['sometimes', 'in:actif,suspendu'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
         ]);

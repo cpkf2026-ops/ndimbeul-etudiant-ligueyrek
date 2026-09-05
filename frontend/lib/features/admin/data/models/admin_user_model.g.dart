@@ -1,3 +1,4 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'admin_user_model.dart';
 
@@ -11,7 +12,7 @@ _$AdminUserModelImpl _$$AdminUserModelImplFromJson(Map<String, dynamic> json) =>
       nom: json['nom'] as String,
       prenom: json['prenom'] as String,
       email: json['email'] as String,
-      role: _roleFromJson(json['role'] as String),
+      role: _roleFromJson(json['role'] as String?),
       region: json['region'] as String?,
       statut: json['statut'] == null
           ? UserStatut.actif

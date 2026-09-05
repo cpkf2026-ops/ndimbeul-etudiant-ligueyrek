@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/network/api_endpoints.dart';
+import '../models/profil_diplome_model.dart';
 import '../models/profil_etudiant_model.dart';
 import '../models/profil_lyceen_model.dart';
 
 /// Enveloppe brute `{utilisateur: {role, profil: {...}}}` — le rôle
 /// détermine quelle variante de profil est active (voir UtilisateurResource
-/// côté backend, `profil` ∈ ProfilLyceenResource | ProfilEtudiantResource).
+/// côté backend, `profil` ∈ ProfilLyceenResource | ProfilEtudiantResource | ProfilDiplomeResource).
 typedef ProfileEnvelope = ({String role, Map<String, dynamic> profil});
 
 abstract interface class ProfileRemoteDataSource {
@@ -15,6 +16,8 @@ abstract interface class ProfileRemoteDataSource {
   Future<ProfilLyceenModel> updateProfilLyceen(ProfilLyceenModel profil);
 
   Future<ProfilEtudiantModel> updateProfilEtudiant(ProfilEtudiantModel profil);
+
+  Future<ProfilDiplomeModel> updateProfilDiplome(ProfilDiplomeModel profil);
 }
 
 /// Implémentation réelle — appelle `/api/v1/profile/me` sur Laravel.
@@ -59,6 +62,20 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       final utilisateur =
           (response.data as Map<String, dynamic>)['utilisateur'] as Map<String, dynamic>;
       return ProfilEtudiantModel.fromJson(
+        (utilisateur['profil'] as Map<String, dynamic>?) ?? const {},
+      );
+    } on DioException catch (e) {
+      throw _mapError(e);
+    }
+  }
+
+  @override
+  Future<ProfilDiplomeModel> updateProfilDiplome(ProfilDiplomeModel profil) async {
+    try {
+      final response = await _dio.put(ApiEndpoints.profileMe, data: profil.toUpdatePayload());
+      final utilisateur =
+          (response.data as Map<String, dynamic>)['utilisateur'] as Map<String, dynamic>;
+      return ProfilDiplomeModel.fromJson(
         (utilisateur['profil'] as Map<String, dynamic>?) ?? const {},
       );
     } on DioException catch (e) {

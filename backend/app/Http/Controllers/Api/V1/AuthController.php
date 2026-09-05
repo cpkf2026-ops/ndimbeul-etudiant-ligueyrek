@@ -8,8 +8,6 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Resources\UtilisateurResource;
-use App\Models\ProfilEtudiant;
-use App\Models\ProfilLyceen;
 use App\Models\Utilisateur;
 use App\Services\AuditLogger;
 use Illuminate\Auth\Events\PasswordReset;
@@ -36,18 +34,14 @@ class AuthController extends Controller
             'prenom' => $data['prenom'],
             'email' => $data['email'],
             'mot_de_passe' => Hash::make($data['mot_de_passe']),
-            'role' => $data['role'],
             'region' => $data['region'] ?? null,
             'statut' => 'actif',
+            'profil_complete' => false,
         ]);
 
-        // Création automatique du profil spécialisé vide, complété ensuite via /profile/me
-        if ($utilisateur->role === Utilisateur::ROLE_LYCEEN) {
-            ProfilLyceen::create(['utilisateur_id' => $utilisateur->id]);
-        } elseif ($utilisateur->role === Utilisateur::ROLE_ETUDIANT) {
-            ProfilEtudiant::create(['utilisateur_id' => $utilisateur->id]);
-        }
-
+        // `role` reste null et aucun profil spécialisé n'est créé ici : l'utilisateur
+        // choisit son statut (lycéen/étudiant/diplômé) via POST /profile/complete,
+        // route requise avant tout accès aux fonctionnalités métier (EnsureProfileComplete).
         $token = $utilisateur->createToken($request->input('device_name', 'default'))->plainTextToken;
 
         $this->auditLogger->connexion($utilisateur);
@@ -173,7 +167,10 @@ class AuthController extends Controller
         return match ($utilisateur->role) {
             'lyceen' => 'profilLyceen',
             'etudiant' => 'profilEtudiant',
-            default => 'profilAdmin',
+            'diplome' => 'profilDiplome',
+            'admin_etablissement', 'super_admin' => 'profilAdmin',
+            // role encore null : profil pas complété, aucune relation à charger.
+            default => 'profilLyceen',
         };
     }
 }

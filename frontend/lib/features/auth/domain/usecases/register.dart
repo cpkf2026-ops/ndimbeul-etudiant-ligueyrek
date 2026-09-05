@@ -9,14 +9,12 @@ class RegisterParams {
     required this.prenom,
     required this.email,
     required this.password,
-    required this.role,
   });
 
   final String nom;
   final String prenom;
   final String email;
   final String password;
-  final UserRole role;
 }
 
 class Register implements UseCase<User, RegisterParams> {
@@ -30,7 +28,6 @@ class Register implements UseCase<User, RegisterParams> {
       prenom: params.prenom,
       email: params.email,
       password: params.password,
-      role: params.role,
     );
   }
 }

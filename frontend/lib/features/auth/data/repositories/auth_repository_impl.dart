@@ -52,7 +52,6 @@ class AuthRepositoryImpl implements AuthRepository {
     required String prenom,
     required String email,
     required String password,
-    required UserRole role,
   }) async {
     if (!await _networkInfo.isConnected) {
       return const Left(Failure.network());
@@ -63,8 +62,29 @@ class AuthRepositoryImpl implements AuthRepository {
         prenom: prenom,
         email: email,
         password: password,
-        role: role,
       );
+      return Right(user.toEntity());
+    } on ValidationException catch (e) {
+      return Left(Failure.validation(message: e.message, errors: e.errors));
+    } on ServerException catch (e) {
+      return Left(Failure.server(message: e.message, statusCode: e.statusCode));
+    } on NetworkException catch (e) {
+      return Left(Failure.network(message: e.message));
+    } catch (_) {
+      return const Left(Failure.unexpected());
+    }
+  }
+
+  @override
+  Future<Result<User>> completeProfile({
+    required UserRole statut,
+    required Map<String, dynamic> fields,
+  }) async {
+    if (!await _networkInfo.isConnected) {
+      return const Left(Failure.network());
+    }
+    try {
+      final user = await _remoteDataSource.completeProfile(statut: statut, fields: fields);
       return Right(user.toEntity());
     } on ValidationException catch (e) {
       return Left(Failure.validation(message: e.message, errors: e.errors));

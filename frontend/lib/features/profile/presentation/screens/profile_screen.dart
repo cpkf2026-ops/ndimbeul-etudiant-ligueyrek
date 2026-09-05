@@ -11,6 +11,7 @@ import '../../../../shared/widgets/app_logo_button.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/skeleton_loader.dart';
 import '../../domain/entities/profil_academique.dart';
+import '../../domain/entities/profil_diplome.dart';
 import '../../domain/entities/profil_etudiant.dart';
 import '../../domain/entities/profil_lyceen.dart';
 import '../providers/profile_provider.dart';
@@ -68,7 +69,7 @@ class ProfileScreen extends ConsumerWidget {
                     const SizedBox(height: 2),
                     Text(user?.email ?? '', style: context.textTheme.bodyMedium),
                     const SizedBox(height: 4),
-                    Text(user?.role.label ?? '', style: context.textTheme.labelSmall),
+                    Text(user?.role?.label ?? '', style: context.textTheme.labelSmall),
                   ],
                 ),
               ),
@@ -86,7 +87,7 @@ class ProfileScreen extends ConsumerWidget {
             title: 'Offres suivies',
             onTap: () => context.push(RoutePaths.jobsFavorites),
           ),
-          if (user?.role.isAdmin ?? false) ...[
+          if (user?.role?.isAdmin ?? false) ...[
             const SizedBox(height: 10),
             _ProfileLinkTile(
               icon: Icons.admin_panel_settings_outlined,
@@ -147,6 +148,7 @@ class ProfileScreen extends ConsumerWidget {
             data: (profil) => switch (profil) {
               ProfilAcademiqueLyceen(:final profil) => _LyceenForm(profil: profil),
               ProfilAcademiqueEtudiant(:final profil) => _EtudiantForm(profil: profil),
+              ProfilAcademiqueDiplome(:final profil) => _DiplomeForm(profil: profil),
             },
           ),
         ],
@@ -469,6 +471,99 @@ class _EtudiantFormState extends ConsumerState<_EtudiantForm> {
           value: _draft.rechercheEmploi,
           activeThumbColor: AppColors.primary,
           onChanged: (v) => setState(() => _draft = _draft.copyWith(rechercheEmploi: v)),
+        ),
+        const SizedBox(height: 28),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: _saving ? null : _save,
+            child: _saving
+                ? const SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : const Text('Enregistrer'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DiplomeForm extends ConsumerStatefulWidget {
+  const _DiplomeForm({required this.profil});
+  final ProfilDiplome profil;
+
+  @override
+  ConsumerState<_DiplomeForm> createState() => _DiplomeFormState();
+}
+
+class _DiplomeFormState extends ConsumerState<_DiplomeForm> {
+  late ProfilDiplome _draft = widget.profil;
+  late final _dernierDiplomeController =
+      TextEditingController(text: widget.profil.dernierDiplome ?? '');
+  late final _domaineController = TextEditingController(text: widget.profil.domaine ?? '');
+  late final _entrepriseController =
+      TextEditingController(text: widget.profil.entreprise ?? '');
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    _dernierDiplomeController.dispose();
+    _domaineController.dispose();
+    _entrepriseController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    setState(() => _saving = true);
+    final failure = await ref.read(profileProvider.notifier).saveDiplome(_draft);
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (failure != null) {
+      context.showSnack(failure.message, isError: true);
+    } else {
+      context.showSnack('Profil mis à jour');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: _dernierDiplomeController,
+          decoration: const InputDecoration(labelText: 'Dernier diplôme obtenu'),
+          onChanged: (v) => _draft = _draft.copyWith(dernierDiplome: v),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _domaineController,
+          decoration: const InputDecoration(labelText: 'Domaine'),
+          onChanged: (v) => _draft = _draft.copyWith(domaine: v),
+        ),
+        const SizedBox(height: 20),
+        Text('Situation actuelle', style: context.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final situation in SituationActuelle.values)
+              ChoiceChip(
+                label: Text(situation.label),
+                selected: _draft.situationActuelle == situation,
+                onSelected: (_) => setState(() => _draft = _draft.copyWith(situationActuelle: situation)),
+              ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _entrepriseController,
+          decoration: const InputDecoration(labelText: 'Entreprise'),
+          onChanged: (v) => _draft = _draft.copyWith(entreprise: v),
         ),
         const SizedBox(height: 28),
         SizedBox(
