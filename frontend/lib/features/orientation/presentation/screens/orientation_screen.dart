@@ -55,6 +55,9 @@ class OrientationScreen extends ConsumerWidget {
             data: (profil) => switch (profil) {
               ProfilAcademiqueLyceen(:final profil) => _ProfileCompletionCard(completude: profil.completude),
               ProfilAcademiqueEtudiant() => const SizedBox.shrink(),
+              // Écran inaccessible aux diplômés (nav masquée + garde du router,
+              // voir UserRole.voitOrientation) — cas retenu pour l'exhaustivité.
+              ProfilAcademiqueDiplome() => const SizedBox.shrink(),
             },
           ),
           const SizedBox(height: 24),

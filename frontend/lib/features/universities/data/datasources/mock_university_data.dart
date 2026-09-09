@@ -195,7 +195,7 @@ abstract final class MockUniversityData {
       commune: 'Diamniadio',
       type: EtablissementType.public,
       siteWebOfficiel: 'https://isep-diamniadio.sn',
-      imageUrl: AppImages.bibliotheque,
+      imageUrl: AppImages.aucunePhoto,
       description:
           'Institut professionnalisant à taille humaine du pôle de Diamniadio, spécialisé '
           'dans la technologie automobile, l\'électronique et le numérique (BTS, licences pro).',
@@ -289,8 +289,8 @@ abstract final class MockUniversityData {
       region: 'Thiès',
       commune: 'Thiès',
       type: EtablissementType.public,
-      site: 'https://univ-thies.sn',
-      image: AppImages.campusGeneric1,
+      site: 'https://www.uidt.sn',
+      image: AppImages.uidtReal,
       description:
           'Université pluridisciplinaire de Thiès (santé, sciences et techniques, '
           'mines-géologie, agriculture), en forte croissance depuis 2007.',
@@ -306,8 +306,8 @@ abstract final class MockUniversityData {
       region: 'Ziguinchor',
       commune: 'Ziguinchor',
       type: EtablissementType.public,
-      site: 'https://univ-zig.sn',
-      image: AppImages.campusGeneric2,
+      site: 'https://uasz.sn',
+      image: AppImages.uaszReal,
       description:
           'Université publique de la Casamance : lettres, sciences économiques, '
           'sciences et technologies, agroforesterie.',
@@ -324,7 +324,7 @@ abstract final class MockUniversityData {
       commune: 'Bambey',
       type: EtablissementType.public,
       site: 'https://uadb.edu.sn',
-      image: AppImages.campusAerial,
+      image: AppImages.uadbReal,
       description:
           'Université orientée agro-sylvo-pastoral, sciences de la santé et STEG, '
           'au cœur du bassin arachidier.',
@@ -341,7 +341,7 @@ abstract final class MockUniversityData {
       commune: 'Kaolack',
       type: EtablissementType.public,
       site: 'https://ussein.sn',
-      image: AppImages.campusGeneric1,
+      image: AppImages.aucunePhoto,
       description:
           'Université multi-sites (Kaolack, Fatick, Kaffrine) spécialisée dans '
           'l\'agriculture, l\'agroalimentaire, la santé et le développement territorial.',
@@ -357,8 +357,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Diamniadio',
       type: EtablissementType.public,
-      site: 'https://uam.edu.sn',
-      image: AppImages.etudiantsDakar,
+      site: 'https://uam.sn',
+      image: AppImages.uamReal,
       description:
           'Université de nouvelle génération au pôle de Diamniadio, centrée sur les '
           'sciences, l\'ingénierie, le numérique et la biotechnologie.',
@@ -375,7 +375,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.public,
       site: 'https://unchk.sn',
-      image: AppImages.digitalLearning,
+      image: AppImages.unchkReal,
       description:
           'Université 100 % numérique, organisée en Espaces Numériques Ouverts (ENO) '
           'répartis dans toutes les régions — formations à distance.',
@@ -429,7 +429,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.public,
       site: 'https://ena.sn',
-      image: AppImages.bureau2,
+      image: AppImages.aucunePhoto,
       description:
           'École de formation des hauts fonctionnaires de l\'État : administration '
           'générale, diplomatie, douanes, impôts, magistrature.',
@@ -461,8 +461,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.public,
-      site: 'https://ucad.sn',
-      image: AppImages.isepThiesAtelier,
+      site: 'https://ensetp.ucad.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Forme les professeurs de l\'enseignement technique et professionnel et les '
           'cadres de la formation : génie mécanique, économie familiale et sociale, biotechnologies.',
@@ -478,7 +478,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.public,
       site: 'https://ensae.sn',
-      image: AppImages.bureau1,
+      image: AppImages.aucunePhoto,
       description:
           'École de la statistique publique : ingénieurs statisticiens économistes, '
           'ingénieurs des travaux statistiques, data science.',
@@ -494,7 +494,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.public,
       site: 'https://ucad.sn',
-      image: AppImages.amphi,
+      image: AppImages.aucunePhoto,
       description:
           'Ex-École Normale Supérieure : formation initiale et continue des professeurs '
           'de collège et de lycée et des inspecteurs de l\'éducation.',
@@ -510,7 +510,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.public,
       site: 'https://ebad.ucad.sn',
-      image: AppImages.bibliotheque,
+      image: AppImages.ebadReal,
       description:
           'Référence régionale des métiers de l\'information documentaire : '
           'bibliothéconomie, archivistique, gestion de l\'information numérique.',
@@ -525,8 +525,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.public,
-      site: 'https://endss.sn',
-      image: AppImages.etudiantEtude,
+      site: 'https://endss.ucad.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Forme les infirmiers, sages-femmes, techniciens supérieurs de santé et '
           'travailleurs sociaux de la fonction publique.',
@@ -542,8 +542,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.public,
-      site: 'https://cesti.sn',
-      image: AppImages.etudiantsGroupe,
+      site: 'https://cesti.ucad.sn',
+      image: AppImages.cestiReal,
       description:
           'Plus ancienne école de journalisme d\'Afrique de l\'Ouest francophone : '
           'presse écrite, radio, télévision, journalisme numérique.',
@@ -559,7 +559,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.public,
       site: 'https://ita.sn',
-      image: AppImages.isepThiesAtelier,
+      image: AppImages.itaReal,
       description:
           'Institut public de recherche-formation en transformation et conservation '
           'des produits agricoles et halieutiques.',
@@ -574,8 +574,8 @@ abstract final class MockUniversityData {
       region: 'Diourbel',
       commune: 'Bambey',
       type: EtablissementType.public,
-      site: 'https://uadb.edu.sn',
-      image: AppImages.campusGeneric1,
+      site: 'https://uadb.edu.sn/ufr-et-instituts/institut-superieur-de-formation-agricole-et-rural',
+      image: AppImages.isfarReal,
       description:
           'Ex-ENCR, rattaché à l\'UADB : forme les techniciens supérieurs et ingénieurs '
           'des travaux agricoles, de l\'élevage et des eaux et forêts.',
@@ -594,7 +594,7 @@ abstract final class MockUniversityData {
       region: 'Thiès',
       commune: 'Thiès',
       type: EtablissementType.public,
-      site: 'https://isepthies.sn',
+      site: 'https://www.isep-thies.sn',
       image: AppImages.isepThiesAtelier,
       description:
           'Premier ISEP du réseau (2014) : maintenance industrielle, électrotechnique, '
@@ -611,8 +611,8 @@ abstract final class MockUniversityData {
       region: 'Saint-Louis',
       commune: 'Richard-Toll',
       type: EtablissementType.public,
-      site: 'https://isep.sn',
-      image: AppImages.campusGeneric1,
+      site: 'https://iseprichardtoll.sn',
+      image: AppImages.aucunePhoto,
       description:
           'ISEP orienté agriculture irriguée, agro-industrie et maintenance des '
           'équipements agricoles dans la vallée du fleuve Sénégal.',
@@ -628,8 +628,8 @@ abstract final class MockUniversityData {
       region: 'Matam',
       commune: 'Matam',
       type: EtablissementType.public,
-      site: 'https://isep.sn',
-      image: AppImages.campusGeneric2,
+      site: 'https://isepmatam.sn',
+      image: AppImages.isepMatamReal,
       description:
           'ISEP de la région de Matam : élevage, agriculture, énergies renouvelables '
           'et entrepreneuriat rural.',
@@ -646,7 +646,7 @@ abstract final class MockUniversityData {
       commune: 'Bignona',
       type: EtablissementType.public,
       site: 'https://isep.sn',
-      image: AppImages.campusGeneric2,
+      image: AppImages.aucunePhoto,
       description:
           'ISEP de la Casamance : arboriculture fruitière, transformation des produits '
           'locaux, tourisme durable et froid.',
@@ -663,7 +663,7 @@ abstract final class MockUniversityData {
       commune: 'Mbacké',
       type: EtablissementType.public,
       site: 'https://isep-mbacke.sn',
-      image: AppImages.isepThiesAtelier,
+      image: AppImages.aucunePhoto,
       description:
           'ISEP de Mbacké : bâtiment et travaux publics, énergie solaire, gestion '
           'commerciale et numérique.',
@@ -683,8 +683,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://ucao-uud.sn',
-      image: AppImages.campusGeneric1,
+      site: 'https://www.st-michel.sn',
+      image: AppImages.ucaoUudReal,
       description:
           'Établissement privé reconnu : droit, économie-gestion, informatique, '
           'philosophie et théologie.',
@@ -700,8 +700,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://uahb.sn',
-      image: AppImages.bureau2,
+      site: 'https://univ.uahb.sn',
+      image: AppImages.uahbReal,
       description:
           'Université privée reconnue : sciences juridiques et politiques, sciences '
           'économiques et de gestion, communication.',
@@ -716,8 +716,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://udb.sn',
-      image: AppImages.bureau1,
+      site: 'https://www.udb-sn.com',
+      image: AppImages.udbReal,
       description:
           'Université privée pluridisciplinaire : gestion, droit, informatique, '
           'communication et langues.',
@@ -732,8 +732,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://unis.sn',
-      image: AppImages.bibliotheque,
+      site: 'https://www.sahel.education',
+      image: AppImages.unisReal,
       description:
           'Université privée reconnue : environnement, agrobusiness, sciences de la '
           'santé, gestion et technologies.',
@@ -749,7 +749,7 @@ abstract final class MockUniversityData {
       commune: 'Saint-Louis',
       type: EtablissementType.prive,
       site: 'https://ukb.sn',
-      image: AppImages.campusGeneric2,
+      image: AppImages.ukbReal,
       description:
           'Établissement privé du nord du pays : management, informatique, tourisme '
           'et agrobusiness.',
@@ -765,7 +765,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.prive,
       site: 'https://groupeism.sn',
-      image: AppImages.bureau1,
+      image: AppImages.aucunePhoto,
       description:
           'Groupe privé de référence en management, avec des campus en régions : '
           'gestion, finance, marketing, ingénierie informatique.',
@@ -781,8 +781,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Mermoz',
       type: EtablissementType.prive,
-      site: 'https://iam.sn',
-      image: AppImages.bureau2,
+      site: 'https://groupeiam.com',
+      image: AppImages.iamReal,
       description:
           'École privée de commerce et de management : marketing, finance, management '
           'de projets, intelligence artificielle appliquée.',
@@ -798,7 +798,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.prive,
       site: 'https://bem.sn',
-      image: AppImages.entreprise1,
+      image: AppImages.aucunePhoto,
       description:
           'Ex-Bordeaux École de Management : programmes Bachelor et Master en '
           'management, finance et business international.',
@@ -814,7 +814,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.prive,
       site: 'https://supdeco.sn',
-      image: AppImages.entreprise2,
+      image: AppImages.aucunePhoto,
       description:
           'Grande école de commerce privée : programme Grande École, Bachelors en '
           'gestion, logistique, banque-assurance, RH.',
@@ -829,8 +829,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://iseg.sn',
-      image: AppImages.bureau1,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'Réseau privé implanté à Dakar et en régions : gestion, informatique, '
           'communication, banque-finance.',
@@ -846,7 +846,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.prive,
       site: 'https://esmt.sn',
-      image: AppImages.digitalLearning,
+      image: AppImages.esmtReal,
       description:
           'École interétatique des télécommunications et du numérique : réseaux, '
           'cybersécurité, télécoms, data et IoT.',
@@ -862,8 +862,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://hecdakar.sn',
-      image: AppImages.entreprise1,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'École de commerce privée : comptabilité-finance, management, commerce '
           'international et entrepreneuriat.',
@@ -878,8 +878,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://isi.sn',
-      image: AppImages.digitalLearning,
+      site: 'https://www.groupeisi.com',
+      image: AppImages.isiReal,
       description:
           'École privée spécialisée dans les technologies de l\'information : génie '
           'logiciel, réseaux, sécurité, systèmes d\'information.',
@@ -895,8 +895,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://ipg.sn',
-      image: AppImages.bureau2,
+      site: 'https://ipg-isti.com',
+      image: AppImages.ipgReal,
       description:
           'École privée de gestion et de management : ressources humaines, marketing, '
           'gestion de projet, comptabilité.',
@@ -912,7 +912,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.prive,
       site: 'https://afi-ue.sn',
-      image: AppImages.entreprise2,
+      image: AppImages.afiUeReal,
       description:
           'Établissement privé agréé : management, finance-comptabilité, informatique '
           'et communication, en licence et master.',
@@ -927,8 +927,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://dbs.sn',
-      image: AppImages.entreprise1,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'Business school privée : management, finance, marketing digital et '
           'business analytics.',
@@ -943,8 +943,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://ceds.sn',
-      image: AppImages.bibliotheque,
+      site: 'https://cedsdakar.org',
+      image: AppImages.cedsDkrReal,
       description:
           'Établissement privé spécialisé en relations internationales, géopolitique, '
           'défense et intelligence économique.',
@@ -959,8 +959,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://pigier.sn',
-      image: AppImages.bureau1,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'Réseau privé de formation tertiaire : secrétariat de direction, '
           'comptabilité, commerce, tourisme, communication.',
@@ -975,8 +975,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.prive,
-      site: 'https://uea.sn',
-      image: AppImages.bibliotheque,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'Université privée : sciences de la santé, gestion, informatique et '
           'sciences juridiques.',
@@ -996,7 +996,7 @@ abstract final class MockUniversityData {
       commune: 'Dakar',
       type: EtablissementType.public,
       site: 'https://cfptsj.sn',
-      image: AppImages.isepThiesAtelier,
+      image: AppImages.cfptSjReal,
       description:
           'Pôle de référence de la coopération sénégalo-japonaise pour les métiers de '
           'l\'industrie : électromécanique, maintenance, structures métalliques, froid.',
@@ -1012,8 +1012,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.public,
-      site: 'https://education.sn',
-      image: AppImages.isepThiesAtelier,
+      site: 'https://ltidelafosse.net',
+      image: AppImages.aucunePhoto,
       description:
           'Lycée technique industriel historique de Dakar : électrotechnique, '
           'mécanique, construction métallique, génie civil.',
@@ -1029,8 +1029,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.public,
-      site: 'https://education.sn',
-      image: AppImages.bureau1,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'Lycée technique commercial de Dakar : comptabilité-gestion, secrétariat '
           'bureautique, action commerciale.',
@@ -1045,8 +1045,8 @@ abstract final class MockUniversityData {
       region: 'Saint-Louis',
       commune: 'Saint-Louis',
       type: EtablissementType.public,
-      site: 'https://education.sn',
-      image: AppImages.campusGeneric2,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'Grand lycée technique du nord : filières industrielles (électricité, '
           'mécanique, froid) et tertiaires (gestion, secrétariat).',
@@ -1061,8 +1061,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Guédiawaye',
       type: EtablissementType.public,
-      site: 'https://cedt-g15.sn',
-      image: AppImages.isepThiesAtelier,
+      site: 'https://cedtleg15.com',
+      image: AppImages.cedtG15Real,
       description:
           'Centre technique de Guédiawaye : électricité, mécanique automobile, '
           'menuiserie métallique et bois, froid.',
@@ -1078,8 +1078,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Pikine',
       type: EtablissementType.public,
-      site: 'https://cnqp.sn',
-      image: AppImages.isepThiesAtelier,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'Centre de qualification et de perfectionnement aux métiers du bâtiment, de '
           'l\'industrie et de l\'énergie, y compris pour adultes en reconversion.',
@@ -1095,8 +1095,8 @@ abstract final class MockUniversityData {
       region: 'Thiès',
       commune: 'Thiès',
       type: EtablissementType.public,
-      site: 'https://formationprofessionnelle.gouv.sn',
-      image: AppImages.campusGeneric1,
+      site: 'https://formation.gouv.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Centre régional : bâtiment, électricité, mécanique, coupe-couture, '
           'transformation agroalimentaire.',
@@ -1111,8 +1111,8 @@ abstract final class MockUniversityData {
       region: 'Kaolack',
       commune: 'Kaolack',
       type: EtablissementType.public,
-      site: 'https://formationprofessionnelle.gouv.sn',
-      image: AppImages.campusGeneric1,
+      site: 'https://formation.gouv.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Centre régional du Saloum : métiers du bâtiment, froid, mécanique '
           'deux-roues, habillement et restauration.',
@@ -1127,8 +1127,8 @@ abstract final class MockUniversityData {
       region: 'Ziguinchor',
       commune: 'Ziguinchor',
       type: EtablissementType.public,
-      site: 'https://formationprofessionnelle.gouv.sn',
-      image: AppImages.campusGeneric2,
+      site: 'https://formation.gouv.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Centre régional de la Casamance : bois, bâtiment, électricité, '
           'transformation des fruits et légumes, tourisme.',
@@ -1143,8 +1143,8 @@ abstract final class MockUniversityData {
       region: 'Louga',
       commune: 'Louga',
       type: EtablissementType.public,
-      site: 'https://formationprofessionnelle.gouv.sn',
-      image: AppImages.isepThiesAtelier,
+      site: 'https://formation.gouv.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Centre régional : électricité bâtiment, énergie solaire, mécanique '
           'automobile, élevage et maraîchage.',
@@ -1159,8 +1159,8 @@ abstract final class MockUniversityData {
       region: 'Tambacounda',
       commune: 'Tambacounda',
       type: EtablissementType.public,
-      site: 'https://formationprofessionnelle.gouv.sn',
-      image: AppImages.campusGeneric1,
+      site: 'https://formation.gouv.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Centre régional du Sénégal oriental : bâtiment, mécanique, agriculture et '
           'transformation des céréales.',
@@ -1175,8 +1175,8 @@ abstract final class MockUniversityData {
       region: 'Thiès',
       commune: 'Saly Portudal',
       type: EtablissementType.public,
-      site: 'https://formationprofessionnelle.gouv.sn',
-      image: AppImages.entreprise1,
+      site: 'https://formation.gouv.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Centre de la Petite Côte dédié à l\'hôtellerie-restauration : cuisine, '
           'service, réception, gestion hôtelière.',
@@ -1191,8 +1191,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.public,
-      site: 'https://education.sn',
-      image: AppImages.etudiantEtude,
+      site: 'https://enfefs.com',
+      image: AppImages.enfefsReal,
       description:
           'Forme les enseignants et animateurs en économie familiale et sociale : '
           'alimentation-nutrition, textile-habillement, développement communautaire.',
@@ -1207,8 +1207,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Dakar',
       type: EtablissementType.public,
-      site: 'https://cfph.sn',
-      image: AppImages.campusGeneric1,
+      site: 'https://www.formation.cfph.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Centre spécialisé en horticulture, maraîchage, floriculture et '
           'aménagement paysager.',
@@ -1223,8 +1223,8 @@ abstract final class MockUniversityData {
       region: 'Dakar',
       commune: 'Diamniadio',
       type: EtablissementType.public,
-      site: 'https://senum.sn',
-      image: AppImages.digitalLearning,
+      site: null,
+      image: AppImages.aucunePhoto,
       description:
           'Centre sectoriel dédié aux métiers du numérique : développement, data, '
           'cybersécurité, support et réseaux, en partenariat public-privé.',
@@ -1240,13 +1240,767 @@ abstract final class MockUniversityData {
       region: 'Kaffrine',
       commune: 'Kaffrine',
       type: EtablissementType.public,
-      site: 'https://formationprofessionnelle.gouv.sn',
-      image: AppImages.campusGeneric2,
+      site: 'https://formation.gouv.sn',
+      image: AppImages.aucunePhoto,
       description:
           'Centre régional : bâtiment, énergie solaire, mécanique agricole, '
           'transformation des produits locaux.',
       formations: const [
         ('CAP Maintenance des Équipements Agricoles', 'Industrie', NiveauFormation.bts, 2, ['3e', 'D'], 10, 30),
+      ],
+    ),
+
+    // =======================================================================
+    // 6. ÉTABLISSEMENTS COMPLÉMENTAIRES — couverture nationale (recherche web
+    //    vérifiée établissement par établissement : site officiel testé,
+    //    photo réelle uniquement quand trouvée et confirmée chargeable,
+    //    sinon AppImages.aucunePhoto plutôt qu'un repli générique trompeur).
+    // =======================================================================
+    _u(
+      id: 'univ_enfm',
+      nom: 'École Nationale de Formation Maritime',
+      code: 'ENFM',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.public,
+      site: 'https://enfm.sn',
+      image: 'https://enfm.sn/assets/images/enfm/ecole.jpg',
+      description:
+          'École publique historique (1964) formant le personnel navigant marchand et de pêche.',
+      formations: const [
+        ('BTS Navigation et Sécurité Maritime', 'Maritime', NiveauFormation.bts, 2, ['S1', 'S2', 'T'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_cnftpa',
+      nom: 'Centre National de Formation des Techniciens des Pêches et de l\'Aquaculture',
+      code: 'CNFTPA',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.public,
+      site: 'https://www.cnftpa.sn',
+      image: AppImages.aucunePhoto,
+      description:
+          'Centre public (décret 2009) de formation aux métiers de la pêche et de l\'aquaculture.',
+      formations: const [
+        ('BTS Techniques des Pêches et Aquaculture', 'Agroalimentaire', NiveauFormation.bts, 2, ['S1', 'S2', 'D'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_dit',
+      nom: 'Dakar Institute of Technology (DIT)',
+      code: 'DIT',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://dit.sn',
+      image: AppImages.ditReal,
+      description:
+          'Première école d\'ingénieurs d\'Afrique de l\'Ouest spécialisée en IA et Big Data (2019).',
+      formations: const [
+        ('Licence Big Data et Intelligence Artificielle', 'Informatique', NiveauFormation.licence, 3, ['S1', 'S2', 'S3'], 12, 60),
+      ],
+    ),
+    _u(
+      id: 'univ_estm',
+      nom: 'École Supérieure de Technologie et de Management (ESTM)',
+      code: 'ESTM',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://estm.sn',
+      image: AppImages.aucunePhoto,
+      description:
+          'École privée de technologie et management fondée en 2001, plus de 10 000 diplômés.',
+      formations: const [
+        ('Licence Télécommunications et Réseaux', 'Télécommunications', NiveauFormation.licence, 3, ['S1', 'S2', 'T'], 10, 80),
+      ],
+    ),
+    _u(
+      id: 'univ_iist',
+      nom: 'Institut International des Sciences et Technologies (IIST)',
+      code: 'IIST',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description:
+          'Institut privé (fin années 1990) accrédité CAMES, du BTS au Master.',
+      formations: const [
+        ('BTS Informatique de Gestion', 'Informatique', NiveauFormation.bts, 2, ['S2', 'G', 'L'], 10, 60),
+      ],
+    ),
+    _u(
+      id: 'univ_ejicom',
+      nom: 'École Supérieure de Journalisme, des Métiers de l\'Internet et de la Communication (E-JICOM)',
+      code: 'E-JICOM',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://ejicom.com',
+      image: AppImages.ejicomReal,
+      description:
+          'Référence panafricaine en formation journalisme/communication/numérique depuis 2011.',
+      formations: const [
+        ('Licence Journalisme et Métiers du Numérique', 'Communication', NiveauFormation.licence, 3, ['L', 'S2', 'ES'], 11, 60),
+      ],
+    ),
+    _u(
+      id: 'univ_cuad',
+      nom: 'Collège Universitaire d\'Architecture de Dakar (CUAD)',
+      code: 'CUAD',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://cuad.archi',
+      image: AppImages.aucunePhoto,
+      description: 'École privée d\'architecture créée en 2008.',
+      formations: const [
+        ('Licence Architecture', 'Architecture', NiveauFormation.licence, 3, ['S2', 'L', 'ES'], 11, 50),
+      ],
+    ),
+    _u(
+      id: 'univ_ismod',
+      nom: 'Institut des Sciences et Métiers de la Mode (ISMOD)',
+      code: 'ISMOD',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Institut privé agréé de stylisme, modélisme et accessoires de mode.',
+      formations: const [
+        ('BTS Stylisme et Modélisme', 'Mode', NiveauFormation.bts, 2, ['L', 'S2'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_enfht',
+      nom: 'École Nationale de Formation Hôtelière et Touristique (ENFHT)',
+      code: 'ENFHT',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.public,
+      site: 'https://enfht.sn',
+      image: AppImages.aucunePhoto,
+      description: 'École publique historique (1959) de référence en hôtellerie-tourisme.',
+      formations: const [
+        ('BTS Gestion Hôtelière', 'Tourisme', NiveauFormation.bts, 2, ['L', 'S2', 'G'], 10, 60),
+      ],
+    ),
+    _u(
+      id: 'univ_ehsm',
+      nom: 'École Hôtelière Sainte-Marthe de Dakar',
+      code: 'EHSM',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'École privée agréée (1999) en hôtellerie-restauration.',
+      formations: const [
+        ('BTS Cuisine et Arts Culinaires', 'Tourisme', NiveauFormation.bts, 2, ['L', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_marmitons',
+      nom: 'Institut Supérieur Les Marmitons',
+      code: 'MARMITONS',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://ecolelesmarmitons.com',
+      image: AppImages.marmitonsReal,
+      description:
+          'Institut privé de référence en gastronomie, hôtellerie et tourisme depuis 2006.',
+      formations: const [
+        ('BTS Cuisine et Pâtisserie', 'Tourisme', NiveauFormation.bts, 2, ['L', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_iss',
+      nom: 'Institut Santé Services — Université Docteur Daouda Sow (ISS)',
+      code: 'ISS',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://www.issante.sn',
+      image: AppImages.issReal,
+      description:
+          'Établissement privé de santé fondé en 1987, 3 campus (Dakar, Kaolack, Ziguinchor).',
+      formations: const [
+        ('Licence Sciences Infirmières', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 11, 80),
+      ],
+    ),
+    _u(
+      id: 'univ_iasm',
+      nom: 'Institut Africain de Santé Moderne (IASM)',
+      code: 'IASM',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://iasmsante.com',
+      image: AppImages.aucunePhoto,
+      description: 'Institut privé de santé agréé ANAQ-Sup (2014/2016).',
+      formations: const [
+        ('Licence Sage-Femme', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 11, 50),
+      ],
+    ),
+    _u(
+      id: 'univ_odc_ecsa',
+      nom: 'Orange Digital Center Sénégal / École du Code Sonatel Academy',
+      code: 'ODC-ECSA',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://orangedigitalcenter.sn',
+      image: AppImages.odcReal,
+      description:
+          'Centre de formation numérique gratuite et d\'accompagnement de start-up, 1ère école de code gratuite d\'Afrique de l\'Ouest.',
+      formations: const [
+        ('Certificat Développeur Web/Mobile', 'Informatique', NiveauFormation.bts, 1, null, 10, 100),
+      ],
+    ),
+    _u(
+      id: 'univ_simplon',
+      nom: 'Simplon Sénégal',
+      code: 'SIMPLON',
+      region: 'Dakar',
+      commune: 'Dakar',
+      type: EtablissementType.prive,
+      site: 'https://simplon.sn',
+      image: AppImages.aucunePhoto,
+      description:
+          'École inclusive et gratuite des métiers du numérique, implantée en 2017 (antennes Pikine, Ouakam, Bargny, Popenguine).',
+      formations: const [
+        ('Certificat Développeur Web/Mobile', 'Informatique', NiveauFormation.bts, 1, null, 10, 80),
+      ],
+    ),
+    _u(
+      id: 'univ_ltfxn',
+      nom: 'Lycée Technique Professionnel Monseigneur François Xavier Ndione',
+      code: 'LTFXN',
+      region: 'Thiès',
+      commune: 'Thiès',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description:
+          'Lycée technique public de référence (2006, coopération Sénégal-Luxembourg), 2500 élèves.',
+      formations: const [
+        ('BT Mécanique Générale', 'Industrie', NiveauFormation.bts, 3, ['3e'], 10, 60),
+      ],
+    ),
+    _u(
+      id: 'univ_isem_mbour',
+      nom: 'Institut Supérieur d\'Études Paramédicales (ISEM)',
+      code: 'ISEM',
+      region: 'Thiès',
+      commune: 'Mbour',
+      type: EtablissementType.prive,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Institut privé paramédical fondé en 2007.',
+      formations: const [
+        ('Diplôme Infirmier d\'État', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_esup_sante',
+      nom: 'ESUP Santé — École Supérieure de Formation Professionnelle en Santé',
+      code: 'ESUP-SANTE',
+      region: 'Saint-Louis',
+      commune: 'Saint-Louis',
+      type: EtablissementType.prive,
+      site: 'https://esupsante.com',
+      image:
+          'https://esupsante.com/_astro/facade-campus.D5mDGPaW_Z1sgD6t.avif',
+      description:
+          'Institut privé de santé, plus de 15 ans d\'existence à Saint-Louis, accrédité ANAQ-Sup.',
+      formations: const [
+        ('Licence Sciences Infirmières', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 11, 50),
+      ],
+    ),
+    _u(
+      id: 'univ_crfp_stlouis',
+      nom: 'Centre Régional de Formation Professionnelle de Saint-Louis',
+      code: 'CRFP-STLOUIS',
+      region: 'Saint-Louis',
+      commune: 'Saint-Louis',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description:
+          'Centre public de formation professionnelle (1964), sous tutelle de l\'ONFP.',
+      formations: const [
+        ('CAP Froid et Climatisation', 'Industrie', NiveauFormation.bts, 2, ['3e'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_ussein_fatick',
+      nom: 'USSEIN — Campus de Fatick',
+      code: 'USSEIN-FATICK',
+      region: 'Fatick',
+      commune: 'Fatick',
+      type: EtablissementType.public,
+      site: 'https://www.ussein.sn',
+      image: AppImages.aucunePhoto,
+      description:
+          'Campus pédagogique de l\'USSEIN, réceptionné en 2026, environ 400 étudiants.',
+      formations: const [
+        ('Licence Ressources Halieutiques', 'Agronomie', NiveauFormation.licence, 3, ['S1', 'S2', 'D'], 10, 50),
+      ],
+    ),
+    _u(
+      id: 'univ_ussein_kaffrine',
+      nom: 'USSEIN — Campus de Kaffrine',
+      code: 'USSEIN-KAFFRINE',
+      region: 'Kaffrine',
+      commune: 'Kaffrine',
+      type: EtablissementType.public,
+      site: 'https://www.ussein.sn',
+      image: AppImages.aucunePhoto,
+      description: 'Campus pédagogique de l\'USSEIN, nouveaux bâtiments réceptionnés en 2026.',
+      formations: const [
+        ('Licence Sciences Agronomiques', 'Agronomie', NiveauFormation.licence, 3, ['S1', 'S2', 'D'], 10, 50),
+      ],
+    ),
+    _u(
+      id: 'univ_ltp_fatick',
+      nom: 'Lycée Technique et Professionnel de Fatick',
+      code: 'LTP-FATICK',
+      region: 'Fatick',
+      commune: 'Fatick',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Lycée technique régional formant au bac technique et à l\'insertion professionnelle.',
+      formations: const [
+        ('BT Installation Panneaux Solaires Photovoltaïques', 'Énergie', NiveauFormation.bts, 3, ['3e'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_cfp_foundiougne',
+      nom: 'Centre de Formation Professionnelle de Foundiougne',
+      code: 'CFP-FOUNDIOUGNE',
+      region: 'Fatick',
+      commune: 'Foundiougne',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre public créé en 1982.',
+      formations: const [
+        ('CAP Aviculture', 'Agronomie', NiveauFormation.bts, 2, ['3e', 'D'], 10, 25),
+      ],
+    ),
+    _u(
+      id: 'univ_ltcean',
+      nom: 'Lycée Technique Commercial Elhadji Abdoulaye Niass de Kaolack',
+      code: 'LTCEAN',
+      region: 'Kaolack',
+      commune: 'Kaolack',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Lycée technique et commercial de référence.',
+      formations: const [
+        ('BT Techniques Quantitatives de Gestion', 'Commerce', NiveauFormation.bts, 3, ['3e'], 10, 60),
+      ],
+    ),
+    _u(
+      id: 'univ_isi_kaolack',
+      nom: 'Institut Supérieur d\'Informatique — Campus Kaolack',
+      code: 'ISI-KAOLACK',
+      region: 'Kaolack',
+      commune: 'Kaolack',
+      type: EtablissementType.prive,
+      site: 'https://isikaolack.com',
+      image: AppImages.aucunePhoto,
+      description: 'Établissement privé en informatique, management et réseaux.',
+      formations: const [
+        ('Licence Génie Logiciel', 'Informatique', NiveauFormation.licence, 3, ['S1', 'S2', 'S3'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_ism_kaolack',
+      nom: 'ISM — Campus Kaolack',
+      code: 'ISM-KAOLACK',
+      region: 'Kaolack',
+      commune: 'Kaolack',
+      type: EtablissementType.prive,
+      site: 'https://www.groupeism.sn',
+      image: AppImages.aucunePhoto,
+      description: 'Antenne régionale du Groupe ISM.',
+      formations: const [
+        ('Licence Management', 'Management', NiveauFormation.licence, 3, ['S2', 'G', 'L'], 10, 60),
+      ],
+    ),
+    _u(
+      id: 'univ_iss_kaolack',
+      nom: 'Institut Santé Services — Campus Kaolack',
+      code: 'ISS-KAOLACK',
+      region: 'Kaolack',
+      commune: 'Kaolack',
+      type: EtablissementType.prive,
+      site: 'https://www.issante.sn',
+      image: AppImages.aucunePhoto,
+      description: 'Institut de formation santé depuis 1987, campus HLM Bongres.',
+      formations: const [
+        ('Diplôme Infirmier d\'État', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_crfs_kaolack',
+      nom: 'Centre Régional de Formation en Santé de Kaolack',
+      code: 'CRFS-KAOLACK',
+      region: 'Kaolack',
+      commune: 'Kaolack',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre public de formation paramédicale, concours national annuel.',
+      formations: const [
+        ('Diplôme Infirmier d\'État', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_ism_zig',
+      nom: 'ISM — Campus Ziguinchor',
+      code: 'ISM-ZIG',
+      region: 'Ziguinchor',
+      commune: 'Ziguinchor',
+      type: EtablissementType.prive,
+      site: 'https://www.ismcasamance.sn',
+      image: AppImages.aucunePhoto,
+      description: 'Campus ISM ouvert en 2005/2006, plus de 3500 apprenants formés depuis.',
+      formations: const [
+        ('Licence Management', 'Management', NiveauFormation.licence, 3, ['S2', 'G', 'L'], 10, 60),
+      ],
+    ),
+    _u(
+      id: 'univ_iss_zig',
+      nom: 'Institut Santé Services — Campus Ziguinchor',
+      code: 'ISS-ZIG',
+      region: 'Ziguinchor',
+      commune: 'Ziguinchor',
+      type: EtablissementType.prive,
+      site: 'https://univ.issante.org/campus-de-ziguinchor',
+      image: AppImages.issZigReal,
+      description: 'Campus santé, quartier Boucotte Sud.',
+      formations: const [
+        ('Diplôme Infirmier d\'État', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_cnftefcpn',
+      nom: 'Centre National de Formation des Techniciens des Eaux, Forêts, Chasses et des Parcs Nationaux',
+      code: 'CNFTEFCPN',
+      region: 'Ziguinchor',
+      commune: 'Djibélor',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre national créé en 1963, dispose d\'une forêt d\'application.',
+      formations: const [
+        ('BTS Eaux et Forêts', 'Environnement', NiveauFormation.bts, 2, ['S1', 'S2', 'D'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_crfs_zig',
+      nom: 'Centre Régional de Formation en Santé de Ziguinchor',
+      code: 'CRFS-ZIG',
+      region: 'Ziguinchor',
+      commune: 'Ziguinchor',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre public de formation paramédicale régionale.',
+      formations: const [
+        ('Diplôme Infirmier d\'État', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_ism_kolda',
+      nom: 'ISM — Campus Kolda',
+      code: 'ISM-KOLDA',
+      region: 'Kolda',
+      commune: 'Kolda',
+      type: EtablissementType.prive,
+      site: 'https://www.ismcasamance.sn',
+      image: AppImages.aucunePhoto,
+      description: 'Extension casamançaise du Groupe ISM ouverte en 2013.',
+      formations: const [
+        ('Licence Management', 'Management', NiveauFormation.licence, 3, ['S2', 'G', 'L'], 10, 50),
+      ],
+    ),
+    _u(
+      id: 'univ_letfp_kolda',
+      nom: 'Lycée d\'Enseignement Technique et de Formation Professionnelle de Kolda',
+      code: 'LETFP-KOLDA',
+      region: 'Kolda',
+      commune: 'Kolda',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Abrite le plus grand centre STEG du Sénégal pour le bac technique.',
+      formations: const [
+        ('BT Électrotechnique', 'Industrie', NiveauFormation.bts, 3, ['3e'], 10, 50),
+      ],
+    ),
+    _u(
+      id: 'univ_cfp_kolda',
+      nom: 'Centre de Formation Professionnelle de Kolda',
+      code: 'CFP-KOLDA',
+      region: 'Kolda',
+      commune: 'Kolda',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description:
+          'Centre de référence, partenaire du projet Pacifa (conduite/entretien engins agricoles).',
+      formations: const [
+        ('CAP Conduite et Maintenance des Engins Agricoles', 'Industrie', NiveauFormation.bts, 2, ['3e', 'D'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_crfs_kolda',
+      nom: 'Centre Régional de Formation en Santé de Kolda',
+      code: 'CRFS-KOLDA',
+      region: 'Kolda',
+      commune: 'Kolda',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre public de formation paramédicale régionale.',
+      formations: const [
+        ('Diplôme Infirmier d\'État', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_ya_salam',
+      nom: 'Institut de Formation en Santé Ya Salam',
+      code: 'YA-SALAM',
+      region: 'Kolda',
+      commune: 'Kolda',
+      type: EtablissementType.prive,
+      site: 'https://institutsanteyasalamkolda.com',
+      image: AppImages.aucunePhoto,
+      description: 'Institut privé de formation paramédicale de courte durée.',
+      formations: const [
+        ('Certificat Aide-Soignant', 'Santé', NiveauFormation.bts, 1, null, 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_ltimk',
+      nom: 'Lycée Technique Industriel et Minier Mamba Guirassy de Kédougou',
+      code: 'LTIMK',
+      region: 'Kédougou',
+      commune: 'Kédougou',
+      type: EtablissementType.public,
+      site: 'https://www.ltimk.com',
+      image: AppImages.ltimkReal,
+      description:
+          'Lycée créé en 1998, environ 500 élèves, partenariats avec Sabodala Gold Operations et PMC.',
+      formations: const [
+        ('BT Formation Minière', 'Industrie', NiveauFormation.bts, 3, ['3e'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_cfp_kedougou',
+      nom: 'Centre de Formation Professionnelle de Kédougou',
+      code: 'CFP-KEDOUGOU',
+      region: 'Kédougou',
+      commune: 'Kédougou',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre régional public de formation professionnelle.',
+      formations: const [
+        ('CAP Métiers Techniques', 'Industrie', NiveauFormation.bts, 2, ['3e'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_isfomm',
+      nom: 'Institut Sénégalais de Formation aux Métiers de la Mine (ISFOMM)',
+      code: 'ISFOMM',
+      region: 'Kédougou',
+      commune: 'Kédougou',
+      type: EtablissementType.prive,
+      site: 'https://isfomm.com',
+      image: AppImages.isfommReal,
+      description: 'Institut agréé (MFPT/ONFP) formant aux métiers miniers et para-miniers.',
+      formations: const [
+        ('BTS Métiers de la Mine', 'Industrie', NiveauFormation.bts, 2, ['S1', 'S2', 'T'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_cfp_sedhiou',
+      nom: 'Centre de Formation Professionnelle de Sédhiou',
+      code: 'CFP-SEDHIOU',
+      region: 'Sédhiou',
+      commune: 'Sédhiou',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description:
+          'Centre public fondé en 1974, seul établissement de formation professionnelle recensé pour Sédhiou.',
+      formations: const [
+        ('CAP Électricité et Énergie Solaire', 'Énergie', NiveauFormation.bts, 2, ['3e'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_cefam_louga',
+      nom: 'Centre de Formation et d\'Appui aux Métiers de Louga',
+      code: 'CEFAM-LOUGA',
+      region: 'Louga',
+      commune: 'Louga',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre public créé en 2010, distinct du Centre Régional de Formation Professionnelle de Louga.',
+      formations: const [
+        ('CAP Graphisme et BTP', 'BTP', NiveauFormation.bts, 2, ['3e'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_cfp_matam',
+      nom: 'Centre de Formation Professionnelle de Matam',
+      code: 'CFP-MATAM',
+      region: 'Matam',
+      commune: 'Matam',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre public régional de formation professionnelle.',
+      formations: const [
+        ('CAP Métiers Techniques', 'Industrie', NiveauFormation.bts, 2, ['3e'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_cfpac_matam',
+      nom: 'Centre de Formation Professionnelle Agnam Civol',
+      code: 'CFPAC-MATAM',
+      region: 'Matam',
+      commune: 'Agnam Civol',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre public créé en 2014, vocation agricole.',
+      formations: const [
+        ('CAP Horticulture et Maraîchage', 'Agronomie', NiveauFormation.bts, 2, ['3e', 'D'], 10, 25),
+      ],
+    ),
+    _u(
+      id: 'univ_letfp_tamba',
+      nom: 'Lycée d\'Enseignement Technique et de Formation Professionnelle de Tambacounda',
+      code: 'LETFP-TAMBA',
+      region: 'Tambacounda',
+      commune: 'Tambacounda',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre d\'examen régional du bac technique (génie civil, plomberie).',
+      formations: const [
+        ('BT Génie Civil', 'BTP', NiveauFormation.bts, 3, ['3e'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_iitem_tamba',
+      nom: 'Institut International des Technologies et du Management de Tambacounda (IITEM)',
+      code: 'IITEM-TAMBA',
+      region: 'Tambacounda',
+      commune: 'Tambacounda',
+      type: EtablissementType.prive,
+      site: 'https://iitem-tamba.com',
+      image: AppImages.aucunePhoto,
+      description: 'Institut privé, formations courtes et diplômantes.',
+      formations: const [
+        ('BTS Comptabilité-Gestion', 'Finance', NiveauFormation.bts, 2, ['G', 'S2'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_iseg_tamba',
+      nom: 'ISEG — Campus Tambacounda',
+      code: 'ISEG-TAMBA',
+      region: 'Tambacounda',
+      commune: 'Tambacounda',
+      type: EtablissementType.prive,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Antenne régionale du réseau ISEG.',
+      formations: const [
+        ('BTS Entrepreneuriat et Gestion', 'Management', NiveauFormation.bts, 2, ['G', 'S2'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_crfs_tamba',
+      nom: 'Centre Régional de Formation en Santé de Tambacounda',
+      code: 'CRFS-TAMBA',
+      region: 'Tambacounda',
+      commune: 'Tambacounda',
+      type: EtablissementType.public,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Centre public de formation paramédicale régionale.',
+      formations: const [
+        ('Diplôme Infirmier d\'État', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 30),
+      ],
+    ),
+    _u(
+      id: 'univ_ucak',
+      nom: 'Université Cheikh Ahmadoul Khadim (UCAK)',
+      code: 'UCAK',
+      region: 'Diourbel',
+      commune: 'Touba',
+      type: EtablissementType.prive,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description:
+          'Université privée fondée en 2023, environ 1100 étudiants, premiers diplômés en 2026.',
+      formations: const [
+        ('Licence Sciences Islamiques', 'Sciences religieuses', NiveauFormation.licence, 3, ['L'], 10, 100),
+      ],
+    ),
+    _u(
+      id: 'univ_isest',
+      nom: 'Institut Supérieur d\'Excellence en Santé de Touba Al Mountakha (ISEST)',
+      code: 'ISEST',
+      region: 'Diourbel',
+      commune: 'Touba',
+      type: EtablissementType.prive,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Institut privé de formation en santé axé sur la pratique clinique.',
+      formations: const [
+        ('Licence Sciences Infirmières', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_if3s',
+      nom: 'Institut de Formation en Santé Serigne Saliou Mbacké (IF3S)',
+      code: 'IF3S',
+      region: 'Diourbel',
+      commune: 'Touba',
+      type: EtablissementType.prive,
+      site: null,
+      image: AppImages.aucunePhoto,
+      description: 'Institut privé de formation paramédicale.',
+      formations: const [
+        ('Diplôme Infirmier d\'État', 'Santé', NiveauFormation.licence, 3, ['S1', 'S2'], 10, 40),
+      ],
+    ),
+    _u(
+      id: 'univ_cefas_touba',
+      nom: 'CEFAS — Campus Touba-Mbacké',
+      code: 'CEFAS-TOUBA',
+      region: 'Diourbel',
+      commune: 'Touba-Mbacké',
+      type: EtablissementType.prive,
+      site: 'https://cefas-senegal.com',
+      image: AppImages.aucunePhoto,
+      description: 'Antenne régionale de CEFAS (5 campus Dakar + 3 régionaux).',
+      formations: const [
+        ('BTS Management', 'Management', NiveauFormation.bts, 2, ['G', 'S2'], 10, 40),
       ],
     ),
   ];
@@ -1260,7 +2014,9 @@ abstract final class MockUniversityData {
     required String region,
     required String commune,
     required EtablissementType type,
-    required String site,
+    // Null = aucun site officiel connu/fonctionnel (voir rapport catalogue) —
+    // à afficher clairement comme tel plutôt que de laisser un lien mort.
+    String? site,
     required String image,
     required String description,
     String? email,

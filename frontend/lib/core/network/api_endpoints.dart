@@ -12,6 +12,7 @@ abstract final class ApiEndpoints {
 
   // Profile
   static const String profileMe = '/profile/me';
+  static const String profileComplete = '/profile/complete';
 
   // Universities
   static const String universities = '/universities';

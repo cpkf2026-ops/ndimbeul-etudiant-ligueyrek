@@ -49,105 +49,12 @@ class DashboardScreen extends ConsumerWidget {
               const SliverToBoxAdapter(
                 child: SectionReveal(delay: Duration(milliseconds: 60), child: _HeroSearchBanner()),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 40)),
-              SliverToBoxAdapter(
-                child: SectionReveal(
-                  delay: const Duration(milliseconds: 120),
-                  child: SectionHeader(
-                    title: 'Actualités Nationales',
-                    onSeeAll: () => context.push(RoutePaths.news),
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
-              SliverToBoxAdapter(
-                child: SectionReveal(
-                  delay: const Duration(milliseconds: 160),
-                  child: ResponsiveLayout(
-                    mobile: _HorizontalActualites(items: kMockActualites),
-                    tablet: _HorizontalActualites(items: kMockActualites),
-                    desktop: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ResponsiveGrid(
-                        desktopColumns: kMockActualites.length.clamp(1, 3),
-                        children: [
-                          for (final item in kMockActualites)
-                            EntityCard(
-                              imageUrl: item.imageUrl,
-                              title: item.title,
-                              subtitle: item.category,
-                              badge: item.category,
-                              width: double.infinity,
-                              height: 190,
-                              onTap: () => context.push(RoutePaths.news),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 28)),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: SectionReveal(
-                    delay: const Duration(milliseconds: 200),
-                    child: AiBanner(
-                      straightTitle: 'Posez votre question',
-                      accentTitle: 'maintenant',
-                      subtitle:
-                          'L\'assistant IA Ndimbeul-Etudiant répond à vos questions sur les universités, bourses, logements et formations — en français, à tout moment.',
-                      onOpenChat: () => context.push(RoutePaths.chat),
-                    ),
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 28)),
-              SliverToBoxAdapter(
-                child: SectionReveal(
-                  delay: const Duration(milliseconds: 240),
-                  child: SectionHeader(
-                    title: 'Universités d\'Excellence',
-                    onSeeAll: () => context.push(RoutePaths.universities),
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
-              SliverToBoxAdapter(
-                child: SectionReveal(
-                  delay: const Duration(milliseconds: 280),
-                  child: ResponsiveLayout(
-                    mobile: _HorizontalUniversities(items: kMockUniversities),
-                    tablet: _HorizontalUniversities(items: kMockUniversities),
-                    desktop: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ResponsiveGrid(
-                        desktopColumns: kMockUniversities.length.clamp(1, 3),
-                        children: [
-                          for (final item in kMockUniversities)
-                            EntityCard(
-                              imageUrl: item.imageUrl,
-                              title: item.nom,
-                              subtitle: item.sousTitre,
-                              trailingText: '${item.nbFormations} formations',
-                              width: double.infinity,
-                              height: 190,
-                              onTap: () => context
-                                  .push(RoutePaths.universityDetailPath(item.id)),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 20)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SectionReveal(
-                    delay: const Duration(milliseconds: 320),
+                    delay: const Duration(milliseconds: 100),
                     child: Row(
                       children: [
                         Expanded(
@@ -184,7 +91,100 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 28)),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+              SliverToBoxAdapter(
+                child: SectionReveal(
+                  delay: const Duration(milliseconds: 120),
+                  child: SectionHeader(
+                    title: 'Actualités Nationales',
+                    onSeeAll: () => context.push(RoutePaths.news),
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+              SliverToBoxAdapter(
+                child: SectionReveal(
+                  delay: const Duration(milliseconds: 160),
+                  child: ResponsiveLayout(
+                    mobile: _HorizontalActualites(items: kMockActualites),
+                    tablet: _HorizontalActualites(items: kMockActualites),
+                    desktop: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ResponsiveGrid(
+                        desktopColumns: kMockActualites.length.clamp(1, 3),
+                        children: [
+                          for (final item in kMockActualites)
+                            EntityCard(
+                              imageUrl: item.imageUrl,
+                              title: item.title,
+                              subtitle: item.category,
+                              badge: item.category,
+                              width: double.infinity,
+                              height: 190,
+                              onTap: () => context.push(RoutePaths.news),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SectionReveal(
+                    delay: const Duration(milliseconds: 200),
+                    child: AiBanner(
+                      straightTitle: 'Posez votre question',
+                      accentTitle: 'maintenant',
+                      subtitle:
+                          'L\'assistant IA Ndimbeul-Etudiant répond à vos questions sur les universités, bourses, logements et formations — en français, à tout moment.',
+                      onOpenChat: () => context.push(RoutePaths.chat),
+                    ),
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+              SliverToBoxAdapter(
+                child: SectionReveal(
+                  delay: const Duration(milliseconds: 240),
+                  child: SectionHeader(
+                    title: 'Universités d\'Excellence',
+                    onSeeAll: () => context.push(RoutePaths.universities),
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+              SliverToBoxAdapter(
+                child: SectionReveal(
+                  delay: const Duration(milliseconds: 280),
+                  child: ResponsiveLayout(
+                    mobile: _HorizontalUniversities(items: kMockUniversities),
+                    tablet: _HorizontalUniversities(items: kMockUniversities),
+                    desktop: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ResponsiveGrid(
+                        desktopColumns: kMockUniversities.length.clamp(1, 3),
+                        children: [
+                          for (final item in kMockUniversities)
+                            EntityCard(
+                              imageUrl: item.imageUrl,
+                              title: item.nom,
+                              subtitle: item.sousTitre,
+                              trailingText: '${item.nbFormations} formations',
+                              width: double.infinity,
+                              height: 190,
+                              onTap: () => context
+                                  .push(RoutePaths.universityDetailPath(item.id)),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
               SliverToBoxAdapter(
                 child: SectionReveal(
                   delay: const Duration(milliseconds: 360),
@@ -194,7 +194,7 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
               SliverToBoxAdapter(
                 child: SectionReveal(
                   delay: const Duration(milliseconds: 400),
@@ -222,7 +222,7 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 28)),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
               SliverToBoxAdapter(
                 child: SectionReveal(
                   delay: const Duration(milliseconds: 440),
@@ -232,7 +232,7 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
               SliverToBoxAdapter(
                 child: SectionReveal(
                   delay: const Duration(milliseconds: 480),
@@ -330,8 +330,8 @@ class _HeroStacked extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.network(
-                        AppImages.campusAerial,
+                      Image.asset(
+                        AppImages.dashboardHero,
                         fit: BoxFit.cover,
                         alignment: const Alignment(0.2, -0.4),
                         errorBuilder: (context, error, stack) => const DecoratedBox(
@@ -345,16 +345,10 @@ class _HeroStacked extends StatelessWidget {
                         ),
                       ),
                       Container(
+                        // Voile uniforme et léger sur toute la bannière (et
+                        // non plus un dégradé concentré côté gauche).
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              AppColors.primary.withValues(alpha: 0.92),
-                              AppColors.primary.withValues(alpha: 0.55),
-                            ],
-                            stops: const [0.45, 1],
-                          ),
+                          color: AppColors.primary.withValues(alpha: 0.35),
                         ),
                         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
                         alignment: Alignment.centerLeft,
@@ -522,8 +516,8 @@ class _HeroWide extends StatelessWidget {
             child: Stack(
               fit: StackFit.passthrough,
               children: [
-                Image.network(
-                  AppImages.campusAerial,
+                Image.asset(
+                  AppImages.dashboardHero,
                   height: 300,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -542,26 +536,22 @@ class _HeroWide extends StatelessWidget {
                 Container(
                   height: 300,
                   padding: const EdgeInsets.all(40),
+                  // Voile uniforme et léger sur toute la bannière (et non plus
+                  // un dégradé concentré côté gauche) : l'image reste visible
+                  // partout tout en gardant le texte lisible.
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.92),
-                        AppColors.primary.withValues(alpha: 0.35),
-                      ],
-                      stops: const [0.5, 1],
-                    ),
+                    color: AppColors.primary.withValues(alpha: 0.35),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       AppTypography.heroTitle(
                         straight: 'Trouvez votre voie,',
                         accent: 'ensemble.',
                         fontSize: 34,
                       ),
+                      const SizedBox(height: AppSpacing.md),
                       SizedBox(
                         width: 460,
                         child: Text(
@@ -619,7 +609,7 @@ class _HorizontalActualites extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 190,
+      height: 220,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: context.pageHorizontalPadding),
@@ -631,8 +621,6 @@ class _HorizontalActualites extends StatelessWidget {
             imageUrl: item.imageUrl,
             title: item.title,
             subtitle: item.category,
-            width: 220,
-            height: 190,
             badge: item.category,
             onTap: () => context.push(RoutePaths.news),
           );
@@ -677,7 +665,7 @@ class _HorizontalHousing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 190,
+      height: 220,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: context.pageHorizontalPadding),
@@ -690,8 +678,6 @@ class _HorizontalHousing extends StatelessWidget {
             title: item.title,
             subtitle: item.distance,
             trailingText: item.prix,
-            width: 200,
-            height: 190,
             onTap: () => context.push(RoutePaths.ecosysteme),
           );
         },

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/auth/presentation/screens/complete_profile_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
@@ -66,13 +67,31 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final user = authState.valueOrNull;
       final isLoggedIn = user != null;
+      final isAdmin = user?.role?.isAdmin ?? false;
+      // Comptes admin jamais soumis à l'étape de complétion de profil (ils
+      // n'ont pas de statut lycéen/étudiant/diplômé à choisir) — voir
+      // EnsureProfileComplete côté backend, même exemption.
+      final needsProfileCompletion = isLoggedIn && !isAdmin && !user.profilComplete;
 
       if (!isLoggedIn && !isPublic) return RoutePaths.login;
-      if (isLoggedIn && isPublic) {
-        return (user?.role.isAdmin ?? false) ? RoutePaths.admin : RoutePaths.dashboard;
+
+      if (isLoggedIn && needsProfileCompletion && loc != RoutePaths.completeProfile) {
+        return RoutePaths.completeProfile;
+      }
+      if (isLoggedIn && !needsProfileCompletion && loc == RoutePaths.completeProfile) {
+        return isAdmin ? RoutePaths.admin : RoutePaths.dashboard;
+      }
+      if (isLoggedIn && isPublic && !needsProfileCompletion) {
+        return isAdmin ? RoutePaths.admin : RoutePaths.dashboard;
       }
 
-      if (loc.startsWith(RoutePaths.admin) && !(user?.role.isAdmin ?? false)) {
+      if (loc.startsWith(RoutePaths.admin) && !isAdmin) {
+        return RoutePaths.dashboard;
+      }
+      // Module Orientation réservé aux lycéens/étudiants (voir
+      // UserRole.voitOrientation et la nav filtrée dans bottom_nav_bar.dart
+      // / sidebar_nav.dart) — un accès direct par URL est aussi bloqué ici.
+      if (loc.startsWith(RoutePaths.orientation) && !(user?.role?.voitOrientation ?? true)) {
         return RoutePaths.dashboard;
       }
       return null;
@@ -94,6 +113,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RoutePaths.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.completeProfile,
+        builder: (context, state) => const CompleteProfileScreen(),
       ),
 
       StatefulShellRoute.indexedStack(

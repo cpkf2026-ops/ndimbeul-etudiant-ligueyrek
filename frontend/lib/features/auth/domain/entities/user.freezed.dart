@@ -20,9 +20,12 @@ mixin _$User {
   String get id => throw _privateConstructorUsedError;
   String get nom => throw _privateConstructorUsedError;
   String get prenom => throw _privateConstructorUsedError;
-  String get email => throw _privateConstructorUsedError;
-  UserRole get role => throw _privateConstructorUsedError;
+  String get email =>
+      throw _privateConstructorUsedError; // Null tant que l'utilisateur n'a pas complété son profil (choix du
+  // statut) — voir profilComplete et CompleteProfileScreen.
+  UserRole? get role => throw _privateConstructorUsedError;
   String? get region => throw _privateConstructorUsedError;
+  bool get profilComplete => throw _privateConstructorUsedError;
   DateTime get dateInscription => throw _privateConstructorUsedError;
 
   /// Create a copy of User
@@ -41,8 +44,9 @@ abstract class $UserCopyWith<$Res> {
     String nom,
     String prenom,
     String email,
-    UserRole role,
+    UserRole? role,
     String? region,
+    bool profilComplete,
     DateTime dateInscription,
   });
 }
@@ -66,8 +70,9 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? nom = null,
     Object? prenom = null,
     Object? email = null,
-    Object? role = null,
+    Object? role = freezed,
     Object? region = freezed,
+    Object? profilComplete = null,
     Object? dateInscription = null,
   }) {
     return _then(
@@ -88,14 +93,18 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
                       as String,
-            role: null == role
+            role: freezed == role
                 ? _value.role
                 : role // ignore: cast_nullable_to_non_nullable
-                      as UserRole,
+                      as UserRole?,
             region: freezed == region
                 ? _value.region
                 : region // ignore: cast_nullable_to_non_nullable
                       as String?,
+            profilComplete: null == profilComplete
+                ? _value.profilComplete
+                : profilComplete // ignore: cast_nullable_to_non_nullable
+                      as bool,
             dateInscription: null == dateInscription
                 ? _value.dateInscription
                 : dateInscription // ignore: cast_nullable_to_non_nullable
@@ -119,8 +128,9 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
     String nom,
     String prenom,
     String email,
-    UserRole role,
+    UserRole? role,
     String? region,
+    bool profilComplete,
     DateTime dateInscription,
   });
 }
@@ -141,8 +151,9 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? nom = null,
     Object? prenom = null,
     Object? email = null,
-    Object? role = null,
+    Object? role = freezed,
     Object? region = freezed,
+    Object? profilComplete = null,
     Object? dateInscription = null,
   }) {
     return _then(
@@ -163,14 +174,18 @@ class __$$UserImplCopyWithImpl<$Res>
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
                   as String,
-        role: null == role
+        role: freezed == role
             ? _value.role
             : role // ignore: cast_nullable_to_non_nullable
-                  as UserRole,
+                  as UserRole?,
         region: freezed == region
             ? _value.region
             : region // ignore: cast_nullable_to_non_nullable
                   as String?,
+        profilComplete: null == profilComplete
+            ? _value.profilComplete
+            : profilComplete // ignore: cast_nullable_to_non_nullable
+                  as bool,
         dateInscription: null == dateInscription
             ? _value.dateInscription
             : dateInscription // ignore: cast_nullable_to_non_nullable
@@ -188,8 +203,9 @@ class _$UserImpl extends _User {
     required this.nom,
     required this.prenom,
     required this.email,
-    required this.role,
+    this.role,
     this.region,
+    this.profilComplete = false,
     required this.dateInscription,
   }) : super._();
 
@@ -201,16 +217,21 @@ class _$UserImpl extends _User {
   final String prenom;
   @override
   final String email;
+  // Null tant que l'utilisateur n'a pas complété son profil (choix du
+  // statut) — voir profilComplete et CompleteProfileScreen.
   @override
-  final UserRole role;
+  final UserRole? role;
   @override
   final String? region;
+  @override
+  @JsonKey()
+  final bool profilComplete;
   @override
   final DateTime dateInscription;
 
   @override
   String toString() {
-    return 'User(id: $id, nom: $nom, prenom: $prenom, email: $email, role: $role, region: $region, dateInscription: $dateInscription)';
+    return 'User(id: $id, nom: $nom, prenom: $prenom, email: $email, role: $role, region: $region, profilComplete: $profilComplete, dateInscription: $dateInscription)';
   }
 
   @override
@@ -224,6 +245,8 @@ class _$UserImpl extends _User {
             (identical(other.email, email) || other.email == email) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.region, region) || other.region == region) &&
+            (identical(other.profilComplete, profilComplete) ||
+                other.profilComplete == profilComplete) &&
             (identical(other.dateInscription, dateInscription) ||
                 other.dateInscription == dateInscription));
   }
@@ -237,6 +260,7 @@ class _$UserImpl extends _User {
     email,
     role,
     region,
+    profilComplete,
     dateInscription,
   );
 
@@ -255,8 +279,9 @@ abstract class _User extends User {
     required final String nom,
     required final String prenom,
     required final String email,
-    required final UserRole role,
+    final UserRole? role,
     final String? region,
+    final bool profilComplete,
     required final DateTime dateInscription,
   }) = _$UserImpl;
   const _User._() : super._();
@@ -268,11 +293,14 @@ abstract class _User extends User {
   @override
   String get prenom;
   @override
-  String get email;
+  String get email; // Null tant que l'utilisateur n'a pas complété son profil (choix du
+  // statut) — voir profilComplete et CompleteProfileScreen.
   @override
-  UserRole get role;
+  UserRole? get role;
   @override
   String? get region;
+  @override
+  bool get profilComplete;
   @override
   DateTime get dateInscription;
 

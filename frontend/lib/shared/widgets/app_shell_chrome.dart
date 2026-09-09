@@ -42,7 +42,8 @@ class AppShellChrome extends ConsumerWidget {
             onTap: (index) => context.go(_kShellBranchPaths[index]),
             compact: context.isTablet,
             userName: user?.nomComplet ?? 'Invité',
-            userSubtitle: user?.role.label ?? '',
+            userSubtitle: user?.role?.label ?? '',
+            role: user?.role,
             onLogout: () async {
               await ref.read(authProvider.notifier).logout();
               if (context.mounted) context.go(RoutePaths.login);

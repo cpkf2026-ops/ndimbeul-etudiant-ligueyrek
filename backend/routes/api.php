@@ -52,38 +52,40 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/profile/me', [ProfileController::class, 'show']);
         Route::put('/profile/me', [ProfileController::class, 'update']);
+        // Hors garde-fou 'profil.complete' : c'est la route qui le satisfait.
+        Route::post('/profile/complete', [ProfileController::class, 'complete']);
     });
 
     // --- Universités : routes statiques d'abord, {universite} en dernier ---
     Route::get('/universities', [UniversityController::class, 'index']);
     Route::get('/universities/compare', [UniversityController::class, 'compare']);
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'profil.complete'])->group(function () {
         Route::get('/universities/history', [UniversityController::class, 'history']);
     });
     Route::get('/universities/{universite}', [UniversityController::class, 'show']);
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'profil.complete'])->group(function () {
         Route::post('/universities/{universite}/track', [UniversityController::class, 'track']);
     });
 
     // --- Formations : routes statiques d'abord, {formation} en dernier ---
     Route::get('/formations', [FormationController::class, 'index']);
     Route::get('/formations/compare', [FormationController::class, 'compare']);
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'profil.complete'])->group(function () {
         Route::get('/formations/favorites', [FormationController::class, 'favorites']);
     });
     Route::get('/formations/{formation}', [FormationController::class, 'show']);
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'profil.complete'])->group(function () {
         Route::post('/formations/{formation}/favorite', [FormationController::class, 'favorite']);
         Route::delete('/formations/{formation}/favorite', [FormationController::class, 'unfavorite']);
     });
 
     // --- Offres emploi/stage : routes statiques d'abord, {job} en dernier ---
     Route::get('/jobs', [JobController::class, 'index']);
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'profil.complete'])->group(function () {
         Route::get('/jobs/favorites', [JobController::class, 'favorites']);
     });
     Route::get('/jobs/{job}', [JobController::class, 'show']);
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'profil.complete'])->group(function () {
         Route::post('/jobs/{job}/favorite', [JobController::class, 'favorite']);
         Route::delete('/jobs/{job}/favorite', [JobController::class, 'unfavorite']);
     });
@@ -93,7 +95,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/news/{actualite}', [NewsController::class, 'show']);
 
     // --- Alertes personnalisées, notifications, IA (authentifié) ---
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'profil.complete'])->group(function () {
         Route::apiResource('alerts', AlertController::class)
             ->parameters(['alerts' => 'alerte'])
             ->only(['index', 'store', 'update', 'destroy']);

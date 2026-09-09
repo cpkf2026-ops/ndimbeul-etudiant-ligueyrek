@@ -5,12 +5,14 @@ import '../../domain/entities/admin_user.dart';
 part 'admin_user_model.freezed.dart';
 part 'admin_user_model.g.dart';
 
-UserRole _roleFromJson(String value) {
+UserRole _roleFromJson(String? value) {
   switch (value) {
     case 'lyceen':
       return UserRole.lyceen;
     case 'etudiant':
       return UserRole.etudiant;
+    case 'diplome':
+      return UserRole.diplome;
     case 'admin_etablissement':
       return UserRole.adminEtablissement;
     case 'super_admin':
@@ -26,6 +28,8 @@ String _roleToJson(UserRole role) {
       return 'lyceen';
     case UserRole.etudiant:
       return 'etudiant';
+    case UserRole.diplome:
+      return 'diplome';
     case UserRole.adminEtablissement:
       return 'admin_etablissement';
     case UserRole.superAdmin:

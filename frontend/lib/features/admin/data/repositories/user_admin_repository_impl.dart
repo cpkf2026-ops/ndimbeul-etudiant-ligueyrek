@@ -10,6 +10,7 @@ import '../datasources/user_admin_remote_datasource.dart';
 String _roleName(UserRole role) => switch (role) {
   UserRole.lyceen => 'lyceen',
   UserRole.etudiant => 'etudiant',
+  UserRole.diplome => 'diplome',
   UserRole.adminEtablissement => 'admin_etablissement',
   UserRole.superAdmin => 'super_admin',
 };

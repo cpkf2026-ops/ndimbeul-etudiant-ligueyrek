@@ -19,7 +19,6 @@ class RegisterRequest extends FormRequest
             'prenom' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:255', 'unique:utilisateurs,email'],
             'mot_de_passe' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'role' => ['required', 'in:lyceen,etudiant'], // les rôles admin sont attribués manuellement, jamais à l'inscription publique
             'region' => ['nullable', 'string', 'max:100'],
         ];
     }
@@ -29,7 +28,6 @@ class RegisterRequest extends FormRequest
         return [
             'email.unique' => 'Un compte existe déjà avec cet email.',
             'mot_de_passe.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
-            'role.in' => 'Le rôle doit être "lyceen" ou "etudiant" lors de l\'inscription.',
         ];
     }
 }

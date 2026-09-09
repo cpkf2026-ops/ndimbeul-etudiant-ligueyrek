@@ -12,8 +12,9 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       nom: json['nom'] as String,
       prenom: json['prenom'] as String,
       email: json['email'] as String,
-      role: _roleFromJson(json['role'] as String),
+      role: _roleFromJson(json['role'] as String?),
       region: json['region'] as String?,
+      profilComplete: json['profil_complete'] as bool? ?? false,
       dateInscription: DateTime.parse(json['date_inscription'] as String),
     );
 
@@ -25,5 +26,6 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'email': instance.email,
       'role': _roleToJson(instance.role),
       'region': instance.region,
+      'profil_complete': instance.profilComplete,
       'date_inscription': instance.dateInscription.toIso8601String(),
     };

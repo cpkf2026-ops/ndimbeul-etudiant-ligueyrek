@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
+import '../../features/auth/domain/entities/user.dart';
 
 class NavDestination {
   const NavDestination({
@@ -54,19 +55,30 @@ const List<NavDestination> kMainNavDestinations = [
   ),
 ];
 
+/// Onglets visibles pour [role] — masque entièrement Orientation (pas
+/// seulement désactivée) pour les statuts qui n'en ont pas l'usage, voir
+/// `UserRole.voitOrientation`.
+List<NavDestination> mainNavDestinationsFor(UserRole? role) => [
+      for (final dest in kMainNavDestinations)
+        if (dest.branchIndex != 1 || (role?.voitOrientation ?? true)) dest,
+    ];
+
 /// Bottom navigation mobile (< 600px) — item actif en vert, façon maquette.
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.role,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final UserRole? role;
 
   @override
   Widget build(BuildContext context) {
+    final destinations = mainNavDestinationsFor(role);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -82,8 +94,8 @@ class BottomNavBar extends StatelessWidget {
         child: SizedBox(
           height: 64,
           child: Row(
-            children: List.generate(kMainNavDestinations.length, (index) {
-              final dest = kMainNavDestinations[index];
+            children: List.generate(destinations.length, (index) {
+              final dest = destinations[index];
               final selected = dest.branchIndex == currentIndex;
               return Expanded(
                 child: InkWell(

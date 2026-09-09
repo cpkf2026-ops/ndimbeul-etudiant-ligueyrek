@@ -47,7 +47,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     _timer?.cancel();
     if (!mounted) return;
     final user = ref.read(authProvider).valueOrNull;
-    context.go((user?.role.isAdmin ?? false) ? RoutePaths.admin : RoutePaths.dashboard);
+    context.go((user?.role?.isAdmin ?? false) ? RoutePaths.admin : RoutePaths.dashboard);
   }
 
   @override
@@ -60,12 +60,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Fond unique plein cadre : vie étudiante (groupe d'étudiants
-            // sénégalais avec ordinateurs). Concept générique, aucun
-            // établissement identifiable (cf. CREDITS_IMAGES.md).
+            // Fond unique plein cadre : mains tenant une ampoule surmontée
+            // d'une toque de diplômé, entourée d'icônes e-learning — visuel
+            // de marque demandé pour l'écran d'accueil.
             Positioned.fill(
               child: Image.asset(
-                'assets/images/splash_hero.webp',
+                'assets/images/splash_hero.jpg',
                 fit: BoxFit.cover,
                 alignment: const Alignment(0, 0.25),
                 errorBuilder: (context, error, stack) =>

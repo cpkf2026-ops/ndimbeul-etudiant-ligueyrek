@@ -21,11 +21,12 @@ class Utilisateur extends Authenticatable implements CanResetPasswordContract
 
     public const ROLE_LYCEEN = 'lyceen';
     public const ROLE_ETUDIANT = 'etudiant';
+    public const ROLE_DIPLOME = 'diplome';
     public const ROLE_ADMIN_ETABLISSEMENT = 'admin_etablissement';
     public const ROLE_SUPER_ADMIN = 'super_admin';
 
     protected $fillable = [
-        'nom', 'prenom', 'email', 'mot_de_passe', 'role', 'region', 'statut',
+        'nom', 'prenom', 'email', 'mot_de_passe', 'role', 'region', 'statut', 'profil_complete',
     ];
 
     protected $hidden = [
@@ -37,6 +38,7 @@ class Utilisateur extends Authenticatable implements CanResetPasswordContract
         return [
             'email_verifie_le' => 'datetime',
             'date_derniere_connexion' => 'datetime',
+            'profil_complete' => 'boolean',
         ];
     }
 
@@ -64,6 +66,11 @@ class Utilisateur extends Authenticatable implements CanResetPasswordContract
     public function profilAdmin(): HasOne
     {
         return $this->hasOne(ProfilAdmin::class, 'utilisateur_id');
+    }
+
+    public function profilDiplome(): HasOne
+    {
+        return $this->hasOne(ProfilDiplome::class, 'utilisateur_id');
     }
 
     public function formationsFavorites(): HasMany
@@ -116,6 +123,11 @@ class Utilisateur extends Authenticatable implements CanResetPasswordContract
     public function estEtudiant(): bool
     {
         return $this->role === self::ROLE_ETUDIANT;
+    }
+
+    public function estDiplome(): bool
+    {
+        return $this->role === self::ROLE_DIPLOME;
     }
 
     public function estAdminEtablissement(): bool

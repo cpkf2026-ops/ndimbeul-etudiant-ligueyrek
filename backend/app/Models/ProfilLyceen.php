@@ -14,7 +14,7 @@ class ProfilLyceen extends Model
     protected $table = 'profils_lyceens';
 
     protected $fillable = [
-        'utilisateur_id', 'serie_bac', 'moyenne_generale', 'passions',
+        'utilisateur_id', 'serie_bac', 'niveau', 'etablissement', 'moyenne_generale', 'passions',
         'metiers_envisages', 'budget_max_annuel', 'mobilite',
         'pref_public_prive', 'region_cible', 'annee_terminale',
     ];
@@ -41,7 +41,7 @@ class ProfilLyceen extends Model
     public function calculerCompletude(): int
     {
         $champs = [
-            'serie_bac', 'moyenne_generale', 'passions', 'metiers_envisages',
+            'serie_bac', 'niveau', 'etablissement', 'moyenne_generale', 'passions', 'metiers_envisages',
             'budget_max_annuel', 'pref_public_prive', 'region_cible', 'annee_terminale',
         ];
 
