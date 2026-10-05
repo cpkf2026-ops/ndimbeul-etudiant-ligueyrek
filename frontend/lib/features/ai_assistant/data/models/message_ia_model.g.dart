@@ -21,6 +21,8 @@ Map<String, dynamic> _$$MessageIaModelImplToJson(
 ) => <String, dynamic>{
   'role': _roleToJson(instance.role),
   'contenu': instance.contenu,
-  'sources': instance.sources,
+  'sources': instance.sources
+      ?.map((e) => <String, dynamic>{'titre': e.titre, 'url': e.url})
+      .toList(),
   'date': instance.date?.toIso8601String(),
 };

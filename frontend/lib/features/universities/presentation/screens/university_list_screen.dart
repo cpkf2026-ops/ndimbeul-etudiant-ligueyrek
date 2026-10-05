@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_paths.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/error/failures.dart';
-import '../../../../shared/constants/app_images.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/entity_card.dart';
+import '../../../../shared/widgets/region_dropdown_chip.dart';
 import '../../../../shared/widgets/search_bar_custom.dart';
 import '../../../../shared/widgets/skeleton_loader.dart';
 import '../../domain/entities/universite.dart';
@@ -15,12 +15,6 @@ import '../providers/university_provider.dart';
 
 class UniversityListScreen extends ConsumerWidget {
   const UniversityListScreen({super.key});
-
-  /// Régions couvertes par le catalogue (Prompt 5) — filtre rapide.
-  static const _regions = [
-    'Dakar', 'Thiès', 'Saint-Louis', 'Diourbel', 'Ziguinchor',
-    'Kaolack', 'Louga', 'Matam', 'Tambacounda', 'Kaffrine',
-  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -80,28 +74,22 @@ class UniversityListScreen extends ConsumerWidget {
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 8)),
             SliverToBoxAdapter(
-              child: SizedBox(
-                height: 40,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
                   children: [
-                    for (final region in _regions)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(region),
-                          selected: filters.region == region,
-                          onSelected: (selected) {
-                            ref.read(universityFiltersProvider.notifier).state =
-                                UniversityFilters(
-                              region: selected ? region : null,
-                              type: filters.type,
-                              q: filters.q,
-                            );
-                          },
-                        ),
-                      ),
+                    // Un clic déroule les 14 régions, un autre les range.
+                    RegionDropdownChip(
+                      selected: filters.region,
+                      onSelected: (region) {
+                        ref.read(universityFiltersProvider.notifier).state =
+                            UniversityFilters(
+                          region: region,
+                          type: filters.type,
+                          q: filters.q,
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -143,7 +131,7 @@ class UniversityListScreen extends ConsumerWidget {
                             final u = page.items[i];
                             final isSelected = selection.contains(u.id);
                             return EntityCard(
-                              imageUrl: u.imageUrl ?? AppImages.universityById(i),
+                              imageUrl: u.imageUrl ?? '',
                               title: u.nom,
                               subtitle: u.localisation,
                               badge: u.type.label,

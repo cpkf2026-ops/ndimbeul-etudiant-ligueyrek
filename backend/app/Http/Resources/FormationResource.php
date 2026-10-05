@@ -18,7 +18,8 @@ class FormationResource extends JsonResource
             'niveau' => $this->niveau,
             'duree_annees' => $this->duree_annees,
             'series_acceptees' => $this->series_acceptees,
-            'moyenne_minimale' => $this->moyenne_minimale,
+            // Cast Eloquent 'decimal:2' -> chaîne PHP : reconverti en number JSON.
+            'moyenne_minimale' => $this->moyenne_minimale !== null ? (float) $this->moyenne_minimale : null,
             'capacite' => $this->capacite,
             'prerequis' => $this->prerequis,
             'debouches' => $this->debouches,

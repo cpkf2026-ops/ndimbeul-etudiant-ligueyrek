@@ -6,10 +6,10 @@ import '../../../../app/router/route_paths.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/date_formatter.dart';
-import '../../../../shared/constants/app_images.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/favorite_button.dart';
+import '../../../../shared/widgets/name_placeholder.dart';
 import '../../../../shared/widgets/source_badge.dart';
 import '../../domain/entities/formation.dart';
 import '../../domain/entities/universite.dart';
@@ -40,7 +40,9 @@ class UniversityDetailScreen extends ConsumerWidget {
         data: (universite) => _UniversityDetailBody(universite: universite),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(RoutePaths.chat),
+        // go() : /chat est un branch de la StatefulShellRoute (voir app_router.dart),
+        // un push() depuis cet écran hors-shell l'empilerait sans basculer proprement dessus.
+        onPressed: () => context.go(RoutePaths.chat),
         backgroundColor: AppColors.accent,
         icon: const Icon(Icons.smart_toy_outlined, color: AppColors.primary),
         label: const Text(
@@ -70,14 +72,17 @@ class _UniversityDetailBody extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    final src = universite.imageUrl ?? AppImages.campusGeneric1;
+                    final src = universite.imageUrl;
+                    if (src == null || src.isEmpty) {
+                      return NamePlaceholder(name: universite.nom, fontSize: 20);
+                    }
                     return src.startsWith('assets/')
                         ? Image.asset(src, fit: BoxFit.cover)
                         : Image.network(
                             src,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stack) =>
-                                Image.network(AppImages.campusGeneric1, fit: BoxFit.cover),
+                                NamePlaceholder(name: universite.nom, fontSize: 20),
                           );
                   },
                 ),

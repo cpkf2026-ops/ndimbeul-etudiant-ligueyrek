@@ -15,7 +15,8 @@ class LogementResource extends JsonResource
             'nom' => $this->nom,
             'type' => $this->type,
             'capacite' => $this->capacite,
-            'tarif_mensuel' => $this->tarif_mensuel,
+            // Cast Eloquent 'decimal:2' -> chaîne PHP : reconverti en number JSON.
+            'tarif_mensuel' => $this->tarif_mensuel !== null ? (float) $this->tarif_mensuel : null,
             'devise' => $this->devise,
             'contact' => $this->contact,
             'source' => $this->source,

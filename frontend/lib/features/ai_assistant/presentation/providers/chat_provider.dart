@@ -74,7 +74,7 @@ class ChatController {
         );
 
     final buffer = StringBuffer();
-    var sources = const <String>[];
+    var sources = const <SourceCitee>[];
     String? errorMessage;
 
     await for (final event in stream) {

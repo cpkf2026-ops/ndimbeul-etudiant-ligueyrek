@@ -31,10 +31,18 @@ sealed class Actualite with _$Actualite {
     String? sourceUrl,
     String? imageUrl,
     required DateTime datePublication,
+    DateTime? dateIndexation,
     String? auteur,
+    /// Niveau de fiabilité de la source vérifié par la veille IA :
+    /// 'officiel' (État, université…) ou 'presse' (média reconnu).
+    String? fiabilite,
   }) = _Actualite;
 
+
   const Actualite._();
+
+  bool get sourceOfficielle => fiabilite == 'officiel';
+  bool get sourceVerifiee => fiabilite == 'officiel' || fiabilite == 'presse';
 }
 
 /// Page de résultats paginés d'actualités (voir NewsController::index meta).

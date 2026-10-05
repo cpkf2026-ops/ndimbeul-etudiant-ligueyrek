@@ -15,7 +15,11 @@ _$ActualiteModelImpl _$$ActualiteModelImplFromJson(Map<String, dynamic> json) =>
       sourceUrl: json['source_url'] as String?,
       imageUrl: json['image_url'] as String?,
       datePublication: DateTime.parse(json['date_publication'] as String),
+      dateIndexation: json['date_indexation'] == null
+          ? null
+          : DateTime.parse(json['date_indexation'] as String),
       auteur: json['auteur'] as String?,
+      fiabilite: json['fiabilite'] as String?,
     );
 
 Map<String, dynamic> _$$ActualiteModelImplToJson(
@@ -28,5 +32,7 @@ Map<String, dynamic> _$$ActualiteModelImplToJson(
   'source_url': instance.sourceUrl,
   'image_url': instance.imageUrl,
   'date_publication': instance.datePublication.toIso8601String(),
+  'date_indexation': instance.dateIndexation?.toIso8601String(),
   'auteur': instance.auteur,
+  'fiabilite': instance.fiabilite,
 };

@@ -4,6 +4,14 @@ import '../../domain/entities/profil_lyceen.dart';
 part 'profil_lyceen_model.freezed.dart';
 part 'profil_lyceen_model.g.dart';
 
+// Défensif : un cast Eloquent 'decimal:2' renvoie parfois un nombre en chaîne ("14.50")
+// selon le contexte de sérialisation — `as double?` planterait dessus (voir bug corrigé
+// dans ProfilLyceenResource ; on garde ce filet de sécurité côté client par prudence).
+double? _decimalFromJson(dynamic value) =>
+    value == null ? null : double.tryParse(value.toString());
+
+dynamic _decimalToJson(double? value) => value;
+
 PrefEtablissement _prefFromJson(String? value) {
   switch (value) {
     case 'public':
@@ -37,14 +45,16 @@ sealed class ProfilLyceenModel with _$ProfilLyceenModel {
     // ignore: invalid_annotation_target
     @JsonKey(name: 'serie_bac') String? serieBac,
     // ignore: invalid_annotation_target
-    @JsonKey(name: 'moyenne_generale') double? moyenneGenerale,
+    @JsonKey(name: 'moyenne_generale', fromJson: _decimalFromJson, toJson: _decimalToJson)
+    double? moyenneGenerale,
     // ignore: invalid_annotation_target
     @JsonKey(fromJson: _stringListFromJson) List<String>? passions,
     // ignore: invalid_annotation_target
+    @JsonKey(name: 'matieres_fortes', fromJson: _stringListFromJson)
+    List<String>? matieresFortes,
+    // ignore: invalid_annotation_target
     @JsonKey(name: 'metiers_envisages', fromJson: _stringListFromJson)
     List<String>? metiersEnvisages,
-    // ignore: invalid_annotation_target
-    @JsonKey(name: 'budget_max_annuel') double? budgetMaxAnnuel,
     @Default(false) bool mobilite,
     // ignore: invalid_annotation_target
     @JsonKey(
@@ -71,8 +81,8 @@ sealed class ProfilLyceenModel with _$ProfilLyceenModel {
         serieBac: entity.serieBac,
         moyenneGenerale: entity.moyenneGenerale,
         passions: entity.passions,
+        matieresFortes: entity.matieresFortes,
         metiersEnvisages: entity.metiersEnvisages,
-        budgetMaxAnnuel: entity.budgetMaxAnnuel,
         mobilite: entity.mobilite,
         prefPublicPrive: entity.prefPublicPrive,
         regionCible: entity.regionCible,
@@ -84,8 +94,8 @@ sealed class ProfilLyceenModel with _$ProfilLyceenModel {
         serieBac: serieBac,
         moyenneGenerale: moyenneGenerale,
         passions: passions ?? const [],
+        matieresFortes: matieresFortes ?? const [],
         metiersEnvisages: metiersEnvisages ?? const [],
-        budgetMaxAnnuel: budgetMaxAnnuel,
         mobilite: mobilite,
         prefPublicPrive: prefPublicPrive,
         regionCible: regionCible,
@@ -99,8 +109,8 @@ sealed class ProfilLyceenModel with _$ProfilLyceenModel {
         'serie_bac': serieBac,
         'moyenne_generale': moyenneGenerale,
         'passions': passions,
+        'matieres_fortes': matieresFortes,
         'metiers_envisages': metiersEnvisages,
-        'budget_max_annuel': budgetMaxAnnuel,
         'mobilite': mobilite,
         'pref_public_prive': _prefToJson(prefPublicPrive),
         'region_cible': regionCible,

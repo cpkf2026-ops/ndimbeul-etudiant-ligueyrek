@@ -38,7 +38,10 @@ sealed class ActualiteModel with _$ActualiteModel {
     @JsonKey(name: 'image_url') String? imageUrl,
     // ignore: invalid_annotation_target
     @JsonKey(name: 'date_publication') required DateTime datePublication,
+    // ignore: invalid_annotation_target
+    @JsonKey(name: 'date_indexation') DateTime? dateIndexation,
     String? auteur,
+    String? fiabilite,
   }) = _ActualiteModel;
 
   const ActualiteModel._();
@@ -54,6 +57,8 @@ sealed class ActualiteModel with _$ActualiteModel {
         sourceUrl: sourceUrl,
         imageUrl: imageUrl,
         datePublication: datePublication,
+        dateIndexation: dateIndexation,
         auteur: auteur,
+        fiabilite: fiabilite,
       );
 }

@@ -24,14 +24,18 @@ mixin _$ProfilLyceenModel {
   // ignore: invalid_annotation_target
   @JsonKey(name: 'serie_bac')
   String? get serieBac => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
-  @JsonKey(name: 'moyenne_generale')
+  @JsonKey(
+    name: 'moyenne_generale',
+    fromJson: _decimalFromJson,
+    toJson: _decimalToJson,
+  )
   double? get moyenneGenerale => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(fromJson: _stringListFromJson)
   List<String>? get passions => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'matieres_fortes', fromJson: _stringListFromJson)
+  List<String>? get matieresFortes => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'metiers_envisages', fromJson: _stringListFromJson)
-  List<String>? get metiersEnvisages => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
-  @JsonKey(name: 'budget_max_annuel')
-  double? get budgetMaxAnnuel => throw _privateConstructorUsedError;
+  List<String>? get metiersEnvisages => throw _privateConstructorUsedError;
   bool get mobilite =>
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(
@@ -65,11 +69,17 @@ abstract class $ProfilLyceenModelCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: 'serie_bac') String? serieBac,
-    @JsonKey(name: 'moyenne_generale') double? moyenneGenerale,
+    @JsonKey(
+      name: 'moyenne_generale',
+      fromJson: _decimalFromJson,
+      toJson: _decimalToJson,
+    )
+    double? moyenneGenerale,
     @JsonKey(fromJson: _stringListFromJson) List<String>? passions,
+    @JsonKey(name: 'matieres_fortes', fromJson: _stringListFromJson)
+    List<String>? matieresFortes,
     @JsonKey(name: 'metiers_envisages', fromJson: _stringListFromJson)
     List<String>? metiersEnvisages,
-    @JsonKey(name: 'budget_max_annuel') double? budgetMaxAnnuel,
     bool mobilite,
     @JsonKey(
       name: 'pref_public_prive',
@@ -101,8 +111,8 @@ class _$ProfilLyceenModelCopyWithImpl<$Res, $Val extends ProfilLyceenModel>
     Object? serieBac = freezed,
     Object? moyenneGenerale = freezed,
     Object? passions = freezed,
+    Object? matieresFortes = freezed,
     Object? metiersEnvisages = freezed,
-    Object? budgetMaxAnnuel = freezed,
     Object? mobilite = null,
     Object? prefPublicPrive = null,
     Object? regionCible = freezed,
@@ -123,14 +133,14 @@ class _$ProfilLyceenModelCopyWithImpl<$Res, $Val extends ProfilLyceenModel>
                 ? _value.passions
                 : passions // ignore: cast_nullable_to_non_nullable
                       as List<String>?,
+            matieresFortes: freezed == matieresFortes
+                ? _value.matieresFortes
+                : matieresFortes // ignore: cast_nullable_to_non_nullable
+                      as List<String>?,
             metiersEnvisages: freezed == metiersEnvisages
                 ? _value.metiersEnvisages
                 : metiersEnvisages // ignore: cast_nullable_to_non_nullable
                       as List<String>?,
-            budgetMaxAnnuel: freezed == budgetMaxAnnuel
-                ? _value.budgetMaxAnnuel
-                : budgetMaxAnnuel // ignore: cast_nullable_to_non_nullable
-                      as double?,
             mobilite: null == mobilite
                 ? _value.mobilite
                 : mobilite // ignore: cast_nullable_to_non_nullable
@@ -168,11 +178,17 @@ abstract class _$$ProfilLyceenModelImplCopyWith<$Res>
   @useResult
   $Res call({
     @JsonKey(name: 'serie_bac') String? serieBac,
-    @JsonKey(name: 'moyenne_generale') double? moyenneGenerale,
+    @JsonKey(
+      name: 'moyenne_generale',
+      fromJson: _decimalFromJson,
+      toJson: _decimalToJson,
+    )
+    double? moyenneGenerale,
     @JsonKey(fromJson: _stringListFromJson) List<String>? passions,
+    @JsonKey(name: 'matieres_fortes', fromJson: _stringListFromJson)
+    List<String>? matieresFortes,
     @JsonKey(name: 'metiers_envisages', fromJson: _stringListFromJson)
     List<String>? metiersEnvisages,
-    @JsonKey(name: 'budget_max_annuel') double? budgetMaxAnnuel,
     bool mobilite,
     @JsonKey(
       name: 'pref_public_prive',
@@ -203,8 +219,8 @@ class __$$ProfilLyceenModelImplCopyWithImpl<$Res>
     Object? serieBac = freezed,
     Object? moyenneGenerale = freezed,
     Object? passions = freezed,
+    Object? matieresFortes = freezed,
     Object? metiersEnvisages = freezed,
-    Object? budgetMaxAnnuel = freezed,
     Object? mobilite = null,
     Object? prefPublicPrive = null,
     Object? regionCible = freezed,
@@ -225,14 +241,14 @@ class __$$ProfilLyceenModelImplCopyWithImpl<$Res>
             ? _value._passions
             : passions // ignore: cast_nullable_to_non_nullable
                   as List<String>?,
+        matieresFortes: freezed == matieresFortes
+            ? _value._matieresFortes
+            : matieresFortes // ignore: cast_nullable_to_non_nullable
+                  as List<String>?,
         metiersEnvisages: freezed == metiersEnvisages
             ? _value._metiersEnvisages
             : metiersEnvisages // ignore: cast_nullable_to_non_nullable
                   as List<String>?,
-        budgetMaxAnnuel: freezed == budgetMaxAnnuel
-            ? _value.budgetMaxAnnuel
-            : budgetMaxAnnuel // ignore: cast_nullable_to_non_nullable
-                  as double?,
         mobilite: null == mobilite
             ? _value.mobilite
             : mobilite // ignore: cast_nullable_to_non_nullable
@@ -263,11 +279,17 @@ class __$$ProfilLyceenModelImplCopyWithImpl<$Res>
 class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
   const _$ProfilLyceenModelImpl({
     @JsonKey(name: 'serie_bac') this.serieBac,
-    @JsonKey(name: 'moyenne_generale') this.moyenneGenerale,
+    @JsonKey(
+      name: 'moyenne_generale',
+      fromJson: _decimalFromJson,
+      toJson: _decimalToJson,
+    )
+    this.moyenneGenerale,
     @JsonKey(fromJson: _stringListFromJson) final List<String>? passions,
+    @JsonKey(name: 'matieres_fortes', fromJson: _stringListFromJson)
+    final List<String>? matieresFortes,
     @JsonKey(name: 'metiers_envisages', fromJson: _stringListFromJson)
     final List<String>? metiersEnvisages,
-    @JsonKey(name: 'budget_max_annuel') this.budgetMaxAnnuel,
     this.mobilite = false,
     @JsonKey(
       name: 'pref_public_prive',
@@ -279,6 +301,7 @@ class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
     @JsonKey(name: 'annee_terminale') this.anneeTerminale,
     this.completude = 0,
   }) : _passions = passions,
+       _matieresFortes = matieresFortes,
        _metiersEnvisages = metiersEnvisages,
        super._();
 
@@ -291,7 +314,11 @@ class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
   final String? serieBac;
   // ignore: invalid_annotation_target
   @override
-  @JsonKey(name: 'moyenne_generale')
+  @JsonKey(
+    name: 'moyenne_generale',
+    fromJson: _decimalFromJson,
+    toJson: _decimalToJson,
+  )
   final double? moyenneGenerale;
   // ignore: invalid_annotation_target
   final List<String>? _passions;
@@ -302,6 +329,19 @@ class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
     final value = _passions;
     if (value == null) return null;
     if (_passions is EqualUnmodifiableListView) return _passions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  // ignore: invalid_annotation_target
+  final List<String>? _matieresFortes;
+  // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'matieres_fortes', fromJson: _stringListFromJson)
+  List<String>? get matieresFortes {
+    final value = _matieresFortes;
+    if (value == null) return null;
+    if (_matieresFortes is EqualUnmodifiableListView) return _matieresFortes;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
@@ -320,10 +360,6 @@ class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
     return EqualUnmodifiableListView(value);
   }
 
-  // ignore: invalid_annotation_target
-  @override
-  @JsonKey(name: 'budget_max_annuel')
-  final double? budgetMaxAnnuel;
   @override
   @JsonKey()
   final bool mobilite;
@@ -349,7 +385,7 @@ class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
 
   @override
   String toString() {
-    return 'ProfilLyceenModel(serieBac: $serieBac, moyenneGenerale: $moyenneGenerale, passions: $passions, metiersEnvisages: $metiersEnvisages, budgetMaxAnnuel: $budgetMaxAnnuel, mobilite: $mobilite, prefPublicPrive: $prefPublicPrive, regionCible: $regionCible, anneeTerminale: $anneeTerminale, completude: $completude)';
+    return 'ProfilLyceenModel(serieBac: $serieBac, moyenneGenerale: $moyenneGenerale, passions: $passions, matieresFortes: $matieresFortes, metiersEnvisages: $metiersEnvisages, mobilite: $mobilite, prefPublicPrive: $prefPublicPrive, regionCible: $regionCible, anneeTerminale: $anneeTerminale, completude: $completude)';
   }
 
   @override
@@ -363,11 +399,13 @@ class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
                 other.moyenneGenerale == moyenneGenerale) &&
             const DeepCollectionEquality().equals(other._passions, _passions) &&
             const DeepCollectionEquality().equals(
+              other._matieresFortes,
+              _matieresFortes,
+            ) &&
+            const DeepCollectionEquality().equals(
               other._metiersEnvisages,
               _metiersEnvisages,
             ) &&
-            (identical(other.budgetMaxAnnuel, budgetMaxAnnuel) ||
-                other.budgetMaxAnnuel == budgetMaxAnnuel) &&
             (identical(other.mobilite, mobilite) ||
                 other.mobilite == mobilite) &&
             (identical(other.prefPublicPrive, prefPublicPrive) ||
@@ -387,8 +425,8 @@ class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
     serieBac,
     moyenneGenerale,
     const DeepCollectionEquality().hash(_passions),
+    const DeepCollectionEquality().hash(_matieresFortes),
     const DeepCollectionEquality().hash(_metiersEnvisages),
-    budgetMaxAnnuel,
     mobilite,
     prefPublicPrive,
     regionCible,
@@ -416,11 +454,17 @@ class _$ProfilLyceenModelImpl extends _ProfilLyceenModel {
 abstract class _ProfilLyceenModel extends ProfilLyceenModel {
   const factory _ProfilLyceenModel({
     @JsonKey(name: 'serie_bac') final String? serieBac,
-    @JsonKey(name: 'moyenne_generale') final double? moyenneGenerale,
+    @JsonKey(
+      name: 'moyenne_generale',
+      fromJson: _decimalFromJson,
+      toJson: _decimalToJson,
+    )
+    final double? moyenneGenerale,
     @JsonKey(fromJson: _stringListFromJson) final List<String>? passions,
+    @JsonKey(name: 'matieres_fortes', fromJson: _stringListFromJson)
+    final List<String>? matieresFortes,
     @JsonKey(name: 'metiers_envisages', fromJson: _stringListFromJson)
     final List<String>? metiersEnvisages,
-    @JsonKey(name: 'budget_max_annuel') final double? budgetMaxAnnuel,
     final bool mobilite,
     @JsonKey(
       name: 'pref_public_prive',
@@ -442,17 +486,21 @@ abstract class _ProfilLyceenModel extends ProfilLyceenModel {
   @JsonKey(name: 'serie_bac')
   String? get serieBac; // ignore: invalid_annotation_target
   @override
-  @JsonKey(name: 'moyenne_generale')
+  @JsonKey(
+    name: 'moyenne_generale',
+    fromJson: _decimalFromJson,
+    toJson: _decimalToJson,
+  )
   double? get moyenneGenerale; // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _stringListFromJson)
   List<String>? get passions; // ignore: invalid_annotation_target
   @override
-  @JsonKey(name: 'metiers_envisages', fromJson: _stringListFromJson)
-  List<String>? get metiersEnvisages; // ignore: invalid_annotation_target
+  @JsonKey(name: 'matieres_fortes', fromJson: _stringListFromJson)
+  List<String>? get matieresFortes; // ignore: invalid_annotation_target
   @override
-  @JsonKey(name: 'budget_max_annuel')
-  double? get budgetMaxAnnuel;
+  @JsonKey(name: 'metiers_envisages', fromJson: _stringListFromJson)
+  List<String>? get metiersEnvisages;
   @override
   bool get mobilite; // ignore: invalid_annotation_target
   @override

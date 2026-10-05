@@ -5,10 +5,10 @@ import '../../features/auth/domain/entities/user.dart';
 import 'app_logo_button.dart';
 import 'bottom_nav_bar.dart';
 
-/// Navigation complète du sidebar desktop/tablette — les 4 onglets
+/// Navigation complète du sidebar desktop/tablette — les onglets
 /// principaux du bottom nav mobile, plus les modules fonctionnels
 /// supplémentaires (Universités, Emploi & Stages, Actualités, Assistant IA)
-/// qui n'ont pas leur place dans une barre du bas à 4 icônes mais méritent
+/// qui n'ont pas leur place dans une barre du bas compacte mais méritent
 /// un accès direct et persistant sur les formats plus larges. Chaque entrée
 /// pointe vers sa propre branche de la [StatefulShellRoute] (voir
 /// `app_router.dart`) — le sidebar reste donc visible et l'entrée active
@@ -27,48 +27,45 @@ const List<NavDestination> kSidebarNavDestinations = [
     branchIndex: 1,
   ),
   NavDestination(
-    icon: Icons.hub_outlined,
-    activeIcon: Icons.hub_rounded,
-    label: 'Écosystème',
-    branchIndex: 2,
-  ),
-  NavDestination(
     icon: Icons.school_outlined,
     activeIcon: Icons.school_rounded,
     label: 'Universités',
-    branchIndex: 4,
+    branchIndex: 3,
   ),
   NavDestination(
     icon: Icons.work_outline_rounded,
     activeIcon: Icons.work_rounded,
     label: 'Emploi & Stages',
-    branchIndex: 5,
+    branchIndex: 4,
   ),
   NavDestination(
     icon: Icons.article_outlined,
     activeIcon: Icons.article_rounded,
     label: 'Actualités',
-    branchIndex: 6,
+    branchIndex: 5,
   ),
   NavDestination(
     icon: Icons.smart_toy_outlined,
     activeIcon: Icons.smart_toy_rounded,
     label: 'Assistant IA',
-    branchIndex: 7,
+    branchIndex: 6,
   ),
   NavDestination(
     icon: Icons.person_outline_rounded,
     activeIcon: Icons.person_rounded,
     label: 'Profil',
-    branchIndex: 3,
+    branchIndex: 2,
   ),
 ];
 
 /// Entrées visibles pour [role] — même règle que [mainNavDestinationsFor]
-/// (Orientation masquée pour les statuts qui n'en ont pas l'usage).
+/// (Orientation masquée pour les statuts qui n'en ont pas l'usage), plus
+/// Emploi & Stages masqué pour les lycéens (`UserRole.voitEmplois`).
 List<NavDestination> sidebarNavDestinationsFor(UserRole? role) => [
       for (final dest in kSidebarNavDestinations)
-        if (dest.branchIndex != 1 || (role?.voitOrientation ?? true)) dest,
+        if ((dest.branchIndex != 1 || (role?.voitOrientation ?? true)) &&
+            (dest.branchIndex != 4 || (role?.voitEmplois ?? true)))
+          dest,
     ];
 
 /// Sidebar web/desktop (>= 1024px) — logo, navigation verticale, bloc
@@ -86,15 +83,20 @@ class SidebarNav extends StatelessWidget {
     required this.onLogout,
     this.compact = false,
     this.role,
+    this.isGuest = false,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
   final String userName;
   final String userSubtitle;
+
+  /// Déconnexion — ou, en mode visiteur ([isGuest]), ouverture de l'écran
+  /// de connexion.
   final VoidCallback onLogout;
   final bool compact;
   final UserRole? role;
+  final bool isGuest;
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +106,7 @@ class SidebarNav extends StatelessWidget {
         onTap: onTap,
         onLogout: onLogout,
         role: role,
+        isGuest: isGuest,
       );
     }
 
@@ -222,11 +225,11 @@ class SidebarNav extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Déconnexion',
+                  tooltip: isGuest ? 'Se connecter' : 'Déconnexion',
                   onPressed: onLogout,
-                  icon: const Icon(
-                    Icons.logout_rounded,
-                    color: AppColors.textSecondary,
+                  icon: Icon(
+                    isGuest ? Icons.login_rounded : Icons.logout_rounded,
+                    color: isGuest ? AppColors.primary : AppColors.textSecondary,
                     size: 20,
                   ),
                 ),
@@ -247,12 +250,14 @@ class _CompactSidebarNav extends StatelessWidget {
     required this.onTap,
     required this.onLogout,
     this.role,
+    this.isGuest = false,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
   final VoidCallback onLogout;
   final UserRole? role;
+  final bool isGuest;
 
   @override
   Widget build(BuildContext context) {
@@ -308,12 +313,12 @@ class _CompactSidebarNav extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 14),
             child: Tooltip(
-              message: 'Déconnexion',
+              message: isGuest ? 'Se connecter' : 'Déconnexion',
               child: IconButton(
                 onPressed: onLogout,
-                icon: const Icon(
-                  Icons.logout_rounded,
-                  color: AppColors.textSecondary,
+                icon: Icon(
+                  isGuest ? Icons.login_rounded : Icons.logout_rounded,
+                  color: isGuest ? AppColors.primary : AppColors.textSecondary,
                   size: 20,
                 ),
               ),

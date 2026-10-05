@@ -23,8 +23,7 @@ class NavDestination {
   final int branchIndex;
 }
 
-/// Onglets principaux mobiles (< 600px) — volontairement limités à 4 pour
-/// rester lisibles dans une barre du bas ; les modules supplémentaires
+/// Onglets principaux mobiles (< 600px) — les modules supplémentaires
 /// (Universités, Emploi & Stages, Actualités, Assistant IA) restent
 /// accessibles via les liens "Voir tout" des écrans existants et le bouton
 /// flottant IA, et apparaissent en plus dans le sidebar desktop/tablette.
@@ -42,16 +41,10 @@ const List<NavDestination> kMainNavDestinations = [
     branchIndex: 1,
   ),
   NavDestination(
-    icon: Icons.hub_outlined,
-    activeIcon: Icons.hub_rounded,
-    label: 'Écosystème',
-    branchIndex: 2,
-  ),
-  NavDestination(
     icon: Icons.person_outline_rounded,
     activeIcon: Icons.person_rounded,
     label: 'Profil',
-    branchIndex: 3,
+    branchIndex: 2,
   ),
 ];
 

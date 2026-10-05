@@ -14,8 +14,8 @@ class Actualite extends Model
     protected $table = 'actualites';
 
     protected $fillable = [
-        'titre', 'contenu', 'auteur_id', 'categorie', 'source_url',
-        'image_url', 'date_publication', 'cible_roles', 'statut',
+        'titre', 'contenu', 'auteur_id', 'categorie', 'source_url', 'source_nom',
+        'fiabilite', 'image_url', 'date_publication', 'cible_roles', 'statut',
     ];
 
     protected function casts(): array

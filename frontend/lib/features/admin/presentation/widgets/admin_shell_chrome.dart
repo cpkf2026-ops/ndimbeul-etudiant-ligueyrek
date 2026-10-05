@@ -210,8 +210,10 @@ class _AdminNavList extends ConsumerWidget {
                   color: AppColors.textSecondary,
                 ),
                 onPressed: () async {
+                  // Accueil d'abord : évite que la fenêtre "Connexion requise"
+                  // ne s'ouvre sur la page courante une fois déconnecté.
+                  context.go(RoutePaths.dashboard);
                   await ref.read(authProvider.notifier).logout();
-                  if (context.mounted) context.go(RoutePaths.login);
                 },
               ),
             ],

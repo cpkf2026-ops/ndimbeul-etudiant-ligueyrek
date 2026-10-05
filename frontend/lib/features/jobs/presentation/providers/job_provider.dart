@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/di/core_providers.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
@@ -16,7 +19,8 @@ import '../../domain/usecases/job_id_params.dart';
 import '../../domain/usecases/unfavorite_job.dart';
 
 final jobRemoteDataSourceProvider = Provider<JobRemoteDataSource>((ref) {
-  if (ref.watch(useMockProvider)) return MockJobRemoteDataSource();
+  // Offres réelles (veille IA toutes les 2 h) même en mode démo — voir kUseMockJobs.
+  if (ref.watch(useMockProvider) && kUseMockJobs) return MockJobRemoteDataSource();
   return JobRemoteDataSourceImpl(dio: ref.watch(dioProvider));
 });
 
@@ -58,6 +62,11 @@ final jobFiltersProvider = StateProvider<JobFilters>((ref) => const JobFilters()
 class JobListNotifier extends AsyncNotifier<JobPage> {
   @override
   Future<JobPage> build() async {
+    // Rechargement automatique (voir kRafraichissementFils) : le minuteur est
+    // réarmé à chaque chargement et annulé si le provider est détruit. Pendant
+    // le rechargement, la liste actuelle reste affichée (pas d'écran vide).
+    final minuteur = Timer(kRafraichissementFils, ref.invalidateSelf);
+    ref.onDispose(minuteur.cancel);
     final filters = ref.watch(jobFiltersProvider);
     final result = await ref.read(getJobsUseCaseProvider).call(
           GetJobsParams(

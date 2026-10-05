@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'message_ia.dart';
 
 part 'chat_stream_event.freezed.dart';
 
@@ -9,7 +10,7 @@ sealed class ChatStreamEvent with _$ChatStreamEvent {
   const factory ChatStreamEvent.token(String delta) = ChatStreamEventToken;
   const factory ChatStreamEvent.done({
     required String conversationId,
-    @Default(<String>[]) List<String> sources,
+    @Default(<SourceCitee>[]) List<SourceCitee> sources,
   }) = ChatStreamEventDone;
   const factory ChatStreamEvent.error(String message) = ChatStreamEventError;
 }

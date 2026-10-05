@@ -32,8 +32,11 @@ mixin _$ActualiteModel {
   @JsonKey(name: 'image_url')
   String? get imageUrl => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'date_publication')
-  DateTime get datePublication => throw _privateConstructorUsedError;
+  DateTime get datePublication => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'date_indexation')
+  DateTime? get dateIndexation => throw _privateConstructorUsedError;
   String? get auteur => throw _privateConstructorUsedError;
+  String? get fiabilite => throw _privateConstructorUsedError;
 
   /// Serializes this ActualiteModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -61,7 +64,9 @@ abstract class $ActualiteModelCopyWith<$Res> {
     @JsonKey(name: 'source_url') String? sourceUrl,
     @JsonKey(name: 'image_url') String? imageUrl,
     @JsonKey(name: 'date_publication') DateTime datePublication,
+    @JsonKey(name: 'date_indexation') DateTime? dateIndexation,
     String? auteur,
+    String? fiabilite,
   });
 }
 
@@ -87,7 +92,9 @@ class _$ActualiteModelCopyWithImpl<$Res, $Val extends ActualiteModel>
     Object? sourceUrl = freezed,
     Object? imageUrl = freezed,
     Object? datePublication = null,
+    Object? dateIndexation = freezed,
     Object? auteur = freezed,
+    Object? fiabilite = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -119,9 +126,17 @@ class _$ActualiteModelCopyWithImpl<$Res, $Val extends ActualiteModel>
                 ? _value.datePublication
                 : datePublication // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            dateIndexation: freezed == dateIndexation
+                ? _value.dateIndexation
+                : dateIndexation // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             auteur: freezed == auteur
                 ? _value.auteur
                 : auteur // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            fiabilite: freezed == fiabilite
+                ? _value.fiabilite
+                : fiabilite // ignore: cast_nullable_to_non_nullable
                       as String?,
           )
           as $Val,
@@ -147,7 +162,9 @@ abstract class _$$ActualiteModelImplCopyWith<$Res>
     @JsonKey(name: 'source_url') String? sourceUrl,
     @JsonKey(name: 'image_url') String? imageUrl,
     @JsonKey(name: 'date_publication') DateTime datePublication,
+    @JsonKey(name: 'date_indexation') DateTime? dateIndexation,
     String? auteur,
+    String? fiabilite,
   });
 }
 
@@ -172,7 +189,9 @@ class __$$ActualiteModelImplCopyWithImpl<$Res>
     Object? sourceUrl = freezed,
     Object? imageUrl = freezed,
     Object? datePublication = null,
+    Object? dateIndexation = freezed,
     Object? auteur = freezed,
+    Object? fiabilite = freezed,
   }) {
     return _then(
       _$ActualiteModelImpl(
@@ -204,9 +223,17 @@ class __$$ActualiteModelImplCopyWithImpl<$Res>
             ? _value.datePublication
             : datePublication // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        dateIndexation: freezed == dateIndexation
+            ? _value.dateIndexation
+            : dateIndexation // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         auteur: freezed == auteur
             ? _value.auteur
             : auteur // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        fiabilite: freezed == fiabilite
+            ? _value.fiabilite
+            : fiabilite // ignore: cast_nullable_to_non_nullable
                   as String?,
       ),
     );
@@ -225,7 +252,9 @@ class _$ActualiteModelImpl extends _ActualiteModel {
     @JsonKey(name: 'source_url') this.sourceUrl,
     @JsonKey(name: 'image_url') this.imageUrl,
     @JsonKey(name: 'date_publication') required this.datePublication,
+    @JsonKey(name: 'date_indexation') this.dateIndexation,
     this.auteur,
+    this.fiabilite,
   }) : super._();
 
   factory _$ActualiteModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -253,12 +282,18 @@ class _$ActualiteModelImpl extends _ActualiteModel {
   @override
   @JsonKey(name: 'date_publication')
   final DateTime datePublication;
+  // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'date_indexation')
+  final DateTime? dateIndexation;
   @override
   final String? auteur;
+  @override
+  final String? fiabilite;
 
   @override
   String toString() {
-    return 'ActualiteModel(id: $id, titre: $titre, contenu: $contenu, categorie: $categorie, sourceUrl: $sourceUrl, imageUrl: $imageUrl, datePublication: $datePublication, auteur: $auteur)';
+    return 'ActualiteModel(id: $id, titre: $titre, contenu: $contenu, categorie: $categorie, sourceUrl: $sourceUrl, imageUrl: $imageUrl, datePublication: $datePublication, dateIndexation: $dateIndexation, auteur: $auteur, fiabilite: $fiabilite)';
   }
 
   @override
@@ -277,7 +312,11 @@ class _$ActualiteModelImpl extends _ActualiteModel {
                 other.imageUrl == imageUrl) &&
             (identical(other.datePublication, datePublication) ||
                 other.datePublication == datePublication) &&
-            (identical(other.auteur, auteur) || other.auteur == auteur));
+            (identical(other.dateIndexation, dateIndexation) ||
+                other.dateIndexation == dateIndexation) &&
+            (identical(other.auteur, auteur) || other.auteur == auteur) &&
+            (identical(other.fiabilite, fiabilite) ||
+                other.fiabilite == fiabilite));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -291,7 +330,9 @@ class _$ActualiteModelImpl extends _ActualiteModel {
     sourceUrl,
     imageUrl,
     datePublication,
+    dateIndexation,
     auteur,
+    fiabilite,
   );
 
   /// Create a copy of ActualiteModel
@@ -321,7 +362,9 @@ abstract class _ActualiteModel extends ActualiteModel {
     @JsonKey(name: 'source_url') final String? sourceUrl,
     @JsonKey(name: 'image_url') final String? imageUrl,
     @JsonKey(name: 'date_publication') required final DateTime datePublication,
+    @JsonKey(name: 'date_indexation') final DateTime? dateIndexation,
     final String? auteur,
+    final String? fiabilite,
   }) = _$ActualiteModelImpl;
   const _ActualiteModel._() : super._();
 
@@ -345,9 +388,14 @@ abstract class _ActualiteModel extends ActualiteModel {
   String? get imageUrl; // ignore: invalid_annotation_target
   @override
   @JsonKey(name: 'date_publication')
-  DateTime get datePublication;
+  DateTime get datePublication; // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'date_indexation')
+  DateTime? get dateIndexation;
   @override
   String? get auteur;
+  @override
+  String? get fiabilite;
 
   /// Create a copy of ActualiteModel
   /// with the given fields replaced by the non-null parameter values.

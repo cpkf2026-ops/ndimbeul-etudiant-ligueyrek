@@ -9,8 +9,16 @@ MessageRole _roleFromJson(String value) =>
 
 String _roleToJson(MessageRole role) => role == MessageRole.assistant ? 'assistant' : 'user';
 
-List<String> _sourcesFromJson(List<dynamic>? value) =>
-    value?.map((e) => e.toString()).toList() ?? const [];
+// Accepte l'ancien format (liste de chaînes, conversations enregistrées avant
+// l'ajout des vraies URLs de source) ET le nouveau ({titre, url}), pour ne pas
+// planter sur l'historique déjà en base.
+List<SourceCitee> _sourcesFromJson(List<dynamic>? value) =>
+    (value ?? const []).map((e) {
+      if (e is Map) {
+        return (titre: (e['titre'] ?? 'Source').toString(), url: e['url'] as String?);
+      }
+      return (titre: e.toString(), url: null);
+    }).toList();
 
 /// Miroir défensif d'un élément du tableau `messages` d'une `ConversationIa`
 /// (`{role, contenu, sources, date}`, voir `ConversationIa::ajouterMessage`).
@@ -21,7 +29,7 @@ sealed class MessageIaModel with _$MessageIaModel {
     @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) required MessageRole role,
     required String contenu,
     // ignore: invalid_annotation_target
-    @JsonKey(fromJson: _sourcesFromJson) List<String>? sources,
+    @JsonKey(fromJson: _sourcesFromJson) List<SourceCitee>? sources,
     DateTime? date,
   }) = _MessageIaModel;
 

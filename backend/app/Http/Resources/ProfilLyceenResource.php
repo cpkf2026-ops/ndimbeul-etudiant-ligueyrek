@@ -17,10 +17,13 @@ class ProfilLyceenResource extends JsonResource
             'serie_bac' => $this->serie_bac,
             'niveau' => $this->niveau,
             'etablissement' => $this->etablissement,
-            'moyenne_generale' => $this->moyenne_generale,
+            // Le cast Eloquent 'decimal:2' renvoie une chaîne ("14.50") pour préserver la
+            // précision — on la reconvertit en nombre ici pour que le JSON soit un vrai
+            // number côté API (Flutter caste `as num?`, qui échoue sur une chaîne).
+            'moyenne_generale' => $this->moyenne_generale !== null ? (float) $this->moyenne_generale : null,
             'passions' => $this->passions,
+            'matieres_fortes' => $this->matieres_fortes,
             'metiers_envisages' => $this->metiers_envisages,
-            'budget_max_annuel' => $this->budget_max_annuel,
             'mobilite' => $this->mobilite,
             'pref_public_prive' => $this->pref_public_prive,
             'region_cible' => $this->region_cible,

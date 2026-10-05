@@ -18,7 +18,16 @@ class UniversiteResource extends JsonResource
             'type' => $this->type,
             'site_web_officiel' => $this->site_web_officiel,
             'description' => $this->description,
-            'image_url' => $this->image_url,
+            // Un logo local (Tâche 2 : téléchargé dans storage/app/public/logos/, voir
+            // TelechargerLogos) est stocké en chemin relatif ("/storage/logos/x.png") —
+            // servi via /api/v1/media/... (et non /storage/... directement) car ce
+            // dernier est renvoyé par le serveur de dev comme fichier statique brut,
+            // sans en-tête CORS, ce que le renderer web de Flutter refuse de décoder.
+            // Un logo pas encore migré (URL distante http(s)://...) ou absent (null)
+            // passe tel quel.
+            'image_url' => $this->image_url && str_starts_with($this->image_url, '/storage/')
+                ? url('/api/v1/media/' . substr($this->image_url, strlen('/storage/')))
+                : $this->image_url,
             'contact' => [
                 'email' => $this->email_contact,
                 'telephone' => $this->telephone_contact,

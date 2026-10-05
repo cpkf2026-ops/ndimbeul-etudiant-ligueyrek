@@ -13,8 +13,11 @@ abstract final class RoutePaths {
 
   // Shell principal (bottom nav / sidebar)
   static const String dashboard = '/dashboard';
+
+  // Fenêtre "Connexion requise" — ouverte par-dessus l'accueil quand un
+  // visiteur non connecté touche une fonctionnalité réservée.
+  static const String authRequired = '/dashboard/connexion-requise';
   static const String orientation = '/orientation';
-  static const String ecosysteme = '/ecosysteme';
   static const String profile = '/profile';
 
   // Universities

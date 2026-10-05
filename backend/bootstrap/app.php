@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureContentLength;
 use App\Http\Middleware\EnsureProfileComplete;
 use App\Http\Middleware\EnsureRole;
 use Illuminate\Foundation\Application;
@@ -25,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // API stateless : pas de session/CSRF sur /api/* (auth via Sanctum Bearer token).
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
+        $middleware->api(append: [
+            EnsureContentLength::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

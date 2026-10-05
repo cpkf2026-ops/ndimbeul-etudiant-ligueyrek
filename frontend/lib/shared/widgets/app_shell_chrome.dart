@@ -10,7 +10,6 @@ import '../extensions/context_extensions.dart';
 const _kShellBranchPaths = [
   RoutePaths.dashboard,
   RoutePaths.orientation,
-  RoutePaths.ecosysteme,
   RoutePaths.profile,
 ];
 
@@ -42,11 +41,18 @@ class AppShellChrome extends ConsumerWidget {
             onTap: (index) => context.go(_kShellBranchPaths[index]),
             compact: context.isTablet,
             userName: user?.nomComplet ?? 'Invité',
-            userSubtitle: user?.role?.label ?? '',
+            userSubtitle: user?.role?.label ?? 'Mode visiteur',
             role: user?.role,
+            isGuest: user == null,
             onLogout: () async {
+              if (user == null) {
+                context.go(RoutePaths.login);
+                return;
+              }
+              // Accueil d'abord : évite que la fenêtre "Connexion requise"
+              // ne s'ouvre sur la page courante une fois déconnecté.
+              context.go(RoutePaths.dashboard);
               await ref.read(authProvider.notifier).logout();
-              if (context.mounted) context.go(RoutePaths.login);
             },
           ),
           Expanded(child: child),

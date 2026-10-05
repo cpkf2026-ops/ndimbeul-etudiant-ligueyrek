@@ -27,8 +27,13 @@ mixin _$OffreEmploi {
   String get description => throw _privateConstructorUsedError;
   String? get sourceUrl => throw _privateConstructorUsedError;
   String? get source => throw _privateConstructorUsedError;
+
+  /// Fiabilité de la source vérifiée par la veille IA : 'officiel', 'presse'
+  /// ou 'plateforme' (null pour les données de démonstration).
+  String? get fiabilite => throw _privateConstructorUsedError;
   DateTime? get datePublication => throw _privateConstructorUsedError;
   DateTime? get dateLimite => throw _privateConstructorUsedError;
+  DateTime? get dateIndexation => throw _privateConstructorUsedError;
   String get statut => throw _privateConstructorUsedError;
   bool get expiree => throw _privateConstructorUsedError;
   bool get estFavori => throw _privateConstructorUsedError;
@@ -58,8 +63,10 @@ abstract class $OffreEmploiCopyWith<$Res> {
     String description,
     String? sourceUrl,
     String? source,
+    String? fiabilite,
     DateTime? datePublication,
     DateTime? dateLimite,
+    DateTime? dateIndexation,
     String statut,
     bool expiree,
     bool estFavori,
@@ -91,8 +98,10 @@ class _$OffreEmploiCopyWithImpl<$Res, $Val extends OffreEmploi>
     Object? description = null,
     Object? sourceUrl = freezed,
     Object? source = freezed,
+    Object? fiabilite = freezed,
     Object? datePublication = freezed,
     Object? dateLimite = freezed,
+    Object? dateIndexation = freezed,
     Object? statut = null,
     Object? expiree = null,
     Object? estFavori = null,
@@ -139,6 +148,10 @@ class _$OffreEmploiCopyWithImpl<$Res, $Val extends OffreEmploi>
                 ? _value.source
                 : source // ignore: cast_nullable_to_non_nullable
                       as String?,
+            fiabilite: freezed == fiabilite
+                ? _value.fiabilite
+                : fiabilite // ignore: cast_nullable_to_non_nullable
+                      as String?,
             datePublication: freezed == datePublication
                 ? _value.datePublication
                 : datePublication // ignore: cast_nullable_to_non_nullable
@@ -146,6 +159,10 @@ class _$OffreEmploiCopyWithImpl<$Res, $Val extends OffreEmploi>
             dateLimite: freezed == dateLimite
                 ? _value.dateLimite
                 : dateLimite // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            dateIndexation: freezed == dateIndexation
+                ? _value.dateIndexation
+                : dateIndexation // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
             statut: null == statut
                 ? _value.statut
@@ -185,8 +202,10 @@ abstract class _$$OffreEmploiImplCopyWith<$Res>
     String description,
     String? sourceUrl,
     String? source,
+    String? fiabilite,
     DateTime? datePublication,
     DateTime? dateLimite,
+    DateTime? dateIndexation,
     String statut,
     bool expiree,
     bool estFavori,
@@ -217,8 +236,10 @@ class __$$OffreEmploiImplCopyWithImpl<$Res>
     Object? description = null,
     Object? sourceUrl = freezed,
     Object? source = freezed,
+    Object? fiabilite = freezed,
     Object? datePublication = freezed,
     Object? dateLimite = freezed,
+    Object? dateIndexation = freezed,
     Object? statut = null,
     Object? expiree = null,
     Object? estFavori = null,
@@ -265,6 +286,10 @@ class __$$OffreEmploiImplCopyWithImpl<$Res>
             ? _value.source
             : source // ignore: cast_nullable_to_non_nullable
                   as String?,
+        fiabilite: freezed == fiabilite
+            ? _value.fiabilite
+            : fiabilite // ignore: cast_nullable_to_non_nullable
+                  as String?,
         datePublication: freezed == datePublication
             ? _value.datePublication
             : datePublication // ignore: cast_nullable_to_non_nullable
@@ -272,6 +297,10 @@ class __$$OffreEmploiImplCopyWithImpl<$Res>
         dateLimite: freezed == dateLimite
             ? _value.dateLimite
             : dateLimite // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        dateIndexation: freezed == dateIndexation
+            ? _value.dateIndexation
+            : dateIndexation // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
         statut: null == statut
             ? _value.statut
@@ -304,8 +333,10 @@ class _$OffreEmploiImpl extends _OffreEmploi {
     required this.description,
     this.sourceUrl,
     this.source,
+    this.fiabilite,
     this.datePublication,
     this.dateLimite,
+    this.dateIndexation,
     required this.statut,
     this.expiree = false,
     this.estFavori = false,
@@ -331,10 +362,17 @@ class _$OffreEmploiImpl extends _OffreEmploi {
   final String? sourceUrl;
   @override
   final String? source;
+
+  /// Fiabilité de la source vérifiée par la veille IA : 'officiel', 'presse'
+  /// ou 'plateforme' (null pour les données de démonstration).
+  @override
+  final String? fiabilite;
   @override
   final DateTime? datePublication;
   @override
   final DateTime? dateLimite;
+  @override
+  final DateTime? dateIndexation;
   @override
   final String statut;
   @override
@@ -346,7 +384,7 @@ class _$OffreEmploiImpl extends _OffreEmploi {
 
   @override
   String toString() {
-    return 'OffreEmploi(id: $id, intitule: $intitule, entreprise: $entreprise, type: $type, domaine: $domaine, niveauRequis: $niveauRequis, region: $region, description: $description, sourceUrl: $sourceUrl, source: $source, datePublication: $datePublication, dateLimite: $dateLimite, statut: $statut, expiree: $expiree, estFavori: $estFavori)';
+    return 'OffreEmploi(id: $id, intitule: $intitule, entreprise: $entreprise, type: $type, domaine: $domaine, niveauRequis: $niveauRequis, region: $region, description: $description, sourceUrl: $sourceUrl, source: $source, fiabilite: $fiabilite, datePublication: $datePublication, dateLimite: $dateLimite, dateIndexation: $dateIndexation, statut: $statut, expiree: $expiree, estFavori: $estFavori)';
   }
 
   @override
@@ -369,10 +407,14 @@ class _$OffreEmploiImpl extends _OffreEmploi {
             (identical(other.sourceUrl, sourceUrl) ||
                 other.sourceUrl == sourceUrl) &&
             (identical(other.source, source) || other.source == source) &&
+            (identical(other.fiabilite, fiabilite) ||
+                other.fiabilite == fiabilite) &&
             (identical(other.datePublication, datePublication) ||
                 other.datePublication == datePublication) &&
             (identical(other.dateLimite, dateLimite) ||
                 other.dateLimite == dateLimite) &&
+            (identical(other.dateIndexation, dateIndexation) ||
+                other.dateIndexation == dateIndexation) &&
             (identical(other.statut, statut) || other.statut == statut) &&
             (identical(other.expiree, expiree) || other.expiree == expiree) &&
             (identical(other.estFavori, estFavori) ||
@@ -392,8 +434,10 @@ class _$OffreEmploiImpl extends _OffreEmploi {
     description,
     sourceUrl,
     source,
+    fiabilite,
     datePublication,
     dateLimite,
+    dateIndexation,
     statut,
     expiree,
     estFavori,
@@ -420,8 +464,10 @@ abstract class _OffreEmploi extends OffreEmploi {
     required final String description,
     final String? sourceUrl,
     final String? source,
+    final String? fiabilite,
     final DateTime? datePublication,
     final DateTime? dateLimite,
+    final DateTime? dateIndexation,
     required final String statut,
     final bool expiree,
     final bool estFavori,
@@ -448,10 +494,17 @@ abstract class _OffreEmploi extends OffreEmploi {
   String? get sourceUrl;
   @override
   String? get source;
+
+  /// Fiabilité de la source vérifiée par la veille IA : 'officiel', 'presse'
+  /// ou 'plateforme' (null pour les données de démonstration).
+  @override
+  String? get fiabilite;
   @override
   DateTime? get datePublication;
   @override
   DateTime? get dateLimite;
+  @override
+  DateTime? get dateIndexation;
   @override
   String get statut;
   @override

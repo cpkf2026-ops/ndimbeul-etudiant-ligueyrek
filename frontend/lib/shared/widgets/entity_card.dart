@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import 'favorite_button.dart';
+import 'name_placeholder.dart';
 import 'skeleton_loader.dart';
 
 /// Carte université / entreprise / logement — image cover + overlay
@@ -33,6 +34,7 @@ class EntityCard extends StatelessWidget {
   final VoidCallback? onTap;
   final String? trailingText;
 
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -52,33 +54,24 @@ class EntityCard extends StatelessWidget {
               // (`CachedNetworkImage`) — mais certaines photos réelles n'ont
               // aucune source distante compatible CORS (voir CREDITS_IMAGES.md,
               // ex. ISEP Thiès) et sont embarquées dans l'app à la place.
-              imageUrl.startsWith('assets/')
-                  ? Image.asset(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stack) => Container(
-                        color: AppColors.greenSoft,
-                        child: const Icon(
-                          Icons.image_not_supported_outlined,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    )
-                  : CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const SkeletonLoader(
-                        height: double.infinity,
-                        borderRadius: 0,
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: AppColors.greenSoft,
-                        child: const Icon(
-                          Icons.image_not_supported_outlined,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
+              if (imageUrl.isEmpty)
+                NamePlaceholder(name: title)
+              else if (imageUrl.startsWith('assets/'))
+                Image.asset(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stack) => NamePlaceholder(name: title),
+                )
+              else
+                CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const SkeletonLoader(
+                    height: double.infinity,
+                    borderRadius: 0,
+                  ),
+                  errorWidget: (context, url, error) => NamePlaceholder(name: title),
+                ),
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(

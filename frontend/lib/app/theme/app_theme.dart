@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
+import 'page_transitions.dart';
 
 abstract final class AppTheme {
   static ThemeData get light {
@@ -19,6 +20,17 @@ abstract final class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
+      // Ouverture de chaque fonctionnalité : vague depuis le point touché.
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: RevealPageTransitionsBuilder(),
+          TargetPlatform.iOS: RevealPageTransitionsBuilder(),
+          TargetPlatform.windows: RevealPageTransitionsBuilder(),
+          TargetPlatform.macOS: RevealPageTransitionsBuilder(),
+          TargetPlatform.linux: RevealPageTransitionsBuilder(),
+          TargetPlatform.fuchsia: RevealPageTransitionsBuilder(),
+        },
+      ),
       textTheme: textTheme,
       fontFamily: textTheme.bodyMedium?.fontFamily,
       appBarTheme: AppBarTheme(

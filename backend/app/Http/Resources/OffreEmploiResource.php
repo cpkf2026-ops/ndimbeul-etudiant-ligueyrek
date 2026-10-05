@@ -20,8 +20,13 @@ class OffreEmploiResource extends JsonResource
             'description' => $this->description,
             'source_url' => $this->source_url,
             'source' => $this->source,
+            // Niveau de fiabilité de la source vérifié par la veille IA :
+            // 'officiel' | 'presse' | 'plateforme' (null = offre non vérifiée).
+            'fiabilite' => $this->fiabilite,
             'date_publication' => $this->date_publication?->toDateString(),
             'date_limite' => $this->date_limite?->toDateString(),
+            // Horodatage précis (jour + heure) de l'indexation par la veille IA.
+            'date_indexation' => $this->date_indexation?->toIso8601String(),
             'statut' => $this->statut,
             'expiree' => $this->estExpiree(),
             'est_favori' => $this->when(

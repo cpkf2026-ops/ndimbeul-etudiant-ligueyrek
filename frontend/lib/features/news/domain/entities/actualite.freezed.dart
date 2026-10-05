@@ -24,7 +24,12 @@ mixin _$Actualite {
   String? get sourceUrl => throw _privateConstructorUsedError;
   String? get imageUrl => throw _privateConstructorUsedError;
   DateTime get datePublication => throw _privateConstructorUsedError;
+  DateTime? get dateIndexation => throw _privateConstructorUsedError;
   String? get auteur => throw _privateConstructorUsedError;
+
+  /// Niveau de fiabilité de la source vérifié par la veille IA :
+  /// 'officiel' (État, université…) ou 'presse' (média reconnu).
+  String? get fiabilite => throw _privateConstructorUsedError;
 
   /// Create a copy of Actualite
   /// with the given fields replaced by the non-null parameter values.
@@ -46,7 +51,9 @@ abstract class $ActualiteCopyWith<$Res> {
     String? sourceUrl,
     String? imageUrl,
     DateTime datePublication,
+    DateTime? dateIndexation,
     String? auteur,
+    String? fiabilite,
   });
 }
 
@@ -72,7 +79,9 @@ class _$ActualiteCopyWithImpl<$Res, $Val extends Actualite>
     Object? sourceUrl = freezed,
     Object? imageUrl = freezed,
     Object? datePublication = null,
+    Object? dateIndexation = freezed,
     Object? auteur = freezed,
+    Object? fiabilite = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -104,9 +113,17 @@ class _$ActualiteCopyWithImpl<$Res, $Val extends Actualite>
                 ? _value.datePublication
                 : datePublication // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            dateIndexation: freezed == dateIndexation
+                ? _value.dateIndexation
+                : dateIndexation // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             auteur: freezed == auteur
                 ? _value.auteur
                 : auteur // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            fiabilite: freezed == fiabilite
+                ? _value.fiabilite
+                : fiabilite // ignore: cast_nullable_to_non_nullable
                       as String?,
           )
           as $Val,
@@ -131,7 +148,9 @@ abstract class _$$ActualiteImplCopyWith<$Res>
     String? sourceUrl,
     String? imageUrl,
     DateTime datePublication,
+    DateTime? dateIndexation,
     String? auteur,
+    String? fiabilite,
   });
 }
 
@@ -156,7 +175,9 @@ class __$$ActualiteImplCopyWithImpl<$Res>
     Object? sourceUrl = freezed,
     Object? imageUrl = freezed,
     Object? datePublication = null,
+    Object? dateIndexation = freezed,
     Object? auteur = freezed,
+    Object? fiabilite = freezed,
   }) {
     return _then(
       _$ActualiteImpl(
@@ -188,9 +209,17 @@ class __$$ActualiteImplCopyWithImpl<$Res>
             ? _value.datePublication
             : datePublication // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        dateIndexation: freezed == dateIndexation
+            ? _value.dateIndexation
+            : dateIndexation // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         auteur: freezed == auteur
             ? _value.auteur
             : auteur // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        fiabilite: freezed == fiabilite
+            ? _value.fiabilite
+            : fiabilite // ignore: cast_nullable_to_non_nullable
                   as String?,
       ),
     );
@@ -208,7 +237,9 @@ class _$ActualiteImpl extends _Actualite {
     this.sourceUrl,
     this.imageUrl,
     required this.datePublication,
+    this.dateIndexation,
     this.auteur,
+    this.fiabilite,
   }) : super._();
 
   @override
@@ -226,11 +257,18 @@ class _$ActualiteImpl extends _Actualite {
   @override
   final DateTime datePublication;
   @override
+  final DateTime? dateIndexation;
+  @override
   final String? auteur;
+
+  /// Niveau de fiabilité de la source vérifié par la veille IA :
+  /// 'officiel' (État, université…) ou 'presse' (média reconnu).
+  @override
+  final String? fiabilite;
 
   @override
   String toString() {
-    return 'Actualite(id: $id, titre: $titre, contenu: $contenu, categorie: $categorie, sourceUrl: $sourceUrl, imageUrl: $imageUrl, datePublication: $datePublication, auteur: $auteur)';
+    return 'Actualite(id: $id, titre: $titre, contenu: $contenu, categorie: $categorie, sourceUrl: $sourceUrl, imageUrl: $imageUrl, datePublication: $datePublication, dateIndexation: $dateIndexation, auteur: $auteur, fiabilite: $fiabilite)';
   }
 
   @override
@@ -249,7 +287,11 @@ class _$ActualiteImpl extends _Actualite {
                 other.imageUrl == imageUrl) &&
             (identical(other.datePublication, datePublication) ||
                 other.datePublication == datePublication) &&
-            (identical(other.auteur, auteur) || other.auteur == auteur));
+            (identical(other.dateIndexation, dateIndexation) ||
+                other.dateIndexation == dateIndexation) &&
+            (identical(other.auteur, auteur) || other.auteur == auteur) &&
+            (identical(other.fiabilite, fiabilite) ||
+                other.fiabilite == fiabilite));
   }
 
   @override
@@ -262,7 +304,9 @@ class _$ActualiteImpl extends _Actualite {
     sourceUrl,
     imageUrl,
     datePublication,
+    dateIndexation,
     auteur,
+    fiabilite,
   );
 
   /// Create a copy of Actualite
@@ -283,7 +327,9 @@ abstract class _Actualite extends Actualite {
     final String? sourceUrl,
     final String? imageUrl,
     required final DateTime datePublication,
+    final DateTime? dateIndexation,
     final String? auteur,
+    final String? fiabilite,
   }) = _$ActualiteImpl;
   const _Actualite._() : super._();
 
@@ -302,7 +348,14 @@ abstract class _Actualite extends Actualite {
   @override
   DateTime get datePublication;
   @override
+  DateTime? get dateIndexation;
+  @override
   String? get auteur;
+
+  /// Niveau de fiabilité de la source vérifié par la veille IA :
+  /// 'officiel' (État, université…) ou 'presse' (média reconnu).
+  @override
+  String? get fiabilite;
 
   /// Create a copy of Actualite
   /// with the given fields replaced by the non-null parameter values.

@@ -15,7 +15,7 @@ class OffreEmploi extends Model
 
     protected $fillable = [
         'intitule', 'entreprise', 'type', 'domaine', 'niveau_requis', 'region',
-        'description', 'source_url', 'source', 'date_publication', 'date_limite',
+        'description', 'source_url', 'source', 'fiabilite', 'date_publication', 'date_limite',
         'statut', 'date_indexation',
     ];
 
@@ -35,13 +35,17 @@ class OffreEmploi extends Model
 
     public function estExpiree(): bool
     {
+        // Une offre reste ouverte jusqu'à la fin du jour de sa date limite.
         return $this->statut === 'expiree'
-            || ($this->date_limite !== null && $this->date_limite->isPast());
+            || ($this->date_limite !== null && $this->date_limite->endOfDay()->isPast());
     }
 
     public function scopeActives($query)
     {
-        return $query->where('statut', 'active');
+        // Exclut aussi les offres dont la date limite est passée, sans attendre
+        // le prochain passage d'archivage de la veille (toutes les 2 h).
+        return $query->where('statut', 'active')
+            ->where(fn ($q) => $q->whereNull('date_limite')->orWhereDate('date_limite', '>=', today()));
     }
 
     public function scopeDansDomaine($query, ?string $domaine)

@@ -82,7 +82,11 @@ class OrientationScreen extends ConsumerWidget {
             title: 'Compléter mon profil',
             subtitle: 'Série, moyenne, passions, préférences — pour des suggestions plus précises',
             color: AppColors.amberSoft,
-            onTap: () => context.push(RoutePaths.profile),
+            // go() et non push() : /profile est l'onglet d'un autre branch de la
+            // StatefulShellRoute (voir app_router.dart) — un push() l'empile par-dessus
+            // l'onglet Orientation au lieu d'y basculer, laissant la nav affichée sur
+            // "Orientation" alors que le contenu Profil est réellement montré.
+            onTap: () => context.go(RoutePaths.profile),
           ),
           const SizedBox(height: 12),
           _OrientationCard(
@@ -90,7 +94,7 @@ class OrientationScreen extends ConsumerWidget {
             title: 'Explorer toutes les universités',
             subtitle: 'Catalogue complet, filtres par région, type et domaine',
             color: AppColors.greenSoft,
-            onTap: () => context.push(RoutePaths.universities),
+            onTap: () => context.go(RoutePaths.universities),
           ),
         ],
       ),

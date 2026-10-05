@@ -1,7 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/auth/presentation/screens/auth_required_screen.dart';
 import '../../features/auth/presentation/screens/complete_profile_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -10,7 +11,6 @@ import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/orientation/presentation/screens/orientation_screen.dart';
 import '../../features/orientation/presentation/screens/recommendations_screen.dart';
 import '../../features/orientation/presentation/screens/simulation_screen.dart';
-import '../../features/universities/presentation/screens/ecosysteme_screen.dart';
 import '../../features/universities/presentation/screens/university_compare_screen.dart';
 import '../../features/universities/presentation/screens/university_detail_screen.dart';
 import '../../features/universities/presentation/screens/university_list_screen.dart';
@@ -27,6 +27,7 @@ import '../../features/admin/presentation/screens/admin_sources_screen.dart';
 import '../../features/admin/presentation/screens/admin_users_screen.dart';
 import '../shell/main_shell.dart';
 import '../splash/splash_screen.dart';
+import '../theme/page_transitions.dart';
 import 'route_paths.dart';
 
 class _GoRouterRefreshNotifier extends ChangeNotifier {
@@ -41,10 +42,23 @@ final _refreshNotifierProvider = Provider<_GoRouterRefreshNotifier>((ref) {
   return notifier;
 });
 
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+/// Cible "from" sûre (chemin interne uniquement) transmise par la fenêtre
+/// Connexion requise, pour renvoyer l'utilisateur là où il voulait aller.
+String? _safeFrom(GoRouterState state) {
+  final from = state.uri.queryParameters['from'];
+  if (from == null || !from.startsWith('/') || from.startsWith('//')) {
+    return null;
+  }
+  return from;
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = ref.watch(_refreshNotifierProvider);
 
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: RoutePaths.splash,
     refreshListenable: refreshNotifier,
     redirect: (context, state) {
@@ -71,18 +85,43 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Comptes admin jamais soumis à l'étape de complétion de profil (ils
       // n'ont pas de statut lycéen/étudiant/diplômé à choisir) — voir
       // EnsureProfileComplete côté backend, même exemption.
-      final needsProfileCompletion = isLoggedIn && !isAdmin && !user.profilComplete;
+      final needsProfileCompletion =
+          isLoggedIn && !isAdmin && !user.profilComplete;
 
-      if (!isLoggedIn && !isPublic) return RoutePaths.login;
+      // Mode visiteur : l'accueil est ouvert à tous, mais toute autre
+      // fonctionnalité ouvre la fenêtre "Connexion requise" par-dessus
+      // l'accueil (en mémorisant la destination demandée).
+      if (!isLoggedIn) {
+        if (isPublic ||
+            loc == RoutePaths.dashboard ||
+            loc == RoutePaths.authRequired) {
+          return null;
+        }
+        if (loc == RoutePaths.completeProfile) return RoutePaths.login;
+        return Uri(
+          path: RoutePaths.authRequired,
+          queryParameters: {'from': state.uri.toString()},
+        ).toString();
+      }
 
-      if (isLoggedIn && needsProfileCompletion && loc != RoutePaths.completeProfile) {
+      // Connecté entre-temps : la fenêtre n'a plus lieu d'être.
+      if (loc == RoutePaths.authRequired) {
+        return _safeFrom(state) ?? RoutePaths.dashboard;
+      }
+
+      if (isLoggedIn &&
+          needsProfileCompletion &&
+          loc != RoutePaths.completeProfile) {
         return RoutePaths.completeProfile;
       }
-      if (isLoggedIn && !needsProfileCompletion && loc == RoutePaths.completeProfile) {
+      if (isLoggedIn &&
+          !needsProfileCompletion &&
+          loc == RoutePaths.completeProfile) {
         return isAdmin ? RoutePaths.admin : RoutePaths.dashboard;
       }
       if (isLoggedIn && isPublic && !needsProfileCompletion) {
-        return isAdmin ? RoutePaths.admin : RoutePaths.dashboard;
+        return _safeFrom(state) ??
+            (isAdmin ? RoutePaths.admin : RoutePaths.dashboard);
       }
 
       if (loc.startsWith(RoutePaths.admin) && !isAdmin) {
@@ -91,7 +130,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Module Orientation réservé aux lycéens/étudiants (voir
       // UserRole.voitOrientation et la nav filtrée dans bottom_nav_bar.dart
       // / sidebar_nav.dart) — un accès direct par URL est aussi bloqué ici.
-      if (loc.startsWith(RoutePaths.orientation) && !(user?.role?.voitOrientation ?? true)) {
+      if (loc.startsWith(RoutePaths.orientation) &&
+          !(user.role?.voitOrientation ?? true)) {
+        return RoutePaths.dashboard;
+      }
+      // Module Emploi & Stages non concerné pour les lycéens (voir
+      // UserRole.voitEmplois) — accès direct par URL bloqué aussi.
+      if (loc.startsWith(RoutePaths.jobs) &&
+          !(user.role?.voitEmplois ?? true)) {
         return RoutePaths.dashboard;
       }
       return null;
@@ -128,6 +174,28 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RoutePaths.dashboard,
                 builder: (context, state) => const DashboardScreen(),
+                routes: [
+                  // Fenêtre transparente au-dessus de l'accueil (navigator
+                  // racine) : l'accueil reste visible derrière.
+                  GoRoute(
+                    path: 'connexion-requise',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) => CustomTransitionPage(
+                      key: state.pageKey,
+                      opaque: false,
+                      barrierDismissible: true,
+                      barrierColor: Colors.black.withValues(alpha: 0.55),
+                      transitionDuration: const Duration(milliseconds: 420),
+                      reverseTransitionDuration: const Duration(
+                        milliseconds: 220,
+                      ),
+                      child: AuthRequiredScreen(from: _safeFrom(state)),
+                      // Dévoilement en cercle depuis l'élément touché.
+                      transitionsBuilder: (context, animation, _, child) =>
+                          CircleRevealTransition(animation: animation, child: child),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -136,14 +204,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: RoutePaths.orientation,
                 builder: (context, state) => const OrientationScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: RoutePaths.ecosysteme,
-                builder: (context, state) => const EcosystemeScreen(),
               ),
             ],
           ),
@@ -213,9 +273,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: RoutePaths.universityDetail,
-        builder: (context, state) => UniversityDetailScreen(
-          universityId: state.pathParameters['id']!,
-        ),
+        builder: (context, state) =>
+            UniversityDetailScreen(universityId: state.pathParameters['id']!),
       ),
 
       // AI assistant (historique — sous-route hors shell)

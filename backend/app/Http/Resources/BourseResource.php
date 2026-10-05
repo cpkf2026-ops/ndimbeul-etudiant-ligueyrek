@@ -14,7 +14,9 @@ class BourseResource extends JsonResource
             'universite_id' => $this->universite_id,
             'nom' => $this->nom,
             'organisme' => $this->organisme,
-            'montant' => $this->montant,
+            // Cast Eloquent 'decimal:2' -> chaîne PHP : reconverti en number JSON (Flutter
+            // caste `as num?`, qui échoue sur une chaîne, voir ProfilLyceenResource).
+            'montant' => $this->montant !== null ? (float) $this->montant : null,
             'devise' => $this->devise,
             'conditions' => $this->conditions,
             'demarches' => $this->demarches,

@@ -1,22 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../app/theme/app_colors.dart';
+import '../../features/ai_assistant/domain/entities/message_ia.dart';
+import '../extensions/context_extensions.dart';
 import 'loading_dots.dart';
 
 /// Bulle de réponse IA — fond vert foncé, avatar robot, texte blanc,
-/// sources cliquables sous la réponse (§4.5).
+/// sources cliquables sous la réponse (§4.5) : ouvre le vrai site de la
+/// source (établissement/offre) quand une URL est disponible, sinon la
+/// source reste affichée mais non cliquable (jamais de lien inventé).
 class IaResponseCard extends StatelessWidget {
   const IaResponseCard({
     super.key,
     required this.text,
     this.sources = const [],
     this.isStreaming = false,
-    this.onSourceTap,
   });
 
   final String text;
-  final List<String> sources;
+  final List<SourceCitee> sources;
   final bool isStreaming;
-  final ValueChanged<String>? onSourceTap;
+
+  Future<void> _ouvrirSource(BuildContext context, SourceCitee source) async {
+    final url = source.url;
+    if (url == null || url.isEmpty) {
+      context.showSnack('Aucun lien disponible pour "${source.titre}".');
+      return;
+    }
+    final ouvert = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    if (!ouvert && context.mounted) {
+      context.showSnack('Impossible d\'ouvrir le lien.', isError: true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,33 +87,36 @@ class IaResponseCard extends StatelessWidget {
                   Wrap(
                     spacing: 8,
                     runSpacing: 6,
-                    children: sources
-                        .map(
-                          (s) => InkWell(
-                            onTap: () => onSourceTap?.call(s),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.link_rounded,
-                                  size: 13,
-                                  color: AppColors.accent,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  s,
-                                  style: const TextStyle(
-                                    color: AppColors.accent,
-                                    fontSize: 12,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: AppColors.accent,
-                                  ),
-                                ),
-                              ],
+                    children: sources.map((s) {
+                      final estCliquable = s.url != null && s.url!.isNotEmpty;
+                      return InkWell(
+                        onTap: estCliquable ? () => _ouvrirSource(context, s) : null,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              estCliquable ? Icons.link_rounded : Icons.description_outlined,
+                              size: 13,
+                              color: estCliquable
+                                  ? AppColors.accent
+                                  : Colors.white.withValues(alpha: 0.6),
                             ),
-                          ),
-                        )
-                        .toList(),
+                            const SizedBox(width: 3),
+                            Text(
+                              s.titre,
+                              style: TextStyle(
+                                color: estCliquable
+                                    ? AppColors.accent
+                                    : Colors.white.withValues(alpha: 0.6),
+                                fontSize: 12,
+                                decoration: estCliquable ? TextDecoration.underline : null,
+                                decorationColor: AppColors.accent,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ],
               ],

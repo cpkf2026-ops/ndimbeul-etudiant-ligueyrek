@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/di/core_providers.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../data/datasources/mock_news_remote_datasource.dart';
@@ -17,7 +20,8 @@ import '../../domain/usecases/mark_all_notifications_read.dart';
 import '../../domain/usecases/mark_notification_read.dart';
 
 final newsRemoteDataSourceProvider = Provider<NewsRemoteDataSource>((ref) {
-  if (ref.watch(useMockProvider)) return MockNewsRemoteDataSource();
+  // Fil réel (veille IA toutes les 2 h) même en mode démo — voir kUseMockNews.
+  if (ref.watch(useMockProvider) && kUseMockNews) return MockNewsRemoteDataSource();
   return NewsRemoteDataSourceImpl(dio: ref.watch(dioProvider));
 });
 
@@ -36,6 +40,11 @@ final newsCategoryFilterProvider = StateProvider<CategorieActualite?>((ref) => n
 class NewsListNotifier extends AsyncNotifier<ActualitePage> {
   @override
   Future<ActualitePage> build() async {
+    // Rechargement automatique (voir kRafraichissementFils) : le minuteur est
+    // réarmé à chaque chargement et annulé si le provider est détruit. Pendant
+    // le rechargement, la liste actuelle reste affichée (pas d'écran vide).
+    final minuteur = Timer(kRafraichissementFils, ref.invalidateSelf);
+    ref.onDispose(minuteur.cancel);
     final categorie = ref.watch(newsCategoryFilterProvider);
     final result =
         await ref.read(getActualitesUseCaseProvider).call(GetActualitesParams(categorie: categorie));

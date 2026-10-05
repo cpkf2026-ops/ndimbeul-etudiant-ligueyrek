@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/di/core_providers.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
+import '../../../orientation/presentation/providers/recommendation_provider.dart';
 import '../../data/datasources/mock_profile_remote_datasource.dart';
 import '../../data/datasources/profile_remote_datasource.dart';
 import '../../data/repositories/profile_repository_impl.dart';
@@ -50,6 +51,10 @@ class ProfileNotifier extends AsyncNotifier<ProfilAcademique> {
       return failure;
     }, (updated) {
       state = AsyncValue.data(ProfilAcademique.lyceen(updated));
+      // Les recommandations dépendent directement du profil (série, moyenne, passions,
+      // matières fortes...) : sans invalidation, l'écran Orientation réafficherait la
+      // liste calculée sur l'ANCIEN profil, en cache depuis le premier chargement.
+      ref.invalidate(recommendationsProvider);
       return null;
     });
   }

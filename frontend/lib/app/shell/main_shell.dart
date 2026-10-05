@@ -8,6 +8,7 @@ import '../../shared/widgets/bottom_nav_bar.dart';
 import '../../shared/widgets/sidebar_nav.dart';
 import '../../shared/widgets/welcome_snackbar.dart';
 import '../router/route_paths.dart';
+import '../theme/page_transitions.dart';
 
 /// Shell principal — bascule bottom nav (mobile, 4 onglets) / sidebar
 /// (tablette-desktop, 8 entrées) et héberge le bouton flottant assistant IA.
@@ -50,14 +51,26 @@ class MainShell extends ConsumerWidget {
               onTap: onTap,
               compact: context.isTablet,
               userName: user?.nomComplet ?? 'Invité',
-              userSubtitle: user?.role?.label ?? '',
+              userSubtitle: user?.role?.label ?? 'Mode visiteur',
               role: user?.role,
+              isGuest: user == null,
               onLogout: () async {
+                if (user == null) {
+                  context.go(RoutePaths.login);
+                  return;
+                }
+                // Accueil d'abord : évite que la fenêtre "Connexion requise"
+                // ne s'ouvre sur la page courante une fois déconnecté.
+                context.go(RoutePaths.dashboard);
                 await ref.read(authProvider.notifier).logout();
-                if (context.mounted) context.go(RoutePaths.login);
               },
             ),
-            Expanded(child: navigationShell),
+            Expanded(
+              child: BranchSwitchAnimator(
+                index: navigationShell.currentIndex,
+                child: navigationShell,
+              ),
+            ),
           ],
         ),
         floatingActionButton: const AiFloatingButton(),
@@ -65,7 +78,10 @@ class MainShell extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: navigationShell,
+      body: BranchSwitchAnimator(
+        index: navigationShell.currentIndex,
+        child: navigationShell,
+      ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: navigationShell.currentIndex,
         onTap: onTap,

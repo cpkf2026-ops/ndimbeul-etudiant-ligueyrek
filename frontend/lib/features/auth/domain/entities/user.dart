@@ -28,9 +28,13 @@ enum UserRole {
       this == UserRole.adminEtablissement || this == UserRole.superAdmin;
 
   /// Le module Orientation (recommandations, simulation de bac) ne concerne
-  /// que les profils encore en cours d'études — voir plan "Séparation
-  /// inscription / complétion de profil" §4.
-  bool get voitOrientation => this == UserRole.lyceen || this == UserRole.etudiant;
+  /// que les lycéens : un étudiant ou un diplômé a déjà passé le bac et
+  /// choisi sa filière. Masqué de la navigation et bloqué par le router.
+  bool get voitOrientation => this == UserRole.lyceen;
+
+  /// Le module Emploi & Stages ne concerne pas les lycéens (pas encore sur
+  /// le marché du travail) : masqué de la navigation et bloqué par le router.
+  bool get voitEmplois => this != UserRole.lyceen;
 }
 
 @freezed

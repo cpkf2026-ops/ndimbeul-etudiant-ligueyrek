@@ -5,41 +5,74 @@ part 'recommandation_model.freezed.dart';
 
 double _decimalFromJson(dynamic value) => double.tryParse(value?.toString() ?? '') ?? 0;
 
-List<String> _sourcesFromJson(dynamic value) {
+List<String> _stringListFromJson(dynamic value) {
   if (value is List) return value.map((e) => e.toString()).toList();
   return const [];
 }
 
-/// Miroir défensif de la réponse Django relayée telle quelle par
-/// `AiProxyController::recommendations` — le contrat exact du micro-service
-/// IA n'est pas garanti côté Laravel (voir `Recommandation` Eloquent, colonnes
-/// `score_correspondance`/`explication_llm`/`sources_infos`/`formation_id`).
-/// Les infos de formation/université, si présentes, sont lues depuis un
-/// éventuel objet imbriqué `formation` — sinon dégradées gracieusement.
+/// Miroir de la réponse réelle de `POST /internal/recommendations` (Django,
+/// `recommandations/views.py::recommendations`), relayée telle quelle par
+/// `AiProxyController::recommendations`.
+@freezed
+sealed class ConditionsAdmissionModel with _$ConditionsAdmissionModel {
+  const factory ConditionsAdmissionModel({
+    @Default(<String>[]) List<String> seriesAcceptees,
+    double? moyenneMinimale,
+    String? prerequis,
+  }) = _ConditionsAdmissionModel;
+
+  factory ConditionsAdmissionModel.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const ConditionsAdmissionModel();
+    return ConditionsAdmissionModel(
+      seriesAcceptees: _stringListFromJson(json['series_acceptees']),
+      moyenneMinimale: json['moyenne_minimale'] != null
+          ? _decimalFromJson(json['moyenne_minimale'])
+          : null,
+      prerequis: json['prerequis']?.toString(),
+    );
+  }
+
+  const ConditionsAdmissionModel._();
+
+  ConditionsAdmission toEntity() => ConditionsAdmission(
+        seriesAcceptees: seriesAcceptees,
+        moyenneMinimale: moyenneMinimale,
+        prerequis: prerequis,
+      );
+}
+
 @freezed
 sealed class RecommandationModel with _$RecommandationModel {
   const factory RecommandationModel({
     required String formationId,
+    required String intitule,
+    String? niveau,
+    String? domaine,
+    required String universiteId,
+    required String universiteNom,
+    String? universiteRegion,
     required double scoreCorrespondance,
     required String explicationLlm,
-    @Default(<String>[]) List<String> sourcesInfos,
-    DateTime? dateGeneration,
-    String? formationIntitule,
-    String? universiteId,
-    String? universiteNom,
+    ConditionsAdmissionModel? conditionsAdmission,
+    String? debouches,
   }) = _RecommandationModel;
 
   factory RecommandationModel.fromJson(Map<String, dynamic> json) {
-    final formation = json['formation'] as Map<String, dynamic>?;
+    final universite = json['universite'] as Map<String, dynamic>?;
     return RecommandationModel(
-      formationId: (json['formation_id'] ?? formation?['id'] ?? '').toString(),
+      formationId: (json['formation_id'] ?? '').toString(),
+      intitule: (json['intitule'] ?? 'Formation suggérée').toString(),
+      niveau: json['niveau']?.toString(),
+      domaine: json['domaine']?.toString(),
+      universiteId: (universite?['id'] ?? '').toString(),
+      universiteNom: (universite?['nom'] ?? '').toString(),
+      universiteRegion: universite?['region']?.toString(),
       scoreCorrespondance: _decimalFromJson(json['score_correspondance']),
-      explicationLlm: (json['explication_llm'] ?? '').toString(),
-      sourcesInfos: _sourcesFromJson(json['sources_infos']),
-      dateGeneration: DateTime.tryParse(json['date_generation']?.toString() ?? ''),
-      formationIntitule: formation?['intitule']?.toString(),
-      universiteId: (formation?['universite_id'])?.toString(),
-      universiteNom: formation?['universite_nom']?.toString(),
+      explicationLlm: (json['explication'] ?? '').toString(),
+      conditionsAdmission: ConditionsAdmissionModel.fromJson(
+        json['conditions_admission'] as Map<String, dynamic>?,
+      ),
+      debouches: json['debouches']?.toString(),
     );
   }
 
@@ -47,12 +80,15 @@ sealed class RecommandationModel with _$RecommandationModel {
 
   Recommandation toEntity() => Recommandation(
         formationId: formationId,
-        scoreCorrespondance: scoreCorrespondance,
-        explicationLlm: explicationLlm,
-        sourcesInfos: sourcesInfos,
-        dateGeneration: dateGeneration,
-        formationIntitule: formationIntitule,
+        intitule: intitule,
+        niveau: niveau,
+        domaine: domaine,
         universiteId: universiteId,
         universiteNom: universiteNom,
+        universiteRegion: universiteRegion,
+        scoreCorrespondance: scoreCorrespondance,
+        explicationLlm: explicationLlm,
+        conditionsAdmission: conditionsAdmission?.toEntity(),
+        debouches: debouches,
       );
 }

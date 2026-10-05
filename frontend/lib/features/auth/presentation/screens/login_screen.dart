@@ -55,7 +55,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
-    final failure = await ref.read(authProvider.notifier).login(
+    final failure = await ref
+        .read(authProvider.notifier)
+        .login(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -81,7 +83,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
     if (!mounted) return;
     final user = ref.read(authProvider).valueOrNull;
-    context.go((user?.role?.isAdmin ?? false) ? RoutePaths.admin : RoutePaths.dashboard);
+    // Retour vers la fonctionnalité demandée avant la connexion (voir
+    // AuthRequiredScreen), sinon page d'accueil selon le rôle.
+    final from = GoRouterState.of(context).uri.queryParameters['from'];
+    final hasFrom =
+        from != null && from.startsWith('/') && !from.startsWith('//');
+    context.go(
+      hasFrom
+          ? from
+          : (user?.role?.isAdmin ?? false)
+          ? RoutePaths.admin
+          : RoutePaths.dashboard,
+    );
   }
 
   @override
@@ -89,25 +102,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: ResponsiveLayout(
-          mobile: _LoginCentered(
-            formKey: _formKey,
-            emailController: _emailController,
-            passwordController: _passwordController,
-            isSubmitting: _isSubmitting,
-            onSubmit: _submit,
-            rememberMe: _rememberMe,
-            onRememberMeChanged: (value) => setState(() => _rememberMe = value),
-          ),
-          desktop: _LoginSplit(
-            formKey: _formKey,
-            emailController: _emailController,
-            passwordController: _passwordController,
-            isSubmitting: _isSubmitting,
-            onSubmit: _submit,
-            rememberMe: _rememberMe,
-            onRememberMeChanged: (value) => setState(() => _rememberMe = value),
-          ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ResponsiveLayout(
+                mobile: _LoginCentered(
+                  formKey: _formKey,
+                  emailController: _emailController,
+                  passwordController: _passwordController,
+                  isSubmitting: _isSubmitting,
+                  onSubmit: _submit,
+                  rememberMe: _rememberMe,
+                  onRememberMeChanged: (value) =>
+                      setState(() => _rememberMe = value),
+                ),
+                desktop: _LoginSplit(
+                  formKey: _formKey,
+                  emailController: _emailController,
+                  passwordController: _passwordController,
+                  isSubmitting: _isSubmitting,
+                  onSubmit: _submit,
+                  rememberMe: _rememberMe,
+                  onRememberMeChanged: (value) =>
+                      setState(() => _rememberMe = value),
+                ),
+              ),
+            ),
+            // Mode visiteur : l'app reste consultable sans compte.
+            Positioned(
+              top: 8,
+              left: 8,
+              child: TextButton.icon(
+                onPressed: () => context.canPop()
+                    ? context.pop()
+                    : context.go(RoutePaths.dashboard),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.textSecondary,
+                ),
+                icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                label: const Text("Retour à l'accueil"),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -155,32 +191,31 @@ class _LoginCentered extends StatelessWidget {
                   .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
               const SizedBox(height: 28),
               Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.06),
-                      blurRadius: 32,
-                      offset: const Offset(0, 12),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.06),
+                          blurRadius: 32,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: _LoginFormBody(
-                  formKey: formKey,
-                  emailController: emailController,
-                  passwordController: passwordController,
-                  isSubmitting: isSubmitting,
-                  onSubmit: onSubmit,
-                  rememberMe: rememberMe,
-                  onRememberMeChanged: onRememberMeChanged,
-                ),
-              ).animate(delay: 170.ms).fadeIn(duration: 380.ms).slideY(
-                    begin: 0.12,
-                    end: 0,
-                    curve: Curves.easeOut,
-                  ),
+                    child: _LoginFormBody(
+                      formKey: formKey,
+                      emailController: emailController,
+                      passwordController: passwordController,
+                      isSubmitting: isSubmitting,
+                      onSubmit: onSubmit,
+                      rememberMe: rememberMe,
+                      onRememberMeChanged: onRememberMeChanged,
+                    ),
+                  )
+                  .animate(delay: 170.ms)
+                  .fadeIn(duration: 380.ms)
+                  .slideY(begin: 0.12, end: 0, curve: Curves.easeOut),
               const SizedBox(height: 24),
               const _RegisterLink()
                   .animate(delay: 240.ms)
@@ -290,18 +325,17 @@ class _LoginSplit extends StatelessWidget {
                         .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
                     const SizedBox(height: 28),
                     _LoginFormBody(
-                      formKey: formKey,
-                      emailController: emailController,
-                      passwordController: passwordController,
-                      isSubmitting: isSubmitting,
-                      onSubmit: onSubmit,
-                      rememberMe: rememberMe,
-                      onRememberMeChanged: onRememberMeChanged,
-                    ).animate(delay: 90.ms).fadeIn(duration: 380.ms).slideY(
-                          begin: 0.1,
-                          end: 0,
-                          curve: Curves.easeOut,
-                        ),
+                          formKey: formKey,
+                          emailController: emailController,
+                          passwordController: passwordController,
+                          isSubmitting: isSubmitting,
+                          onSubmit: onSubmit,
+                          rememberMe: rememberMe,
+                          onRememberMeChanged: onRememberMeChanged,
+                        )
+                        .animate(delay: 90.ms)
+                        .fadeIn(duration: 380.ms)
+                        .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
                     const SizedBox(height: 24),
                     const _RegisterLink()
                         .animate(delay: 170.ms)
@@ -432,9 +466,11 @@ class _LoginFormBody extends StatelessWidget {
                         height: 20,
                         child: Checkbox(
                           value: rememberMe,
-                          onChanged: (value) => onRememberMeChanged(value ?? false),
+                          onChanged: (value) =>
+                              onRememberMeChanged(value ?? false),
                           visualDensity: VisualDensity.compact,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                         ),
                       ),
                       const SizedBox(width: 8),

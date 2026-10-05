@@ -19,7 +19,8 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$MessageIa {
   MessageRole get role => throw _privateConstructorUsedError;
   String get contenu => throw _privateConstructorUsedError;
-  List<String> get sources => throw _privateConstructorUsedError;
+  List<({String titre, String? url})> get sources =>
+      throw _privateConstructorUsedError;
   DateTime? get date => throw _privateConstructorUsedError;
   bool get isStreaming => throw _privateConstructorUsedError;
 
@@ -38,7 +39,7 @@ abstract class $MessageIaCopyWith<$Res> {
   $Res call({
     MessageRole role,
     String contenu,
-    List<String> sources,
+    List<({String titre, String? url})> sources,
     DateTime? date,
     bool isStreaming,
   });
@@ -78,7 +79,7 @@ class _$MessageIaCopyWithImpl<$Res, $Val extends MessageIa>
             sources: null == sources
                 ? _value.sources
                 : sources // ignore: cast_nullable_to_non_nullable
-                      as List<String>,
+                      as List<({String titre, String? url})>,
             date: freezed == date
                 ? _value.date
                 : date // ignore: cast_nullable_to_non_nullable
@@ -105,7 +106,7 @@ abstract class _$$MessageIaImplCopyWith<$Res>
   $Res call({
     MessageRole role,
     String contenu,
-    List<String> sources,
+    List<({String titre, String? url})> sources,
     DateTime? date,
     bool isStreaming,
   });
@@ -144,7 +145,7 @@ class __$$MessageIaImplCopyWithImpl<$Res>
         sources: null == sources
             ? _value._sources
             : sources // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
+                  as List<({String titre, String? url})>,
         date: freezed == date
             ? _value.date
             : date // ignore: cast_nullable_to_non_nullable
@@ -164,7 +165,7 @@ class _$MessageIaImpl extends _MessageIa {
   const _$MessageIaImpl({
     required this.role,
     required this.contenu,
-    final List<String> sources = const <String>[],
+    final List<({String titre, String? url})> sources = const <SourceCitee>[],
     this.date,
     this.isStreaming = false,
   }) : _sources = sources,
@@ -174,10 +175,10 @@ class _$MessageIaImpl extends _MessageIa {
   final MessageRole role;
   @override
   final String contenu;
-  final List<String> _sources;
+  final List<({String titre, String? url})> _sources;
   @override
   @JsonKey()
-  List<String> get sources {
+  List<({String titre, String? url})> get sources {
     if (_sources is EqualUnmodifiableListView) return _sources;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_sources);
@@ -230,7 +231,7 @@ abstract class _MessageIa extends MessageIa {
   const factory _MessageIa({
     required final MessageRole role,
     required final String contenu,
-    final List<String> sources,
+    final List<({String titre, String? url})> sources,
     final DateTime? date,
     final bool isStreaming,
   }) = _$MessageIaImpl;
@@ -241,7 +242,7 @@ abstract class _MessageIa extends MessageIa {
   @override
   String get contenu;
   @override
-  List<String> get sources;
+  List<({String titre, String? url})> get sources;
   @override
   DateTime? get date;
   @override

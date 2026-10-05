@@ -24,6 +24,8 @@ class NewsController extends Controller
 
         $actualites = Actualite::query()
             ->publiees()
+            ->whereNotNull('image_url')
+            ->where('image_url', '!=', '')
             ->when($request->query('categorie'), fn ($q, $c) => $q->where('categorie', $c))
             ->when($role, fn ($q) => $q->where(function ($q2) use ($role) {
                 $q2->whereNull('cible_roles')->orWhereJsonContains('cible_roles', $role);

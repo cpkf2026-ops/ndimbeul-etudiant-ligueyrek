@@ -27,7 +27,8 @@ mixin _$MessageIaModel {
   String get contenu =>
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(fromJson: _sourcesFromJson)
-  List<String>? get sources => throw _privateConstructorUsedError;
+  List<({String titre, String? url})>? get sources =>
+      throw _privateConstructorUsedError;
   DateTime? get date => throw _privateConstructorUsedError;
 
   /// Serializes this MessageIaModel to a JSON map.
@@ -50,7 +51,8 @@ abstract class $MessageIaModelCopyWith<$Res> {
   $Res call({
     @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) MessageRole role,
     String contenu,
-    @JsonKey(fromJson: _sourcesFromJson) List<String>? sources,
+    @JsonKey(fromJson: _sourcesFromJson)
+    List<({String titre, String? url})>? sources,
     DateTime? date,
   });
 }
@@ -88,7 +90,7 @@ class _$MessageIaModelCopyWithImpl<$Res, $Val extends MessageIaModel>
             sources: freezed == sources
                 ? _value.sources
                 : sources // ignore: cast_nullable_to_non_nullable
-                      as List<String>?,
+                      as List<({String titre, String? url})>?,
             date: freezed == date
                 ? _value.date
                 : date // ignore: cast_nullable_to_non_nullable
@@ -111,7 +113,8 @@ abstract class _$$MessageIaModelImplCopyWith<$Res>
   $Res call({
     @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) MessageRole role,
     String contenu,
-    @JsonKey(fromJson: _sourcesFromJson) List<String>? sources,
+    @JsonKey(fromJson: _sourcesFromJson)
+    List<({String titre, String? url})>? sources,
     DateTime? date,
   });
 }
@@ -148,7 +151,7 @@ class __$$MessageIaModelImplCopyWithImpl<$Res>
         sources: freezed == sources
             ? _value._sources
             : sources // ignore: cast_nullable_to_non_nullable
-                  as List<String>?,
+                  as List<({String titre, String? url})>?,
         date: freezed == date
             ? _value.date
             : date // ignore: cast_nullable_to_non_nullable
@@ -164,7 +167,8 @@ class _$MessageIaModelImpl extends _MessageIaModel {
   const _$MessageIaModelImpl({
     @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson) required this.role,
     required this.contenu,
-    @JsonKey(fromJson: _sourcesFromJson) final List<String>? sources,
+    @JsonKey(fromJson: _sourcesFromJson)
+    final List<({String titre, String? url})>? sources,
     this.date,
   }) : _sources = sources,
        super._();
@@ -179,11 +183,11 @@ class _$MessageIaModelImpl extends _MessageIaModel {
   @override
   final String contenu;
   // ignore: invalid_annotation_target
-  final List<String>? _sources;
+  final List<({String titre, String? url})>? _sources;
   // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _sourcesFromJson)
-  List<String>? get sources {
+  List<({String titre, String? url})>? get sources {
     final value = _sources;
     if (value == null) return null;
     if (_sources is EqualUnmodifiableListView) return _sources;
@@ -242,7 +246,8 @@ abstract class _MessageIaModel extends MessageIaModel {
     @JsonKey(fromJson: _roleFromJson, toJson: _roleToJson)
     required final MessageRole role,
     required final String contenu,
-    @JsonKey(fromJson: _sourcesFromJson) final List<String>? sources,
+    @JsonKey(fromJson: _sourcesFromJson)
+    final List<({String titre, String? url})>? sources,
     final DateTime? date,
   }) = _$MessageIaModelImpl;
   const _MessageIaModel._() : super._();
@@ -258,7 +263,7 @@ abstract class _MessageIaModel extends MessageIaModel {
   String get contenu; // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _sourcesFromJson)
-  List<String>? get sources;
+  List<({String titre, String? url})>? get sources;
   @override
   DateTime? get date;
 

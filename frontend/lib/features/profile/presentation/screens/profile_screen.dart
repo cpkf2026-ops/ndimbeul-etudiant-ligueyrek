@@ -37,8 +37,10 @@ class ProfileScreen extends ConsumerWidget {
             tooltip: 'Se déconnecter',
             icon: const Icon(Icons.logout_rounded),
             onPressed: () async {
+              // Accueil d'abord : évite que la fenêtre "Connexion requise"
+              // ne s'ouvre sur la page courante une fois déconnecté.
+              context.go(RoutePaths.dashboard);
               await ref.read(authProvider.notifier).logout();
-              if (context.mounted) context.go(RoutePaths.login);
             },
           ),
         ],
@@ -81,12 +83,14 @@ class ProfileScreen extends ConsumerWidget {
             title: 'Historique des conversations IA',
             onTap: () => context.push(RoutePaths.chatHistory),
           ),
-          const SizedBox(height: 10),
-          _ProfileLinkTile(
-            icon: Icons.bookmark_border_rounded,
-            title: 'Offres suivies',
-            onTap: () => context.push(RoutePaths.jobsFavorites),
-          ),
+          if (user?.role?.voitEmplois ?? true) ...[
+            const SizedBox(height: 10),
+            _ProfileLinkTile(
+              icon: Icons.bookmark_border_rounded,
+              title: 'Offres suivies',
+              onTap: () => context.push(RoutePaths.jobsFavorites),
+            ),
+          ],
           if (user?.role?.isAdmin ?? false) ...[
             const SizedBox(height: 10),
             _ProfileLinkTile(
@@ -220,8 +224,6 @@ class _LyceenFormState extends ConsumerState<_LyceenForm> {
   late ProfilLyceen _draft = widget.profil;
   late final _moyenneController =
       TextEditingController(text: widget.profil.moyenneGenerale?.toString() ?? '');
-  late final _budgetController =
-      TextEditingController(text: widget.profil.budgetMaxAnnuel?.toString() ?? '');
   bool _saving = false;
 
   static const _series = ['S1', 'S2', 'S3', 'L', 'L1', 'L2', 'ES', 'STI2D', 'STG'];
@@ -245,7 +247,6 @@ class _LyceenFormState extends ConsumerState<_LyceenForm> {
   @override
   void dispose() {
     _moyenneController.dispose();
-    _budgetController.dispose();
     super.dispose();
   }
 
@@ -332,13 +333,6 @@ class _LyceenFormState extends ConsumerState<_LyceenForm> {
           ],
         ),
         const SizedBox(height: 16),
-        TextField(
-          controller: _budgetController,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: 'Budget annuel max (FCFA)'),
-          onChanged: (v) => _draft = _draft.copyWith(budgetMaxAnnuel: double.tryParse(v)),
-        ),
-        const SizedBox(height: 16),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           title: const Text('Mobilité géographique'),
@@ -354,6 +348,15 @@ class _LyceenFormState extends ConsumerState<_LyceenForm> {
           values: _draft.passions,
           onChanged: (values) => setState(() => _draft = _draft.copyWith(passions: values)),
           hint: 'Ajouter une passion',
+        ),
+        const SizedBox(height: 12),
+        Text('Matières fortes', style: context.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        _ChipInput(
+          values: _draft.matieresFortes,
+          onChanged: (values) =>
+              setState(() => _draft = _draft.copyWith(matieresFortes: values)),
+          hint: 'Ex : Mathématiques, Physique-Chimie...',
         ),
         const SizedBox(height: 12),
         Text('Métiers envisagés', style: context.textTheme.titleMedium),

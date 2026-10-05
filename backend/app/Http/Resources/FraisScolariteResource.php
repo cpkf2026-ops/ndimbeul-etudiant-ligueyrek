@@ -13,7 +13,8 @@ class FraisScolariteResource extends JsonResource
             'id' => $this->id,
             'universite_id' => $this->universite_id,
             'formation_id' => $this->formation_id,
-            'montant' => $this->montant,
+            // Cast Eloquent 'decimal:2' -> chaîne PHP : reconverti en number JSON.
+            'montant' => $this->montant !== null ? (float) $this->montant : null,
             'devise' => $this->devise,
             'echeancier' => $this->echeancier,
             'moyens_paiement' => $this->moyens_paiement,

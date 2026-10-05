@@ -50,7 +50,10 @@ class MockChatRemoteDataSource implements ChatRemoteDataSource {
       yield ChatStreamEvent.token(i == 0 ? mots[i] : ' ${mots[i]}');
     }
 
-    final sources = ['ucad.sn/formations', 'isep.sn'];
+    final sources = <SourceCitee>[
+      (titre: 'Université Cheikh Anta Diop', url: 'https://www.ucad.sn'),
+      (titre: 'ISEP-Thiès', url: 'https://www.isep-thies.sn'),
+    ];
     await Future.delayed(const Duration(milliseconds: 150));
     yield ChatStreamEvent.done(conversationId: id, sources: sources);
 

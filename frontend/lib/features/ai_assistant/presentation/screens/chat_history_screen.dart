@@ -37,7 +37,7 @@ class ChatHistoryScreen extends ConsumerWidget {
                 icon: Icons.forum_outlined,
                 title: 'Aucune conversation pour le moment',
                 actionLabel: 'Ouvrir le chat',
-                onAction: () => context.push(RoutePaths.chat),
+                onAction: () => context.go(RoutePaths.chat),
               )
             : ListView.separated(
                 padding: const EdgeInsets.all(16),
@@ -57,7 +57,7 @@ class ChatHistoryScreen extends ConsumerWidget {
                         if (failure != null) {
                           context.showSnack(failure.message, isError: true);
                         } else {
-                          context.push(RoutePaths.chat);
+                          context.go(RoutePaths.chat);
                         }
                       },
                       child: Padding(

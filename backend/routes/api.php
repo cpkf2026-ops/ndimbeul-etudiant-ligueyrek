@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\AlertController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\FormationController;
 use App\Http\Controllers\Api\V1\JobController;
+use App\Http\Controllers\Api\V1\MediaController;
 use App\Http\Controllers\Api\V1\NewsController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\ProfileController;
@@ -89,6 +90,10 @@ Route::prefix('v1')->group(function () {
         Route::post('/jobs/{job}/favorite', [JobController::class, 'favorite']);
         Route::delete('/jobs/{job}/favorite', [JobController::class, 'unfavorite']);
     });
+
+    // --- Médias (publique) : logos/images téléchargés localement par la veille IA,
+    // servis avec CORS explicite (voir MediaController) ---
+    Route::get('/media/{path}', [MediaController::class, 'show'])->where('path', '.*');
 
     // --- Actualités (publique) ---
     Route::get('/news', [NewsController::class, 'index']);

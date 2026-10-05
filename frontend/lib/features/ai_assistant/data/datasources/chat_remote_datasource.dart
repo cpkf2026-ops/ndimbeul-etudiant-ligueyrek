@@ -4,7 +4,17 @@ import 'package:dio/dio.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../domain/entities/chat_stream_event.dart';
+import '../../domain/entities/message_ia.dart';
 import '../models/conversation_ia_model.dart';
+
+// Accepte {titre, url} (nouveau format) et une simple chaîne (compat le temps
+// que tout serveur backend renvoie le nouveau format).
+SourceCitee _sourceCiteeFromJson(dynamic e) {
+  if (e is Map) {
+    return (titre: (e['titre'] ?? 'Source').toString(), url: e['url'] as String?);
+  }
+  return (titre: e.toString(), url: null);
+}
 
 abstract interface class ChatRemoteDataSource {
   Stream<ChatStreamEvent> sendMessage({required String message, String? conversationId});
@@ -39,7 +49,19 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
           'message': message,
           if (conversationId != null) 'conversation_id': conversationId,
         },
-        options: Options(responseType: ResponseType.stream),
+        // Le LLM tourne en local via Ollama, sans GPU : une réponse peut prendre
+        // plusieurs minutes (le timeout global de 30s de AppConstants est bien trop
+        // court et faisait échouer toutes les conversations avant même que le
+        // premier token n'arrive).
+        options: Options(
+          responseType: ResponseType.stream,
+          // connectTimeout élargi pour la même raison que les recommandations
+          // (serveur de dev Laravel mono-thread sous Windows) : sinon une
+          // connexion en attente derrière une requête en cours dépasse les 15s
+          // par défaut et échoue avant même le début du streaming.
+          connectTimeout: const Duration(minutes: 3),
+          receiveTimeout: const Duration(minutes: 6),
+        ),
       );
     } on DioException catch (e) {
       yield ChatStreamEvent.error(_errorMessage(e));
@@ -48,7 +70,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
     var buffer = '';
     var lastConversationId = conversationId ?? '';
-    final sources = <String>[];
+    final sources = <SourceCitee>[];
 
     await for (final chunk in response.data!.stream) {
       buffer += utf8.decode(chunk, allowMalformed: true);
@@ -89,7 +111,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         if (decoded['sources'] is List) {
           sources
             ..clear()
-            ..addAll((decoded['sources'] as List).map((e) => e.toString()));
+            ..addAll((decoded['sources'] as List).map(_sourceCiteeFromJson));
         }
         if (decoded['error'] != null) {
           yield ChatStreamEvent.error(decoded['error'].toString());

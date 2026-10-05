@@ -26,10 +26,21 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
   final Dio _dio;
 
+  // Le serveur de dev Laravel (PHP built-in, mono-thread sous Windows) peut mettre plus
+  // de 15s/30s à répondre quand il est occupé par une autre requête (recommandations,
+  // chat) — sans ce délai élargi, un enregistrement de profil échoue en timeout PENDANT
+  // qu'un pic de charge est en cours, silencieusement pour l'utilisateur, qui croit ses
+  // champs sauvegardés alors qu'ils ne le sont pas (voir recommendation_remote_datasource.dart
+  // pour le même correctif appliqué en premier).
+  static final _optionsTimeoutElargi = Options(
+    connectTimeout: const Duration(minutes: 2),
+    receiveTimeout: const Duration(minutes: 2),
+  );
+
   @override
   Future<ProfileEnvelope> getProfile() async {
     try {
-      final response = await _dio.get(ApiEndpoints.profileMe);
+      final response = await _dio.get(ApiEndpoints.profileMe, options: _optionsTimeoutElargi);
       final utilisateur =
           (response.data as Map<String, dynamic>)['utilisateur'] as Map<String, dynamic>;
       return (
@@ -44,7 +55,11 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<ProfilLyceenModel> updateProfilLyceen(ProfilLyceenModel profil) async {
     try {
-      final response = await _dio.put(ApiEndpoints.profileMe, data: profil.toUpdatePayload());
+      final response = await _dio.put(
+        ApiEndpoints.profileMe,
+        data: profil.toUpdatePayload(),
+        options: _optionsTimeoutElargi,
+      );
       final utilisateur =
           (response.data as Map<String, dynamic>)['utilisateur'] as Map<String, dynamic>;
       return ProfilLyceenModel.fromJson(
@@ -58,7 +73,11 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<ProfilEtudiantModel> updateProfilEtudiant(ProfilEtudiantModel profil) async {
     try {
-      final response = await _dio.put(ApiEndpoints.profileMe, data: profil.toUpdatePayload());
+      final response = await _dio.put(
+        ApiEndpoints.profileMe,
+        data: profil.toUpdatePayload(),
+        options: _optionsTimeoutElargi,
+      );
       final utilisateur =
           (response.data as Map<String, dynamic>)['utilisateur'] as Map<String, dynamic>;
       return ProfilEtudiantModel.fromJson(
@@ -72,7 +91,11 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<ProfilDiplomeModel> updateProfilDiplome(ProfilDiplomeModel profil) async {
     try {
-      final response = await _dio.put(ApiEndpoints.profileMe, data: profil.toUpdatePayload());
+      final response = await _dio.put(
+        ApiEndpoints.profileMe,
+        data: profil.toUpdatePayload(),
+        options: _optionsTimeoutElargi,
+      );
       final utilisateur =
           (response.data as Map<String, dynamic>)['utilisateur'] as Map<String, dynamic>;
       return ProfilDiplomeModel.fromJson(

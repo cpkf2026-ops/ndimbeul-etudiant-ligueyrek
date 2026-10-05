@@ -19,7 +19,7 @@ class JobController extends Controller
         $request->validate([
             'domaine' => ['sometimes', 'string'],
             'region' => ['sometimes', 'string'],
-            'type' => ['sometimes', 'in:emploi,stage,alternance,formation,bourse'],
+            'type' => ['sometimes', 'in:emploi,stage,alternance,formation,bourse,concours'],
             'niveau_requis' => ['sometimes', 'string'],
             'date_limite_avant' => ['sometimes', 'date'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
@@ -32,7 +32,9 @@ class JobController extends Controller
             ->deType($request->query('type'))
             ->when($request->query('niveau_requis'), fn ($q, $n) => $q->where('niveau_requis', $n))
             ->when($request->query('date_limite_avant'), fn ($q, $d) => $q->where('date_limite', '<=', $d))
+            // Plus récentes d'abord ; à date égale, la dernière indexée par la veille.
             ->orderByDesc('date_publication')
+            ->orderByDesc('date_indexation')
             ->paginate($request->integer('per_page', 20));
 
         return response()->json([

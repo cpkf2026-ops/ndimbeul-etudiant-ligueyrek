@@ -17,7 +17,7 @@ class AlerteProfilRequest extends FormRequest
             'criteres' => ['required', 'array'],
             'criteres.domaine' => ['sometimes', 'nullable', 'string'],
             'criteres.region' => ['sometimes', 'nullable', 'string'],
-            'criteres.type' => ['sometimes', 'nullable', 'in:emploi,stage,alternance,formation,bourse'],
+            'criteres.type' => ['sometimes', 'nullable', 'in:emploi,stage,alternance,formation,bourse,concours'],
             'criteres.niveau' => ['sometimes', 'nullable', 'string'],
             'actif' => ['sometimes', 'boolean'],
         ];

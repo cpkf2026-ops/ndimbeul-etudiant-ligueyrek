@@ -9,7 +9,8 @@ enum JobType {
   stage,
   alternance,
   formation,
-  bourse;
+  bourse,
+  concours;
 
   String get label {
     switch (this) {
@@ -23,6 +24,8 @@ enum JobType {
         return 'Formation';
       case JobType.bourse:
         return 'Bourse';
+      case JobType.concours:
+        return 'Concours';
     }
   }
 }
@@ -40,12 +43,19 @@ sealed class OffreEmploi with _$OffreEmploi {
     required String description,
     String? sourceUrl,
     String? source,
+    /// Fiabilité de la source vérifiée par la veille IA : 'officiel', 'presse'
+    /// ou 'plateforme' (null pour les données de démonstration).
+    String? fiabilite,
     DateTime? datePublication,
     DateTime? dateLimite,
+    DateTime? dateIndexation,
     required String statut,
     @Default(false) bool expiree,
     @Default(false) bool estFavori,
   }) = _OffreEmploi;
 
   const OffreEmploi._();
+
+  bool get sourceVerifiee => fiabilite != null;
+  bool get sourceOfficielle => fiabilite == 'officiel';
 }

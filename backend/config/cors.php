@@ -10,7 +10,11 @@ return [
 
     'allowed_origins' => explode(',', (string) env('CORS_ALLOWED_ORIGINS', 'http://localhost:5000')),
 
-    'allowed_origins_patterns' => [],
+    // En développement local uniquement : `flutter run -d chrome` choisit un port
+    // différent à chaque lancement — on accepte donc localhost/127.0.0.1 sur tout port.
+    'allowed_origins_patterns' => env('APP_ENV') === 'local'
+        ? ['#^http://(localhost|127\.0\.0\.1)(:\d+)?$#']
+        : [],
 
     'allowed_headers' => ['*'],
 

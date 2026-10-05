@@ -20,19 +20,31 @@ mixin _$ChatStreamEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String delta) token,
-    required TResult Function(String conversationId, List<String> sources) done,
+    required TResult Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )
+    done,
     required TResult Function(String message) error,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String delta)? token,
-    TResult? Function(String conversationId, List<String> sources)? done,
+    TResult? Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )?
+    done,
     TResult? Function(String message)? error,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String delta)? token,
-    TResult Function(String conversationId, List<String> sources)? done,
+    TResult Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )?
+    done,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
@@ -154,7 +166,11 @@ class _$ChatStreamEventTokenImpl implements ChatStreamEventToken {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String delta) token,
-    required TResult Function(String conversationId, List<String> sources) done,
+    required TResult Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )
+    done,
     required TResult Function(String message) error,
   }) {
     return token(delta);
@@ -164,7 +180,11 @@ class _$ChatStreamEventTokenImpl implements ChatStreamEventToken {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String delta)? token,
-    TResult? Function(String conversationId, List<String> sources)? done,
+    TResult? Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )?
+    done,
     TResult? Function(String message)? error,
   }) {
     return token?.call(delta);
@@ -174,7 +194,11 @@ class _$ChatStreamEventTokenImpl implements ChatStreamEventToken {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String delta)? token,
-    TResult Function(String conversationId, List<String> sources)? done,
+    TResult Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )?
+    done,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -239,7 +263,10 @@ abstract class _$$ChatStreamEventDoneImplCopyWith<$Res> {
     $Res Function(_$ChatStreamEventDoneImpl) then,
   ) = __$$ChatStreamEventDoneImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String conversationId, List<String> sources});
+  $Res call({
+    String conversationId,
+    List<({String titre, String? url})> sources,
+  });
 }
 
 /// @nodoc
@@ -265,7 +292,7 @@ class __$$ChatStreamEventDoneImplCopyWithImpl<$Res>
         sources: null == sources
             ? _value._sources
             : sources // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
+                  as List<({String titre, String? url})>,
       ),
     );
   }
@@ -276,15 +303,15 @@ class __$$ChatStreamEventDoneImplCopyWithImpl<$Res>
 class _$ChatStreamEventDoneImpl implements ChatStreamEventDone {
   const _$ChatStreamEventDoneImpl({
     required this.conversationId,
-    final List<String> sources = const <String>[],
+    final List<({String titre, String? url})> sources = const <SourceCitee>[],
   }) : _sources = sources;
 
   @override
   final String conversationId;
-  final List<String> _sources;
+  final List<({String titre, String? url})> _sources;
   @override
   @JsonKey()
-  List<String> get sources {
+  List<({String titre, String? url})> get sources {
     if (_sources is EqualUnmodifiableListView) return _sources;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_sources);
@@ -327,7 +354,11 @@ class _$ChatStreamEventDoneImpl implements ChatStreamEventDone {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String delta) token,
-    required TResult Function(String conversationId, List<String> sources) done,
+    required TResult Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )
+    done,
     required TResult Function(String message) error,
   }) {
     return done(conversationId, sources);
@@ -337,7 +368,11 @@ class _$ChatStreamEventDoneImpl implements ChatStreamEventDone {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String delta)? token,
-    TResult? Function(String conversationId, List<String> sources)? done,
+    TResult? Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )?
+    done,
     TResult? Function(String message)? error,
   }) {
     return done?.call(conversationId, sources);
@@ -347,7 +382,11 @@ class _$ChatStreamEventDoneImpl implements ChatStreamEventDone {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String delta)? token,
-    TResult Function(String conversationId, List<String> sources)? done,
+    TResult Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )?
+    done,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -395,11 +434,11 @@ class _$ChatStreamEventDoneImpl implements ChatStreamEventDone {
 abstract class ChatStreamEventDone implements ChatStreamEvent {
   const factory ChatStreamEventDone({
     required final String conversationId,
-    final List<String> sources,
+    final List<({String titre, String? url})> sources,
   }) = _$ChatStreamEventDoneImpl;
 
   String get conversationId;
-  List<String> get sources;
+  List<({String titre, String? url})> get sources;
 
   /// Create a copy of ChatStreamEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -483,7 +522,11 @@ class _$ChatStreamEventErrorImpl implements ChatStreamEventError {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String delta) token,
-    required TResult Function(String conversationId, List<String> sources) done,
+    required TResult Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )
+    done,
     required TResult Function(String message) error,
   }) {
     return error(message);
@@ -493,7 +536,11 @@ class _$ChatStreamEventErrorImpl implements ChatStreamEventError {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String delta)? token,
-    TResult? Function(String conversationId, List<String> sources)? done,
+    TResult? Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )?
+    done,
     TResult? Function(String message)? error,
   }) {
     return error?.call(message);
@@ -503,7 +550,11 @@ class _$ChatStreamEventErrorImpl implements ChatStreamEventError {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String delta)? token,
-    TResult Function(String conversationId, List<String> sources)? done,
+    TResult Function(
+      String conversationId,
+      List<({String titre, String? url})> sources,
+    )?
+    done,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {

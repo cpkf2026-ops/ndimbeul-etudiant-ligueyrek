@@ -40,7 +40,7 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
       p.moyenneGenerale != null,
       (p.passions ?? []).isNotEmpty,
       (p.metiersEnvisages ?? []).isNotEmpty,
-      p.budgetMaxAnnuel != null,
+      (p.matieresFortes ?? []).isNotEmpty,
       p.prefPublicPrive != PrefEtablissement.indifferent,
       p.regionCible != null && p.regionCible!.isNotEmpty,
       p.anneeTerminale != null,

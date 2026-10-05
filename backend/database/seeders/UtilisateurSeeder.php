@@ -28,8 +28,9 @@ class UtilisateurSeeder extends Seeder
 
         ProfilLyceen::create([
             'utilisateur_id' => $lyceen->id, 'serie_bac' => 'S2', 'moyenne_generale' => 14.5,
-            'passions' => ['informatique', 'entrepreneuriat'], 'metiers_envisages' => ['développeur', 'data analyst'],
-            'budget_max_annuel' => 500000, 'mobilite' => true, 'pref_public_prive' => 'indifferent',
+            'passions' => ['informatique', 'entrepreneuriat'], 'matieres_fortes' => ['Mathématiques', 'Physique-Chimie'],
+            'metiers_envisages' => ['développeur', 'data analyst'],
+            'mobilite' => true, 'pref_public_prive' => 'indifferent',
             'region_cible' => 'Dakar', 'annee_terminale' => 2026,
         ]);
 

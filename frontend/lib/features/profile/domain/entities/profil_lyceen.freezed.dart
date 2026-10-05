@@ -20,8 +20,8 @@ mixin _$ProfilLyceen {
   String? get serieBac => throw _privateConstructorUsedError;
   double? get moyenneGenerale => throw _privateConstructorUsedError;
   List<String> get passions => throw _privateConstructorUsedError;
+  List<String> get matieresFortes => throw _privateConstructorUsedError;
   List<String> get metiersEnvisages => throw _privateConstructorUsedError;
-  double? get budgetMaxAnnuel => throw _privateConstructorUsedError;
   bool get mobilite => throw _privateConstructorUsedError;
   PrefEtablissement get prefPublicPrive => throw _privateConstructorUsedError;
   String? get regionCible => throw _privateConstructorUsedError;
@@ -46,8 +46,8 @@ abstract class $ProfilLyceenCopyWith<$Res> {
     String? serieBac,
     double? moyenneGenerale,
     List<String> passions,
+    List<String> matieresFortes,
     List<String> metiersEnvisages,
-    double? budgetMaxAnnuel,
     bool mobilite,
     PrefEtablissement prefPublicPrive,
     String? regionCible,
@@ -74,8 +74,8 @@ class _$ProfilLyceenCopyWithImpl<$Res, $Val extends ProfilLyceen>
     Object? serieBac = freezed,
     Object? moyenneGenerale = freezed,
     Object? passions = null,
+    Object? matieresFortes = null,
     Object? metiersEnvisages = null,
-    Object? budgetMaxAnnuel = freezed,
     Object? mobilite = null,
     Object? prefPublicPrive = null,
     Object? regionCible = freezed,
@@ -96,14 +96,14 @@ class _$ProfilLyceenCopyWithImpl<$Res, $Val extends ProfilLyceen>
                 ? _value.passions
                 : passions // ignore: cast_nullable_to_non_nullable
                       as List<String>,
+            matieresFortes: null == matieresFortes
+                ? _value.matieresFortes
+                : matieresFortes // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
             metiersEnvisages: null == metiersEnvisages
                 ? _value.metiersEnvisages
                 : metiersEnvisages // ignore: cast_nullable_to_non_nullable
                       as List<String>,
-            budgetMaxAnnuel: freezed == budgetMaxAnnuel
-                ? _value.budgetMaxAnnuel
-                : budgetMaxAnnuel // ignore: cast_nullable_to_non_nullable
-                      as double?,
             mobilite: null == mobilite
                 ? _value.mobilite
                 : mobilite // ignore: cast_nullable_to_non_nullable
@@ -143,8 +143,8 @@ abstract class _$$ProfilLyceenImplCopyWith<$Res>
     String? serieBac,
     double? moyenneGenerale,
     List<String> passions,
+    List<String> matieresFortes,
     List<String> metiersEnvisages,
-    double? budgetMaxAnnuel,
     bool mobilite,
     PrefEtablissement prefPublicPrive,
     String? regionCible,
@@ -170,8 +170,8 @@ class __$$ProfilLyceenImplCopyWithImpl<$Res>
     Object? serieBac = freezed,
     Object? moyenneGenerale = freezed,
     Object? passions = null,
+    Object? matieresFortes = null,
     Object? metiersEnvisages = null,
-    Object? budgetMaxAnnuel = freezed,
     Object? mobilite = null,
     Object? prefPublicPrive = null,
     Object? regionCible = freezed,
@@ -192,14 +192,14 @@ class __$$ProfilLyceenImplCopyWithImpl<$Res>
             ? _value._passions
             : passions // ignore: cast_nullable_to_non_nullable
                   as List<String>,
+        matieresFortes: null == matieresFortes
+            ? _value._matieresFortes
+            : matieresFortes // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
         metiersEnvisages: null == metiersEnvisages
             ? _value._metiersEnvisages
             : metiersEnvisages // ignore: cast_nullable_to_non_nullable
                   as List<String>,
-        budgetMaxAnnuel: freezed == budgetMaxAnnuel
-            ? _value.budgetMaxAnnuel
-            : budgetMaxAnnuel // ignore: cast_nullable_to_non_nullable
-                  as double?,
         mobilite: null == mobilite
             ? _value.mobilite
             : mobilite // ignore: cast_nullable_to_non_nullable
@@ -232,14 +232,15 @@ class _$ProfilLyceenImpl extends _ProfilLyceen {
     this.serieBac,
     this.moyenneGenerale,
     final List<String> passions = const <String>[],
+    final List<String> matieresFortes = const <String>[],
     final List<String> metiersEnvisages = const <String>[],
-    this.budgetMaxAnnuel,
     this.mobilite = false,
     this.prefPublicPrive = PrefEtablissement.indifferent,
     this.regionCible,
     this.anneeTerminale,
     this.completude = 0,
   }) : _passions = passions,
+       _matieresFortes = matieresFortes,
        _metiersEnvisages = metiersEnvisages,
        super._();
 
@@ -256,6 +257,15 @@ class _$ProfilLyceenImpl extends _ProfilLyceen {
     return EqualUnmodifiableListView(_passions);
   }
 
+  final List<String> _matieresFortes;
+  @override
+  @JsonKey()
+  List<String> get matieresFortes {
+    if (_matieresFortes is EqualUnmodifiableListView) return _matieresFortes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_matieresFortes);
+  }
+
   final List<String> _metiersEnvisages;
   @override
   @JsonKey()
@@ -266,8 +276,6 @@ class _$ProfilLyceenImpl extends _ProfilLyceen {
     return EqualUnmodifiableListView(_metiersEnvisages);
   }
 
-  @override
-  final double? budgetMaxAnnuel;
   @override
   @JsonKey()
   final bool mobilite;
@@ -284,7 +292,7 @@ class _$ProfilLyceenImpl extends _ProfilLyceen {
 
   @override
   String toString() {
-    return 'ProfilLyceen(serieBac: $serieBac, moyenneGenerale: $moyenneGenerale, passions: $passions, metiersEnvisages: $metiersEnvisages, budgetMaxAnnuel: $budgetMaxAnnuel, mobilite: $mobilite, prefPublicPrive: $prefPublicPrive, regionCible: $regionCible, anneeTerminale: $anneeTerminale, completude: $completude)';
+    return 'ProfilLyceen(serieBac: $serieBac, moyenneGenerale: $moyenneGenerale, passions: $passions, matieresFortes: $matieresFortes, metiersEnvisages: $metiersEnvisages, mobilite: $mobilite, prefPublicPrive: $prefPublicPrive, regionCible: $regionCible, anneeTerminale: $anneeTerminale, completude: $completude)';
   }
 
   @override
@@ -298,11 +306,13 @@ class _$ProfilLyceenImpl extends _ProfilLyceen {
                 other.moyenneGenerale == moyenneGenerale) &&
             const DeepCollectionEquality().equals(other._passions, _passions) &&
             const DeepCollectionEquality().equals(
+              other._matieresFortes,
+              _matieresFortes,
+            ) &&
+            const DeepCollectionEquality().equals(
               other._metiersEnvisages,
               _metiersEnvisages,
             ) &&
-            (identical(other.budgetMaxAnnuel, budgetMaxAnnuel) ||
-                other.budgetMaxAnnuel == budgetMaxAnnuel) &&
             (identical(other.mobilite, mobilite) ||
                 other.mobilite == mobilite) &&
             (identical(other.prefPublicPrive, prefPublicPrive) ||
@@ -321,8 +331,8 @@ class _$ProfilLyceenImpl extends _ProfilLyceen {
     serieBac,
     moyenneGenerale,
     const DeepCollectionEquality().hash(_passions),
+    const DeepCollectionEquality().hash(_matieresFortes),
     const DeepCollectionEquality().hash(_metiersEnvisages),
-    budgetMaxAnnuel,
     mobilite,
     prefPublicPrive,
     regionCible,
@@ -344,8 +354,8 @@ abstract class _ProfilLyceen extends ProfilLyceen {
     final String? serieBac,
     final double? moyenneGenerale,
     final List<String> passions,
+    final List<String> matieresFortes,
     final List<String> metiersEnvisages,
-    final double? budgetMaxAnnuel,
     final bool mobilite,
     final PrefEtablissement prefPublicPrive,
     final String? regionCible,
@@ -361,9 +371,9 @@ abstract class _ProfilLyceen extends ProfilLyceen {
   @override
   List<String> get passions;
   @override
-  List<String> get metiersEnvisages;
+  List<String> get matieresFortes;
   @override
-  double? get budgetMaxAnnuel;
+  List<String> get metiersEnvisages;
   @override
   bool get mobilite;
   @override

@@ -34,7 +34,9 @@ class RecommendationsScreen extends ConsumerWidget {
               title: 'Profil incomplet',
               message: error.message,
               actionLabel: 'Compléter mon profil',
-              onAction: () => context.push(RoutePaths.profile),
+              // go() : /profile est un autre branch de la StatefulShellRoute, voir
+              // orientation_screen.dart pour la même correction.
+              onAction: () => context.go(RoutePaths.profile),
             );
           }
           return EmptyState(
@@ -122,14 +124,16 @@ class _RecommendationCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(recommendation.intitule, style: context.textTheme.titleLarge),
+                    const SizedBox(height: 2),
                     Text(
-                      recommendation.formationIntitule ?? 'Formation suggérée',
-                      style: context.textTheme.titleLarge,
+                      [
+                        recommendation.universiteNom,
+                        if (recommendation.universiteRegion != null)
+                          recommendation.universiteRegion!,
+                      ].join(' — '),
+                      style: context.textTheme.bodyMedium,
                     ),
-                    if (recommendation.universiteNom != null) ...[
-                      const SizedBox(height: 2),
-                      Text(recommendation.universiteNom!, style: context.textTheme.bodyMedium),
-                    ],
                   ],
                 ),
               ),
@@ -148,19 +152,68 @@ class _RecommendationCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(recommendation.explicationLlm, style: context.textTheme.bodyLarge),
-          if (recommendation.universiteId != null) ...[
-            const SizedBox(height: 14),
-            Align(
-              alignment: Alignment.centerRight,
-              child: OutlinedButton(
-                onPressed: () =>
-                    context.push(RoutePaths.universityDetailPath(recommendation.universiteId!)),
-                child: const Text('Voir la fiche université'),
-              ),
+          if (recommendation.conditionsAdmission != null &&
+              recommendation.conditionsAdmission!.seriesAcceptees.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            _InfoLine(
+              icon: Icons.checklist_rounded,
+              label: 'Séries acceptées',
+              value: recommendation.conditionsAdmission!.seriesAcceptees.join(', '),
             ),
           ],
+          if (recommendation.conditionsAdmission?.moyenneMinimale != null) ...[
+            const SizedBox(height: 4),
+            _InfoLine(
+              icon: Icons.grade_outlined,
+              label: 'Moyenne minimale',
+              value: '${recommendation.conditionsAdmission!.moyenneMinimale}/20',
+            ),
+          ],
+          if (recommendation.debouches != null && recommendation.debouches!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            _InfoLine(
+              icon: Icons.trending_up_rounded,
+              label: 'Débouchés',
+              value: recommendation.debouches!,
+            ),
+          ],
+          const SizedBox(height: 14),
+          Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton(
+              onPressed: () =>
+                  context.push(RoutePaths.universityDetailPath(recommendation.universiteId)),
+              child: const Text('Voir la fiche université'),
+            ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _InfoLine extends StatelessWidget {
+  const _InfoLine({required this.icon, required this.label, required this.value});
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 15, color: AppColors.textSecondary),
+        const SizedBox(width: 6),
+        Text('$label : ', style: context.textTheme.labelSmall),
+        Expanded(
+          child: Text(
+            value,
+            style: context.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -16,7 +16,22 @@ class RecommendationRemoteDataSourceImpl implements RecommendationRemoteDataSour
   @override
   Future<List<RecommandationModel>> getRecommendations() async {
     try {
-      final response = await _dio.get(ApiEndpoints.aiRecommendations);
+      final response = await _dio.get(
+        ApiEndpoints.aiRecommendations,
+        // Le moteur de scoring appelle le LLM local (Ollama, CPU) pour rédiger une
+        // explication par formation recommandée : le timeout global de 30s de
+        // AppConstants est trop court et faisait échouer l'écran avec "Pas de
+        // connexion internet" alors que le calcul était simplement en cours.
+        // connectTimeout doit être élargi lui aussi : le serveur de dev Laravel
+        // (PHP built-in, mono-thread sur Windows) peut mettre plus de 15s à
+        // accepter une nouvelle connexion tant qu'il traite une requête en cours,
+        // ce qui déclenchait un faux "Pas de connexion internet" au moment même
+        // de la connexion, avant même que receiveTimeout ne compte.
+        options: Options(
+          connectTimeout: const Duration(minutes: 3),
+          receiveTimeout: const Duration(minutes: 3),
+        ),
+      );
       final data = response.data;
       final list = data is Map<String, dynamic> ? data['data'] ?? data['recommendations'] : data;
       if (list is! List) return const [];

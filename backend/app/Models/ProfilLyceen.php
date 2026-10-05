@@ -15,7 +15,7 @@ class ProfilLyceen extends Model
 
     protected $fillable = [
         'utilisateur_id', 'serie_bac', 'niveau', 'etablissement', 'moyenne_generale', 'passions',
-        'metiers_envisages', 'budget_max_annuel', 'mobilite',
+        'matieres_fortes', 'metiers_envisages', 'mobilite',
         'pref_public_prive', 'region_cible', 'annee_terminale',
     ];
 
@@ -23,8 +23,8 @@ class ProfilLyceen extends Model
     {
         return [
             'passions' => 'array',
+            'matieres_fortes' => 'array',
             'metiers_envisages' => 'array',
-            'budget_max_annuel' => 'decimal:2',
             'moyenne_generale' => 'decimal:2',
             'mobilite' => 'boolean',
         ];
@@ -41,8 +41,8 @@ class ProfilLyceen extends Model
     public function calculerCompletude(): int
     {
         $champs = [
-            'serie_bac', 'niveau', 'etablissement', 'moyenne_generale', 'passions', 'metiers_envisages',
-            'budget_max_annuel', 'pref_public_prive', 'region_cible', 'annee_terminale',
+            'serie_bac', 'niveau', 'etablissement', 'moyenne_generale', 'passions', 'matieres_fortes',
+            'metiers_envisages', 'pref_public_prive', 'region_cible', 'annee_terminale',
         ];
 
         $remplis = collect($champs)->filter(fn ($champ) => filled($this->{$champ}))->count();
@@ -50,9 +50,14 @@ class ProfilLyceen extends Model
         return (int) round(($remplis / count($champs)) * 100);
     }
 
+    /** En-dessous de ce seuil, le profil est jugé trop incomplet pour des recommandations
+     * fiables ; au-delà, on recommande sur la base de ce qui est renseigné plutôt que
+     * d'exiger 100% (quelques champs facultatifs manquants ne doivent pas tout bloquer). */
+    private const SEUIL_COMPLETUDE_MINIMUM = 70;
+
     public function estComplet(): bool
     {
-        return $this->calculerCompletude() === 100;
+        return $this->calculerCompletude() >= self::SEUIL_COMPLETUDE_MINIMUM;
     }
 
     /**
@@ -63,11 +68,11 @@ class ProfilLyceen extends Model
         return [
             'serie_bac' => $this->serie_bac,
             'moyenne_generale' => $this->moyenne_generale,
-            'budget_max' => $this->budget_max_annuel,
             'mobilite' => $this->mobilite,
             'pref_public_prive' => $this->pref_public_prive,
             'region_cible' => $this->region_cible,
             'passions' => $this->passions ?? [],
+            'matieres_fortes' => $this->matieres_fortes ?? [],
             'metiers_envisages' => $this->metiers_envisages ?? [],
         ];
     }

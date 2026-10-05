@@ -16,13 +16,15 @@ class Universite extends Model
 
     protected $fillable = [
         'nom', 'code_unique', 'region', 'commune', 'type', 'site_web_officiel',
-        'description', 'image_url', 'email_contact', 'telephone_contact', 'statut_actif',
+        'source', 'date_verification', 'description', 'image_url', 'email_contact',
+        'telephone_contact', 'statut_actif',
     ];
 
     protected function casts(): array
     {
         return [
             'statut_actif' => 'boolean',
+            'date_verification' => 'date',
         ];
     }
 
