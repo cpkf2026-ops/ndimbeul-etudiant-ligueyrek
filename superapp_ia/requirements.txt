@@ -3,7 +3,6 @@ djangorestframework>=3.14
 django-cors-headers>=4.3
 PyMySQL>=1.1
 python-dotenv>=1.0
-openai>=1.30
 httpx>=0.27
 faiss-cpu>=1.8
 sentence-transformers>=3.0
@@ -13,3 +12,4 @@ celery>=5.4
 # commande HELLO utilisée par redis-py 5.x pour négocier RESP3 (erreur de connexion).
 redis>=4.5,<5
 beautifulsoup4>=4.12
+tavily-python==0.7.12

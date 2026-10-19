@@ -1,6 +1,8 @@
 """Prompt système et assemblage du prompt final (PARTIE 6 du cahier des charges)."""
 import re
 
+from services.texte import extrait_pertinent
+
 SYSTEM_PROMPT = """
 Tu es l'assistant IA de Ndimbeul-Etudiant, un conseiller d'orientation
 virtuel pour les lycéens et étudiants sénégalais. Réponds toujours en
@@ -167,3 +169,45 @@ def parser_explications_groupees(texte, nb_attendu):
         if 1 <= numero <= nb_attendu:
             explications[numero - 1] = match.group(2).strip()
     return explications
+
+
+# --- Module 4 : chatbot avec sources numérotées (ia/chatbot.py) -----------------
+
+# Volontairement bref : le modèle relit ce texte à chaque question (~25 tokens/s sur ce
+# CPU). Chaque règle compte ; les contrôles de chatbot.py vérifient ensuite la réponse.
+SYSTEM_PROMPT_CHAT_SOURCES = (
+    "Assistant de Ndimbeul Étudiant (études, orientation, bourses, emploi au Sénégal). "
+    "Réponds en français, en 2 phrases maximum, en tutoyant. "
+    "Utilise SEULEMENT les SOURCES et cite [n] après chaque information. "
+    "N'invente aucune date, chiffre ni nom. "
+    "Si la réponse n'est pas dans les sources, dis-le et renvoie aux LIENS OFFICIELS."
+)
+
+# Sur ce CPU, le modèle LIT le prompt à ~25 tokens/s : chaque source est réduite à ses
+# phrases utiles, l'historique est raccourci et les URL ne sont pas envoyées (l'app
+# affiche elle-même les liens des sources).
+LONGUEUR_MAX_SOURCE_CHAT = 170
+LONGUEUR_MAX_MESSAGE_HISTORIQUE = 200
+
+
+def construire_messages_chat(question, documents, liens_officiels, profil, historique, mots_cles=()):
+    lignes = [
+        f"[{i}] {doc.get('titre') or 'Source'} — "
+        f"{extrait_pertinent(doc['texte'], mots_cles, LONGUEUR_MAX_SOURCE_CHAT)}"
+        for i, doc in enumerate(documents, start=1)
+    ]
+    morceaux = ["SOURCES :\n" + ('\n'.join(lignes) if lignes else '(aucune source trouvée)')]
+    morceaux.append(f"LIENS OFFICIELS : {', '.join(liens_officiels)}")
+    if profil:
+        morceaux.append(f"PROFIL DE L'ÉLÈVE :\n{construire_profil(profil)}")
+    morceaux.append(f"QUESTION : {question}")
+
+    messages = [{'role': 'system', 'content': SYSTEM_PROMPT_CHAT_SOURCES}]
+    for tour in historique:
+        role = tour.get('role')
+        texte_tour = tour.get('contenu') or tour.get('content')
+        if role in ('user', 'assistant') and texte_tour:
+            messages.append({'role': role, 'content': texte_tour[:LONGUEUR_MAX_MESSAGE_HISTORIQUE]})
+    contenu = '\n\n'.join(morceaux)
+    messages.append({'role': 'user', 'content': contenu})
+    return messages

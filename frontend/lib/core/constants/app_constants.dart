@@ -6,7 +6,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 /// C'est le SEUL point de bascule mock/API réelle de toute l'application —
 /// voir `core/di/providers_scope.dart` qui lit ce flag pour choisir quelle
 /// implémentation de RemoteDataSource injecter dans chaque Repository.
-const bool kUseMock = bool.fromEnvironment('USE_MOCK', defaultValue: true);
+///
+/// Par défaut : la VRAIE API (Laravel + service IA). En mode démo (données
+/// fictives), le chat renvoyait toujours la même phrase, quelle que soit la
+/// question. Repasser en démo : `--dart-define=USE_MOCK=true`.
+const bool kUseMock = bool.fromEnvironment('USE_MOCK', defaultValue: false);
 
 /// Exception au mode démo : le fil d'actualités lit TOUJOURS la vraie API
 /// (alimentée toutes les 2 h par la veille IA), même quand le reste de l'app
@@ -46,6 +50,9 @@ abstract final class AppConstants {
   static const String keyAccessToken = 'ndimbeul_access_token';
   static const String keyRefreshToken = 'ndimbeul_refresh_token';
   static const String keyUserRole = 'ndimbeul_user_role';
+  // Dernier compte chargé, pour rester connecté après une actualisation de page
+  // même si le serveur est lent ou injoignable à ce moment-là.
+  static const String keyCachedUser = 'ndimbeul_utilisateur';
 
   // "Se souvenir de moi" — email pré-rempli au retour sur l'écran de connexion
   static const String keyRememberedEmail = 'ndimbeul_remembered_email';

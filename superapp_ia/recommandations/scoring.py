@@ -2,9 +2,9 @@
 Moteur de recommandation (PARTIE 8) — deux étapes bien séparées, comme demandé :
 
   1) FILTRAGE PAR RÈGLES (éliminatoire) : une formation dont la série de bac du
-     profil n'est pas dans `series_acceptees` est retirée AVANT tout scoring —
-     on ne recommande JAMAIS une filière incompatible avec la série du bac, quel
-     que soit son score sur les autres critères.
+     profil n'est pas dans `series_acceptees`, ou dont la `moyenne_minimale` dépasse
+     la moyenne du profil, est retirée AVANT tout scoring — on ne recommande JAMAIS
+     une filière inaccessible, quel que soit son score sur les autres critères.
 
   2) CLASSEMENT PAR SCORE des formations survivantes, sur 100 points :
        - Compatibilité série bac (déjà garantie par le filtrage, toujours pleine
@@ -41,6 +41,14 @@ def _est_compatible_serie(formation, serie_bac):
     return serie_bac in formation.series_acceptees
 
 
+def _est_compatible_moyenne(formation, moyenne):
+    """Règle éliminatoire : sans moyenne minimale renseignée (ou sans moyenne dans le
+    profil), la formation reste proposée."""
+    if moyenne is None or formation.moyenne_minimale is None:
+        return True
+    return float(moyenne) >= float(formation.moyenne_minimale)
+
+
 def _score_domaine_passions(embedding_profil, embedding_formation):
     if embedding_profil is None or embedding_formation is None:
         return 0.0
@@ -60,10 +68,15 @@ def _score_region(formation, region_cible, mobilite):
     if mobilite:
         # L'étudiant se dit mobile : la région ciblée n'est plus un critère discriminant.
         return POIDS_REGION
-    region_universite = getattr(formation.universite, 'region', None)
-    if not region_cible or not region_universite:
+    if not region_cible:
         return 0.0
-    return POIDS_REGION if region_universite.strip().lower() == region_cible.strip().lower() else 0.0
+    # La cible peut être une région (« Thiès ») ou une ville (« Mbour ») : on compare
+    # aux deux champs de l'établissement.
+    lieux = {
+        (getattr(formation.universite, champ, None) or '').strip().lower()
+        for champ in ('region', 'commune')
+    } - {''}
+    return POIDS_REGION if region_cible.strip().lower() in lieux else 0.0
 
 
 def _score_bourse(formation, universites_avec_bourse_active):
@@ -123,14 +136,18 @@ def generer_recommandations(profil, limite=10):
     Chaque élément : {'formation': Formation, 'score': float, 'details': {...sous-scores}}.
     """
     serie_bac = profil.get('serie_bac')
+    moyenne = profil.get('moyenne_generale')
 
     formations_candidates = list(
         Formation.objects.select_related('universite').filter(
             deleted_at__isnull=True, universite__statut_actif=True
         )
     )
-    # 1) FILTRAGE ÉLIMINATOIRE — jamais de filière incompatible avec la série du bac.
-    formations = [f for f in formations_candidates if _est_compatible_serie(f, serie_bac)]
+    # 1) FILTRAGE ÉLIMINATOIRE — jamais de filière incompatible avec la série ou la moyenne.
+    formations = [
+        f for f in formations_candidates
+        if _est_compatible_serie(f, serie_bac) and _est_compatible_moyenne(f, moyenne)
+    ]
     if not formations:
         return []
 

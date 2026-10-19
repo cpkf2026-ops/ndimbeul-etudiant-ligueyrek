@@ -1,0 +1,7 @@
+
+# Fichiers générés localement (Redis, journaux)
+dump.rdb
+*.log
+
+# Journaux et état local de la veille IA
+superapp_ia/logs/

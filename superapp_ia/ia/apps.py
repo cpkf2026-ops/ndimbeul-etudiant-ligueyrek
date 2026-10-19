@@ -10,23 +10,22 @@ class IaConfig(AppConfig):
     verbose_name = 'Assistant IA (RAG + Ollama)'
 
     def ready(self):
-        # Le modèle sentence-transformers met ~30-40s à charger la première fois
-        # (import torch/transformers + poids). Sans préchargement, ce coût tombe sur la
-        # toute première requête chat/recommandation après chaque démarrage serveur, et
-        # dépasse alors le timeout du client (Flutter/Laravel) — ce qui donnait l'impression
-        # que le chat "ne marche pas". On le charge donc en tâche de fond dès le démarrage.
-        # Uniquement pour `runserver` : pas pour `manage.py shell`/`migrate`/`veiller`/celery,
-        # qui n'ont pas besoin du modèle et seraient inutilement ralentis au démarrage.
+        # Au démarrage de `runserver`, on charge le modèle Ollama en mémoire (sinon le premier
+        # message utilisateur paie le chargement, ~10-20 s) et on le garde chaud (keep_alive).
+        #
+        # Le modèle d'embeddings (torch, ~1 Go) est chargé en arrière-plan, sans bloquer le
+        # démarrage : sans lui, la première recommandation attendait ~45 s de chargement et
+        # dépassait le délai de 30 s de l'application.
         if 'runserver' not in sys.argv:
             return
 
         def _precharger():
+            # Modèle de comparaison passions/formations (~1 Go, ~45 s) : chargé en arrière-plan
+            # pour que les recommandations de l'écran Orientation répondent en quelques
+            # secondes. Possible depuis le retrait de Mistral 7B (4,4 Go) sur ce PC.
             from .embeddings import get_model
             get_model()
 
-            # Force aussi le chargement du modèle Ollama en mémoire dès le démarrage (sinon
-            # le premier message utilisateur paie le rechargement, ~10-20s) et le garde chaud
-            # (keep_alive) pour que les messages suivants restent rapides.
             from . import llm_gateway
             llm_gateway.precharger_modele()
 

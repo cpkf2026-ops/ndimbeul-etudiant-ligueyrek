@@ -21,7 +21,8 @@ class UniversityController extends Controller
             'region' => ['sometimes', 'string'],
             'type' => ['sometimes', 'in:public,prive'],
             'q' => ['sometimes', 'string', 'max:255'],
-            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            // 300 : le catalogue centralisé (~210 établissements) tient en une page.
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:300'],
         ]);
 
         $universites = Universite::query()

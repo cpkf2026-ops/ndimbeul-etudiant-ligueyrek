@@ -1,12 +1,11 @@
 """
-Endpoints /internal/* exposés uniquement à Laravel (protégés par
-ia.middleware.InternalKeyMiddleware) : chat (PARTIE 7), indexation de documents
+Endpoints /internal/* et /api/ia/chat/ exposés uniquement à Laravel (protégés par
+services.securite.ServiceTokenMiddleware) : chat (PARTIE 7), indexation de documents
 (PARTIE 4), métriques qualité et health check (PARTIE 9).
 """
-import hashlib
 import io
 import json
-import re
+import logging
 
 import httpx
 from django.conf import settings
@@ -15,61 +14,26 @@ from django.http import JsonResponse, StreamingHttpResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from . import llm_gateway, prompts, rag_local, rag_pipeline
+from . import chatbot, rag_pipeline
 from .models import CacheReponse, ConversationIA, DocumentRAG, SourceDonnee
+from .serializers import ChatEntreeSerializer
+
+logger = logging.getLogger(__name__)
 
 
 # --------------------------------------------------------------------------
-# POST /internal/chat  (PARTIE 7)
+# POST /internal/chat  (PARTIE 7) : chat de l'application, relayé par Laravel à Flutter
 # --------------------------------------------------------------------------
-
-def _normaliser(message):
-    return re.sub(r'\s+', ' ', message.strip().lower())
-
-
-def _hash_question(message):
-    return hashlib.sha256(_normaliser(message).encode('utf-8')).hexdigest()
-
+# Même cerveau que POST /api/ia/chat/ (ia/chatbot.py) : salutations et hors-sujet
+# instantanés, recherche dans la base puis Tavily, contrôles anti-invention, cache Redis,
+# réponse en moins de 30 s. Seul le FORMAT change : des événements SSE, que Flutter lit
+# déjà ({"token": ...} puis {"done": true, "conversation_id", "sources"}).
 
 def _sse(data):
     return f'data: {json.dumps(data, ensure_ascii=False)}\n\n'
-
-
-def _obtenir_ou_creer_conversation(conversation_id, utilisateur_id):
-    if conversation_id:
-        conversation, _ = ConversationIA.objects.get_or_create(
-            id=conversation_id, defaults={'utilisateur_id': utilisateur_id, 'messages': []}
-        )
-        return conversation
-    return ConversationIA.objects.create(utilisateur_id=utilisateur_id, messages=[])
-
-
-def _sources_uniques(documents):
-    """{titre, url} par source citée — url est le vrai site officiel de l'établissement
-    ou l'annonce source de l'offre (voir rag_local.py), null pour les documents
-    manuellement importés (pas de page web associée). Flutter n'affiche le lien comme
-    cliquable QUE si une url réelle est présente (jamais de lien inventé)."""
-    vues = set()
-    sources = []
-    for doc in documents:
-        libelle = doc.get('titre') or 'Document'
-        if libelle not in vues:
-            vues.add(libelle)
-            sources.append({'titre': libelle, 'url': doc.get('url')})
-    return sources
-
-
-def _mettre_en_cache(question_hash, reponse, sources):
-    expiration = timezone.now() + timezone.timedelta(hours=settings.CACHE_REPONSE_TTL_HEURES)
-    CacheReponse.objects.update_or_create(
-        question_hash=question_hash,
-        defaults={
-            'reponse_json': {'reponse': reponse},
-            'sources_utilisees': sources,
-            'date_expiration': expiration,
-        },
-    )
 
 
 def _stream_headers(response):
@@ -91,29 +55,6 @@ def _erreur_sse(message, status=400):
     return _stream_headers(reponse)
 
 
-def _stream_depuis_cache(cache, conversation, message):
-    def generer():
-        reponse = (cache.reponse_json or {}).get('reponse', '')
-        sources = cache.sources_utilisees or []
-
-        yield _sse({'token': reponse})
-
-        conversation.ajouter_message('user', message)
-        conversation.ajouter_message('assistant', reponse, sources)
-
-        cache.nb_utilisations += 1
-        cache.save(update_fields=['nb_utilisations', 'updated_at'])
-
-        yield _sse({
-            'done': True,
-            'conversation_id': str(conversation.id),
-            'sources': sources,
-            'depuis_cache': True,
-        })
-
-    return _stream_headers(StreamingHttpResponse(generer(), content_type='text/event-stream'))
-
-
 @csrf_exempt
 @require_http_methods(['POST'])
 def chat(request):
@@ -126,49 +67,45 @@ def chat(request):
     if not message:
         return _erreur_sse('Le champ "message" est requis.')
 
-    utilisateur_id = payload.get('utilisateur_id')
-    profil = payload.get('profil') or {}
-    conversation_id = payload.get('conversation_id')
-
-    conversation = _obtenir_ou_creer_conversation(conversation_id, utilisateur_id)
-
-    # 1) Cache : hash SHA-256 du message normalisé, réponse réutilisée si < 24h.
-    question_hash = _hash_question(message)
-    cache = CacheReponse.objects.filter(question_hash=question_hash).first()
-    if cache and cache.date_expiration > timezone.now():
-        return _stream_depuis_cache(cache, conversation, message)
-
-    # 2 & 3) Embedding de la question + recherche des top-k documents FAISS (PDF/texte
-    # indexés manuellement), complétée par une recherche mots-clés dans NOS données réelles
-    # (établissements, offres) — le chat doit s'appuyer sur l'application, pas juste sur le
-    # savoir général du modèle.
-    documents = rag_pipeline.rechercher(message) + rag_local.rechercher(message)
-
     def generer():
-        # 4) Construction du prompt complet (système + contexte + profil + question).
-        historique = conversation.messages or []
-        messages_llm = prompts.construire_messages(message, documents, profil, historique)
-
-        # 5 & 6) Appel Ollama en streaming, relayé token par token en SSE.
-        reponse_complete = ''
+        # Ligne de commentaire SSE envoyée tout de suite (ignorée par Flutter, qui ne lit
+        # que les lignes « data: ») : la connexion est ouverte pendant que l'IA travaille.
+        yield ': reponse en preparation\n\n'
         try:
-            for morceau in llm_gateway.generer_reponse_stream(messages_llm):
-                reponse_complete += morceau
-                yield _sse({'token': morceau})
-        except llm_gateway.LLMIndisponibleError as exc:
-            yield _sse({'error': str(exc)})
+            resultat = chatbot.repondre(
+                message=message,
+                conversation_id=payload.get('conversation_id'),
+                utilisateur_id=payload.get('utilisateur_id'),
+                profil=payload.get('profil') or {},
+            )
+        except Exception:  # erreur imprévue : tracée, message lisible pour l'élève
+            logger.exception('Chat (SSE) : erreur interne')
+            yield _sse({'error': "L'assistant a rencontré un problème. Réessaie dans un instant."})
             return
-
-        sources = _sources_uniques(documents)
-
-        # 7) Sauvegarde de la conversation (tour user + assistant) et mise en cache.
-        conversation.ajouter_message('user', message)
-        conversation.ajouter_message('assistant', reponse_complete, sources)
-        _mettre_en_cache(question_hash, reponse_complete, sources)
-
-        yield _sse({'done': True, 'conversation_id': str(conversation.id), 'sources': sources})
+        yield _sse({'token': resultat['reponse']})
+        yield _sse({
+            'done': True,
+            'conversation_id': resultat['conversation_id'] or payload.get('conversation_id'),
+            'sources': resultat['sources'],
+            'depuis_cache': resultat['depuis_cache'],
+            'temps_ms': resultat['temps_ms'],
+        })
 
     return _stream_headers(StreamingHttpResponse(generer(), content_type='text/event-stream'))
+
+
+# --------------------------------------------------------------------------
+# POST /api/ia/chat/  (module 4 : réponse JSON en moins de 30 s)
+# --------------------------------------------------------------------------
+
+class ChatView(APIView):
+    """{"message": "...", "utilisateur_id"?, "conversation_id"?, "profil"?, "historique"?}
+    -> {"reponse", "sources", "temps_ms", "intention", "conversation_id", ...}"""
+
+    def post(self, request):
+        entree = ChatEntreeSerializer(data=request.data)
+        entree.is_valid(raise_exception=True)
+        return Response(chatbot.repondre(**entree.validated_data))
 
 
 # --------------------------------------------------------------------------

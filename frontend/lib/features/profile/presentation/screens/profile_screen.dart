@@ -224,6 +224,11 @@ class _LyceenFormState extends ConsumerState<_LyceenForm> {
   late ProfilLyceen _draft = widget.profil;
   late final _moyenneController =
       TextEditingController(text: widget.profil.moyenneGenerale?.toString() ?? '');
+  // Texte encore en cours de saisie dans les champs à étiquettes : il est ajouté au
+  // moment d'« Enregistrer », sinon il était perdu sans que l'élève le sache.
+  final _passionsController = TextEditingController();
+  final _matieresController = TextEditingController();
+  final _metiersController = TextEditingController();
   bool _saving = false;
 
   static const _series = ['S1', 'S2', 'S3', 'L', 'L1', 'L2', 'ES', 'STI2D', 'STG'];
@@ -247,11 +252,21 @@ class _LyceenFormState extends ConsumerState<_LyceenForm> {
   @override
   void dispose() {
     _moyenneController.dispose();
+    _passionsController.dispose();
+    _matieresController.dispose();
+    _metiersController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
-    setState(() => _saving = true);
+    setState(() {
+      _draft = _draft.copyWith(
+        passions: ajouterSaisieEnCours(_draft.passions, _passionsController),
+        matieresFortes: ajouterSaisieEnCours(_draft.matieresFortes, _matieresController),
+        metiersEnvisages: ajouterSaisieEnCours(_draft.metiersEnvisages, _metiersController),
+      );
+      _saving = true;
+    });
     final failure = await ref.read(profileProvider.notifier).saveLyceen(_draft);
     if (!mounted) return;
     setState(() => _saving = false);
@@ -345,14 +360,16 @@ class _LyceenFormState extends ConsumerState<_LyceenForm> {
         Text('Passions / centres d\'intérêt', style: context.textTheme.titleMedium),
         const SizedBox(height: 8),
         _ChipInput(
+          controller: _passionsController,
           values: _draft.passions,
           onChanged: (values) => setState(() => _draft = _draft.copyWith(passions: values)),
-          hint: 'Ajouter une passion',
+          hint: 'Ex : Médecine, Informatique...',
         ),
         const SizedBox(height: 12),
         Text('Matières fortes', style: context.textTheme.titleMedium),
         const SizedBox(height: 8),
         _ChipInput(
+          controller: _matieresController,
           values: _draft.matieresFortes,
           onChanged: (values) =>
               setState(() => _draft = _draft.copyWith(matieresFortes: values)),
@@ -362,10 +379,11 @@ class _LyceenFormState extends ConsumerState<_LyceenForm> {
         Text('Métiers envisagés', style: context.textTheme.titleMedium),
         const SizedBox(height: 8),
         _ChipInput(
+          controller: _metiersController,
           values: _draft.metiersEnvisages,
           onChanged: (values) =>
               setState(() => _draft = _draft.copyWith(metiersEnvisages: values)),
-          hint: 'Ajouter un métier',
+          hint: 'Ex : Médecin, Ingénieur...',
         ),
         const SizedBox(height: 28),
         SizedBox(
@@ -400,17 +418,24 @@ class _EtudiantFormState extends ConsumerState<_EtudiantForm> {
       TextEditingController(text: widget.profil.universiteActuelle ?? '');
   late final _formationController =
       TextEditingController(text: widget.profil.formationActuelle ?? '');
+  final _domainesController = TextEditingController();
   bool _saving = false;
 
   @override
   void dispose() {
     _universiteController.dispose();
     _formationController.dispose();
+    _domainesController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
-    setState(() => _saving = true);
+    setState(() {
+      _draft = _draft.copyWith(
+        domainesInterets: ajouterSaisieEnCours(_draft.domainesInterets, _domainesController),
+      );
+      _saving = true;
+    });
     final failure = await ref.read(profileProvider.notifier).saveEtudiant(_draft);
     if (!mounted) return;
     setState(() => _saving = false);
@@ -455,6 +480,7 @@ class _EtudiantFormState extends ConsumerState<_EtudiantForm> {
         Text('Domaines d\'intérêt', style: context.textTheme.titleMedium),
         const SizedBox(height: 8),
         _ChipInput(
+          controller: _domainesController,
           values: _draft.domainesInterets,
           onChanged: (values) =>
               setState(() => _draft = _draft.copyWith(domainesInterets: values)),
@@ -587,33 +613,39 @@ class _DiplomeFormState extends ConsumerState<_DiplomeForm> {
   }
 }
 
-/// Saisie de tags libres (passions, métiers, domaines) — ajout via champ +
-/// suppression via chip fermable.
-class _ChipInput extends StatefulWidget {
-  const _ChipInput({required this.values, required this.onChanged, required this.hint});
+/// Ajoute aux [valeurs] le texte encore saisi dans [controller] (plusieurs valeurs
+/// possibles, séparées par des virgules), puis vide le champ. Utilisé à l'enregistrement :
+/// un élève qui tape « Médecine » sans cliquer sur + ne doit pas perdre sa saisie.
+List<String> ajouterSaisieEnCours(List<String> valeurs, TextEditingController controller) {
+  final ajouts = controller.text
+      .split(',')
+      .map((v) => v.trim())
+      .where((v) => v.isNotEmpty && !valeurs.contains(v))
+      .toSet();
+  controller.clear();
+  return [...valeurs, ...ajouts];
+}
 
+/// Saisie de tags libres (passions, métiers, domaines) — ajout via Entrée ou +,
+/// plusieurs à la fois séparés par des virgules ; suppression via chip fermable.
+/// Le [controller] appartient au formulaire, qui reprend le texte en attente
+/// lors de l'enregistrement (voir [ajouterSaisieEnCours]).
+class _ChipInput extends StatelessWidget {
+  const _ChipInput({
+    required this.controller,
+    required this.values,
+    required this.onChanged,
+    required this.hint,
+  });
+
+  final TextEditingController controller;
   final List<String> values;
   final ValueChanged<List<String>> onChanged;
   final String hint;
 
-  @override
-  State<_ChipInput> createState() => _ChipInputState();
-}
-
-class _ChipInputState extends State<_ChipInput> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _add(String value) {
-    final trimmed = value.trim();
-    if (trimmed.isEmpty || widget.values.contains(trimmed)) return;
-    widget.onChanged([...widget.values, trimmed]);
-    _controller.clear();
+  void _add() {
+    final nouvelles = ajouterSaisieEnCours(values, controller);
+    if (nouvelles.length != values.length) onChanged(nouvelles);
   }
 
   @override
@@ -625,25 +657,26 @@ class _ChipInputState extends State<_ChipInput> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final value in widget.values)
+            for (final value in values)
               Chip(
                 label: Text(value),
-                onDeleted: () =>
-                    widget.onChanged(widget.values.where((v) => v != value).toList()),
+                onDeleted: () => onChanged(values.where((v) => v != value).toList()),
               ),
           ],
         ),
         const SizedBox(height: 8),
         TextField(
-          controller: _controller,
+          controller: controller,
           decoration: InputDecoration(
-            hintText: widget.hint,
+            hintText: hint,
+            helperText: 'Entrée ou + pour ajouter (plusieurs : séparez par des virgules)',
             suffixIcon: IconButton(
+              tooltip: 'Ajouter',
               icon: const Icon(Icons.add_rounded),
-              onPressed: () => _add(_controller.text),
+              onPressed: _add,
             ),
           ),
-          onSubmitted: _add,
+          onSubmitted: (_) => _add(),
         ),
       ],
     );

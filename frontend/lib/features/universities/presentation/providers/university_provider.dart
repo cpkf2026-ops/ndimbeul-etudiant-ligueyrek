@@ -62,9 +62,9 @@ class UniversityListNotifier extends AsyncNotifier<PaginatedResult<Universite>> 
             region: filters.region,
             type: filters.type,
             q: filters.q,
-            // Catalogue élargi (Prompt 5) : ~60 établissements, servis en une
-            // page (le back-office Laravel plafonne per_page à 100).
-            perPage: 100,
+            // Catalogue centralisé : ~210 établissements, servis en une page
+            // (le back-office Laravel plafonne per_page à 300).
+            perPage: 300,
           ),
         );
     return result.fold((failure) => throw failure, (page) => page);

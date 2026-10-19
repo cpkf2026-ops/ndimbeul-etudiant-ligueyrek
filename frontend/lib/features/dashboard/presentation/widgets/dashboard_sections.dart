@@ -1,14 +1,18 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../app/router/route_paths.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../../shared/widgets/skeleton_loader.dart';
+import '../../../jobs/presentation/widgets/job_type_style.dart';
+import '../providers/dashboard_insights_provider.dart';
 import 'dashboard_mock_data.dart';
+import 'logement_officiel.dart';
 
 /// Sections enrichies de l'Accueil (chiffres clés, accès rapides, calendrier,
 /// filières porteuses, parcours, logements, témoignages, partenaires, appel
@@ -469,17 +473,44 @@ class _QuickActionTileState extends State<_QuickActionTile> {
 }
 
 // -----------------------------------------------------------------------------
-// Calendrier + filières porteuses (côte à côte sur desktop)
+// Échéances + offres par type (côte à côte sur desktop) — DONNÉES RÉELLES de
+// la veille IA (voir dashboard_insights_provider.dart), aucune valeur inventée.
 // -----------------------------------------------------------------------------
 
-class KeyDatesAndTrends extends StatelessWidget {
+class KeyDatesAndTrends extends ConsumerWidget {
   const KeyDatesAndTrends({super.key, required this.voitOrientation});
   final bool voitOrientation;
 
   @override
-  Widget build(BuildContext context) {
-    const dates = _KeyDatesCard();
-    final trends = _TrendingFieldsCard(voitOrientation: voitOrientation);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final insights = ref.watch(dashboardInsightsProvider);
+
+    final Widget dates;
+    final Widget trends;
+    switch (insights) {
+      case AsyncData(:final value):
+        dates = _KeyDatesCard(echeances: value.echeances);
+        trends = _TrendingFieldsCard(
+          tendances: value.tendances,
+          nbOffres: value.nbOffres,
+          voitOrientation: voitOrientation,
+        );
+      case AsyncError():
+        dates = const _InsightsMessageCard(
+          icon: Icons.cloud_off_rounded,
+          title: 'Échéances indisponibles',
+          message: 'Impossible de joindre le serveur pour le moment.',
+        );
+        trends = const _InsightsMessageCard(
+          icon: Icons.cloud_off_rounded,
+          title: 'Offres indisponibles',
+          message: 'Impossible de joindre le serveur pour le moment.',
+        );
+      default:
+        dates = const _InsightsSkeletonCard();
+        trends = const _InsightsSkeletonCard();
+    }
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: context.pageHorizontalPadding),
       child: context.isDesktop
@@ -499,19 +530,27 @@ class KeyDatesAndTrends extends StatelessWidget {
 }
 
 class _KeyDatesCard extends StatelessWidget {
-  const _KeyDatesCard();
+  const _KeyDatesCard({required this.echeances});
+  final List<Echeance> echeances;
 
-  Color _kindColor(String kind) => switch (kind) {
-    'Inscriptions' => AppColors.primary,
-    'Bourses' => _kCoral,
-    'Concours' => _kViolet,
-    _ => AppColors.info,
-  };
+  Future<void> _ouvrir(BuildContext context, Echeance e) async {
+    if (e.offreId != null) {
+      await context.push(RoutePaths.jobDetailPath(e.offreId!));
+    } else if (e.url != null && e.url!.isNotEmpty) {
+      await launchUrl(Uri.parse(e.url!), mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final day = DateFormat('dd', 'fr_FR');
     final month = DateFormat('MMM', 'fr_FR');
+    final maintenant = DateTime.now();
+    final aujourdHui = DateTime(
+      maintenant.year,
+      maintenant.month,
+      maintenant.day,
+    );
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -522,20 +561,37 @@ class _KeyDatesCard extends StatelessWidget {
           const _CardHeader(
             icon: Icons.event_note_rounded,
             color: AppColors.primary,
-            title: 'Calendrier académique',
-            subtitle: 'Les échéances à ne pas manquer',
+            title: 'Échéances & annonces',
+            subtitle: 'Dates limites vérifiées et derniers concours / bourses',
           ),
           const SizedBox(height: 14),
-          for (var i = 0; i < kKeyDates.length; i++) ...[
+          if (echeances.isEmpty)
+            const _InlineEmpty(
+              message:
+                  'Aucune échéance confirmée pour le moment. La veille IA '
+                  'cherche toutes les 2 h : une date limite n\'apparaît ici que si '
+                  'elle est écrite dans l\'annonce officielle.',
+            ),
+          for (var i = 0; i < echeances.length; i++) ...[
             if (i > 0) const Divider(height: 18, color: AppColors.divider),
             Builder(
               builder: (context) {
-                final d = kKeyDates[i];
-                final c = _kindColor(d.kind);
-                final urgent = d.daysFromNow <= 7;
+                final e = echeances[i];
+                final c = e.estDateLimite ? _kCoral : _kViolet;
+                final jours = DateTime(
+                  e.date.year,
+                  e.date.month,
+                  e.date.day,
+                ).difference(aujourdHui).inDays;
+                final urgent = e.estDateLimite && jours <= 7;
+                final pastille = e.estDateLimite
+                    ? (jours == 0 ? "Aujourd'hui" : 'J-$jours')
+                    : (jours.abs() == 0
+                          ? 'Publié auj.'
+                          : 'Publié il y a ${jours.abs()} j');
                 return InkWell(
                   borderRadius: BorderRadius.circular(14),
-                  onTap: () => context.go(RoutePaths.news),
+                  onTap: () => _ouvrir(context, e),
                   child: Row(
                     children: [
                       Container(
@@ -548,7 +604,7 @@ class _KeyDatesCard extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              day.format(d.date),
+                              day.format(e.date),
                               style: TextStyle(
                                 color: c,
                                 fontSize: 18,
@@ -559,7 +615,7 @@ class _KeyDatesCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               month
-                                  .format(d.date)
+                                  .format(e.date)
                                   .toUpperCase()
                                   .replaceAll('.', ''),
                               style: TextStyle(
@@ -578,7 +634,7 @@ class _KeyDatesCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              d.title,
+                              e.titre,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: context.textTheme.titleMedium?.copyWith(
@@ -588,15 +644,19 @@ class _KeyDatesCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Row(
                               children: [
-                                const Icon(
-                                  Icons.place_outlined,
+                                Icon(
+                                  e.estDateLimite
+                                      ? Icons.timer_outlined
+                                      : Icons.verified_rounded,
                                   size: 12,
                                   color: AppColors.textSecondary,
                                 ),
                                 const SizedBox(width: 3),
                                 Expanded(
                                   child: Text(
-                                    d.place,
+                                    e.estDateLimite
+                                        ? 'Date limite · ${e.source}'
+                                        : 'Annonce · ${e.source}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: context.textTheme.labelSmall,
@@ -618,7 +678,7 @@ class _KeyDatesCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: Text(
-                          'J-${d.daysFromNow}',
+                          pastille,
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
@@ -641,16 +701,23 @@ class _KeyDatesCard extends StatelessWidget {
 }
 
 class _TrendingFieldsCard extends StatelessWidget {
-  const _TrendingFieldsCard({required this.voitOrientation});
+  const _TrendingFieldsCard({
+    required this.tendances,
+    required this.nbOffres,
+    required this.voitOrientation,
+  });
+
+  final List<TendanceOffres> tendances;
+  final int nbOffres;
 
   /// Bouton "Mes filières recommandées" (module Orientation) : lycéens uniquement.
   final bool voitOrientation;
 
   @override
   Widget build(BuildContext context) {
-    final maxGrowth = kTrendingFields
-        .map((f) => f.growth)
-        .reduce((a, b) => a > b ? a : b);
+    final max = tendances.isEmpty
+        ? 1
+        : tendances.map((t) => t.nombre).reduce((a, b) => a > b ? a : b);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -658,20 +725,27 @@ class _TrendingFieldsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _CardHeader(
+          _CardHeader(
             icon: Icons.trending_up_rounded,
             color: _kTeal,
-            title: 'Filières qui recrutent',
-            subtitle: 'Croissance de la demande sur 3 ans',
+            title: 'Où ça recrute en ce moment',
+            subtitle:
+                '$nbOffres offre(s) vérifiée(s) par la veille IA · mise à jour toutes les 2 h',
           ),
           const SizedBox(height: 16),
-          for (var i = 0; i < kTrendingFields.length; i++)
+          if (tendances.isEmpty)
+            const _InlineEmpty(
+              message:
+                  'Aucune offre active pour le moment : la veille IA en '
+                  'cherche de nouvelles toutes les 2 h.',
+            ),
+          for (var i = 0; i < tendances.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 13),
               child: _TrendBar(
                 rank: i + 1,
-                field: kTrendingFields[i],
-                ratio: kTrendingFields[i].growth / maxGrowth,
+                tendance: tendances[i],
+                ratio: tendances[i].nombre / max,
               ),
             ),
           const SizedBox(height: 2),
@@ -702,43 +776,37 @@ class _TrendingFieldsCard extends StatelessWidget {
 class _TrendBar extends StatelessWidget {
   const _TrendBar({
     required this.rank,
-    required this.field,
+    required this.tendance,
     required this.ratio,
   });
   final int rank;
-  final DashboardTrendingField field;
+  final TendanceOffres tendance;
   final double ratio;
 
   @override
   Widget build(BuildContext context) {
+    final couleur = tendance.type.color;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(
-              '0$rank',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textSecondary,
-              ),
-            ),
+            Icon(tendance.type.icon, size: 15, color: couleur),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                field.name,
+                tendance.type.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: context.textTheme.titleMedium?.copyWith(fontSize: 13),
               ),
             ),
             Text(
-              '+${field.growth}%',
-              style: const TextStyle(
+              '${tendance.nombre} offre${tendance.nombre > 1 ? 's' : ''}',
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
-                color: AppColors.success,
+                color: couleur,
               ),
             ),
           ],
@@ -766,21 +834,99 @@ class _TrendBar extends StatelessWidget {
                   height: 7,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    gradient: const LinearGradient(
-                      colors: [_kTeal, Color(0xFF3CC7A6)],
-                    ),
+                    color: couleur,
                   ),
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          field.debouches,
-          style: context.textTheme.labelSmall?.copyWith(fontSize: 11),
-        ),
+        if (tendance.domaines.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            tendance.domaines.join(' · '),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textTheme.labelSmall?.copyWith(fontSize: 11),
+          ),
+        ],
       ],
+    );
+  }
+}
+
+class _InlineEmpty extends StatelessWidget {
+  const _InlineEmpty({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+        message,
+        style: context.textTheme.bodyMedium?.copyWith(fontSize: 12.5),
+      ),
+    );
+  }
+}
+
+class _InsightsMessageCard extends StatelessWidget {
+  const _InsightsMessageCard({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: _softCard(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _CardHeader(
+            icon: icon,
+            color: AppColors.textSecondary,
+            title: title,
+            subtitle: message,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InsightsSkeletonCard extends StatelessWidget {
+  const _InsightsSkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: _softCard(),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SkeletonLoader(height: 36, width: 220, borderRadius: 12),
+          SizedBox(height: 18),
+          SkeletonLoader(height: 44, borderRadius: 14),
+          SizedBox(height: 12),
+          SkeletonLoader(height: 44, borderRadius: 14),
+          SizedBox(height: 12),
+          SkeletonLoader(height: 44, borderRadius: 14),
+        ],
+      ),
     );
   }
 }
@@ -1163,63 +1309,142 @@ class _StepCard extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// Logements à proximité
+// Logement étudiant — organismes officiels (liens vérifiés) + actualités
+// logement trouvées par la veille IA. Aucune annonce, aucun prix inventé.
 // -----------------------------------------------------------------------------
 
-class HousingSection extends StatelessWidget {
+class HousingSection extends ConsumerWidget {
   const HousingSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final horizontal = context.pageHorizontalPadding;
-    if (context.isDesktop) {
-      return Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontal),
-        child: LayoutBuilder(
-          builder: (context, c) {
-            final width = (c.maxWidth - 12 * 3) / 4;
-            return Wrap(
-              spacing: 12,
-              runSpacing: 12,
+    final infos =
+        ref.watch(dashboardInsightsProvider).value?.infosLogement ?? const [];
+    final colonnes = context.isDesktop ? 4 : (context.isTablet ? 2 : 1);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: horizontal),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LayoutBuilder(
+            builder: (context, c) {
+              const espace = 12.0;
+              final largeur = (c.maxWidth - espace * (colonnes - 1)) / colonnes;
+              return Wrap(
+                spacing: espace,
+                runSpacing: espace,
+                children: [
+                  for (final o in kOrganismesLogement)
+                    SizedBox(
+                      width: largeur,
+                      child: _OrganismeCard(organisme: o),
+                    ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: _softCard(radius: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final h in kMockHousing)
-                  SizedBox(
-                    width: width,
-                    child: _HousingCard(housing: h),
+                const _CardHeader(
+                  icon: Icons.newspaper_rounded,
+                  color: AppColors.primary,
+                  title: 'Dernières infos logement',
+                  subtitle:
+                      'Codification, cités universitaires… (veille IA, toutes les 2 h)',
+                ),
+                const SizedBox(height: 12),
+                if (infos.isEmpty)
+                  const _InlineEmpty(
+                    message:
+                        'Aucune actualité récente sur le logement étudiant. '
+                        'La veille IA en cherche toutes les 2 h ; en attendant, '
+                        'consultez les sites officiels ci-dessus.',
                   ),
+                for (var i = 0; i < infos.length; i++) ...[
+                  if (i > 0)
+                    const Divider(height: 16, color: AppColors.divider),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      final url = infos[i].sourceUrl;
+                      if (url != null && url.isNotEmpty) {
+                        launchUrl(
+                          Uri.parse(url),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.home_work_rounded,
+                          size: 18,
+                          color: _kTeal,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                infos[i].titre,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: context.textTheme.titleMedium?.copyWith(
+                                  fontSize: 13.5,
+                                ),
+                              ),
+                              Text(
+                                '${infos[i].auteur ?? 'Presse'} · '
+                                '${DateFormat('d MMM yyyy', 'fr_FR').format(infos[i].datePublication)}',
+                                style: context.textTheme.labelSmall,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.north_east_rounded,
+                          size: 16,
+                          color: AppColors.textSecondary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
-            );
-          },
-        ),
-      );
-    }
-    return SizedBox(
-      height: 236,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: horizontal),
-        itemCount: kMockHousing.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (context, i) =>
-            SizedBox(width: 220, child: _HousingCard(housing: kMockHousing[i])),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _HousingCard extends StatelessWidget {
-  const _HousingCard({required this.housing});
-  final DashboardHousing housing;
+class _OrganismeCard extends StatelessWidget {
+  const _OrganismeCard({required this.organisme});
+  final OrganismeLogement organisme;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(20),
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.go(RoutePaths.chat),
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => launchUrl(
+          Uri.parse(organisme.siteOfficiel),
+          mode: LaunchMode.externalApplication,
+        ),
         child: Container(
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: AppColors.border),
@@ -1227,116 +1452,111 @@ class _HousingCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 130,
-                width: double.infinity,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: housing.imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => const SkeletonLoader(
-                        height: double.infinity,
-                        borderRadius: 0,
-                      ),
-                      errorWidget: (_, _, _) => Container(
-                        color: AppColors.greenSoft,
-                        child: const Icon(
-                          Icons.home_work_rounded,
-                          color: AppColors.primary,
-                          size: 36,
-                        ),
-                      ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(9),
+                    decoration: BoxDecoration(
+                      color: AppColors.greenSoft,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    Positioned(
-                      left: 10,
-                      bottom: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Text(
-                          '${housing.prix} / mois',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
+                    child: const Icon(
+                      Icons.apartment_rounded,
+                      color: AppColors.primary,
+                      size: 20,
                     ),
-                    Positioned(
-                      right: 10,
-                      top: 10,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.favorite_border_rounded,
-                          size: 16,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      housing.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.textTheme.titleMedium?.copyWith(
-                        fontSize: 13.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
-                          Icons.near_me_rounded,
-                          size: 13,
-                          color: _kTeal,
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            housing.distance,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.textTheme.labelSmall,
-                          ),
-                        ),
-                        const Icon(
-                          Icons.star_rounded,
-                          size: 14,
-                          color: AppColors.accent,
-                        ),
-                        const SizedBox(width: 2),
                         Text(
-                          '4.${(housing.title.length % 5) + 4}',
-                          style: context.textTheme.labelSmall?.copyWith(
+                          organisme.universite,
+                          style: context.textTheme.titleLarge,
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.place_outlined,
+                              size: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              organisme.ville,
+                              style: context.textTheme.labelSmall,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.info.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.account_balance_rounded,
+                          size: 11,
+                          color: AppColors.info,
+                        ),
+                        SizedBox(width: 3),
+                        Text(
+                          'Officiel',
+                          style: TextStyle(
+                            fontSize: 10,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: AppColors.info,
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                organisme.organisme,
+                style: context.textTheme.titleMedium?.copyWith(fontSize: 13.5),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                organisme.description,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.bodyMedium?.copyWith(fontSize: 12.5),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      Uri.parse(organisme.siteOfficiel).host,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.north_east_rounded,
+                    size: 14,
+                    color: AppColors.primary,
+                  ),
+                ],
               ),
             ],
           ),

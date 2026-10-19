@@ -30,6 +30,11 @@ REQUETES_ACTUALITES = [
     'Office du Bac Sénégal',
     'Campusen orientation',
     'Direction des bourses Sénégal',
+    # Logement étudiant (bloc « Dernières infos logement » de l'accueil).
+    'codification COUD',
+    'logement étudiants Sénégal',
+    'CROUS Sénégal étudiants',
+    'cité universitaire Sénégal',
 ]
 
 # Offres (emploi, stage, alternance, bourse, formation, concours), cherchées dans le

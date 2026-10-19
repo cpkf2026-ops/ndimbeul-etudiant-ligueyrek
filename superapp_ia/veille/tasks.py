@@ -8,28 +8,27 @@ local de trier et résumer — sans jamais inventer d'information.
 """
 from celery import shared_task
 
-from . import pipeline
+from . import actualites, opportunites, pipeline
 
 
 @shared_task
-def veiller_actualites_task():
-    """Nouvelles actualités vérifiées, puis complétion des images manquantes,
-    déduplication et archivage des actualités trop anciennes ou non fiables.
-    Retourne les statistiques du passage (créées / rejetées par motif)."""
-    stats = pipeline.veiller_actualites()
-    pipeline.backfiller_metadonnees_actualites()
-    pipeline.dedupliquer_actualites_similaires()
-    pipeline.archiver_actualites_obsoletes()
+def veille_actualites():
+    """Module 3 : actualités éducation via Tavily + Mistral (repli sur les sources
+    gratuites si le quota est épuisé), puis déduplication des quasi-doublons et
+    archivage des actualités trop anciennes. Retourne les statistiques du passage."""
+    stats = actualites.veille_actualites()
+    if stats.get('mode') != 'ignore':
+        pipeline.dedupliquer_actualites_similaires()
+        pipeline.archiver_actualites_obsoletes()
     return stats
 
 
 @shared_task
-def veiller_offres_task():
-    """Nouvelles offres vérifiées, puis expiration des offres dépassées, trop
-    anciennes ou non vérifiées. Retourne les statistiques du passage."""
-    stats = pipeline.veiller_offres()
-    pipeline.archiver_offres_obsoletes()
-    return stats
+def veille_opportunites():
+    """Module 2 : emplois, stages, formations, bourses et concours via Tavily +
+    Mistral (repli sur les sources gratuites si le quota est épuisé), puis
+    expiration des offres dépassées. Retourne les statistiques du passage."""
+    return opportunites.veille_opportunites()
 
 
 @shared_task

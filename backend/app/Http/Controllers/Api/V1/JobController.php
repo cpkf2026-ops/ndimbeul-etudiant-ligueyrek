@@ -32,8 +32,10 @@ class JobController extends Controller
             ->deType($request->query('type'))
             ->when($request->query('niveau_requis'), fn ($q, $n) => $q->where('niveau_requis', $n))
             ->when($request->query('date_limite_avant'), fn ($q, $d) => $q->where('date_limite', '<=', $d))
-            // Plus récentes d'abord ; à date égale, la dernière indexée par la veille.
-            ->orderByDesc('date_publication')
+            // Plus récentes d'abord. Les offres trouvées par la veille Tavily sur les sites
+            // d'emploi n'ont pas toujours de date de publication : on prend alors leur date
+            // de collecte, sinon MySQL les rangerait tout en bas (NULL en dernier).
+            ->orderByRaw('COALESCE(date_publication, DATE(date_collecte), DATE(date_indexation)) DESC')
             ->orderByDesc('date_indexation')
             ->paginate($request->integer('per_page', 20));
 

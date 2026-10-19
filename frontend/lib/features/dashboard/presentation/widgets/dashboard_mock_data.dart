@@ -31,20 +31,6 @@ class DashboardUniversity {
   final int nbFormations;
 }
 
-class DashboardHousing {
-  const DashboardHousing({
-    required this.title,
-    required this.distance,
-    required this.prix,
-    required this.imageUrl,
-  });
-
-  final String title;
-  final String distance;
-  final String prix;
-  final String imageUrl;
-}
-
 final List<DashboardActuality> kMockActualites = [
   DashboardActuality(
     title: 'Ouverture des inscriptions CAMPUSEN 2026',
@@ -108,33 +94,6 @@ final List<DashboardUniversity> kMockUniversities = [
   ),
 ];
 
-final List<DashboardHousing> kMockHousing = [
-  DashboardHousing(
-    title: 'Studio Fann Résidence',
-    distance: "300 m de l'UCAD",
-    prix: '60 000 FCFA',
-    imageUrl: AppImages.logement3,
-  ),
-  DashboardHousing(
-    title: 'Chambre partagée Sanar',
-    distance: "0.8 km de l'UGB",
-    prix: '25 000 FCFA',
-    imageUrl: AppImages.logement4,
-  ),
-  DashboardHousing(
-    title: 'Cité des Étudiants Thiès',
-    distance: '0.5 km du campus',
-    prix: '45 000 FCFA',
-    imageUrl: AppImages.logement1,
-  ),
-  DashboardHousing(
-    title: 'Résidence Le Savoir',
-    distance: '1.2 km du campus',
-    prix: '35 000 FCFA',
-    imageUrl: AppImages.logement2,
-  ),
-];
-
 // -----------------------------------------------------------------------------
 // Contenus de démonstration supplémentaires de l'Accueil — à remplacer par
 // les données réelles du backend (calendrier, statistiques, avis).
@@ -157,90 +116,6 @@ const List<DashboardKeyFigure> kKeyFigures = [
   DashboardKeyFigure(value: 1200, suffix: '+', label: 'Formations'),
   DashboardKeyFigure(value: 14, suffix: '', label: 'Régions couvertes'),
   DashboardKeyFigure(value: 24, suffix: '/7', label: 'Assistant IA'),
-];
-
-/// Échéance du calendrier académique — [daysFromNow] garde la démo à jour
-/// quelle que soit la date du jour.
-class DashboardKeyDate {
-  const DashboardKeyDate({
-    required this.title,
-    required this.place,
-    required this.daysFromNow,
-    required this.kind,
-  });
-  final String title;
-  final String place;
-  final int daysFromNow;
-  final String kind;
-
-  DateTime get date => DateTime.now().add(Duration(days: daysFromNow));
-}
-
-const List<DashboardKeyDate> kKeyDates = [
-  DashboardKeyDate(
-    title: 'Clôture des inscriptions CAMPUSEN',
-    place: "Plateforme nationale d'orientation",
-    daysFromNow: 4,
-    kind: 'Inscriptions',
-  ),
-  DashboardKeyDate(
-    title: "Dépôt des dossiers de bourses d'excellence",
-    place: 'Direction des Bourses — Dakar',
-    daysFromNow: 11,
-    kind: 'Bourses',
-  ),
-  DashboardKeyDate(
-    title: "Concours d'entrée en classes préparatoires",
-    place: 'ESP — Dakar',
-    daysFromNow: 19,
-    kind: 'Concours',
-  ),
-  DashboardKeyDate(
-    title: "Salon de l'orientation et des métiers",
-    place: 'CICES — Dakar',
-    daysFromNow: 33,
-    kind: 'Événement',
-  ),
-];
-
-/// Filière porteuse (débouchés au Sénégal) avec tendance de la demande.
-class DashboardTrendingField {
-  const DashboardTrendingField({
-    required this.name,
-    required this.growth,
-    required this.debouches,
-  });
-  final String name;
-  final int growth;
-  final String debouches;
-}
-
-const List<DashboardTrendingField> kTrendingFields = [
-  DashboardTrendingField(
-    name: 'Informatique & IA',
-    growth: 38,
-    debouches: 'Développeur, data analyst',
-  ),
-  DashboardTrendingField(
-    name: 'Pétrole, gaz & énergie',
-    growth: 31,
-    debouches: 'Ingénieur procédés, HSE',
-  ),
-  DashboardTrendingField(
-    name: 'Santé & médecine',
-    growth: 24,
-    debouches: 'Médecin, infirmier, pharmacien',
-  ),
-  DashboardTrendingField(
-    name: 'Agronomie & agro-industrie',
-    growth: 21,
-    debouches: 'Ingénieur agronome',
-  ),
-  DashboardTrendingField(
-    name: 'BTP & génie civil',
-    growth: 18,
-    debouches: 'Conducteur de travaux',
-  ),
 ];
 
 /// Avis d'utilisateur (contenu d'illustration).

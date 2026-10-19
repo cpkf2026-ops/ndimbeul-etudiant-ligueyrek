@@ -1,4 +1,4 @@
-"""POST /internal/recommendations (PARTIE 8)."""
+"""POST /internal/recommendations (PARTIE 8) et POST /api/ia/orientation/ (module 1)."""
 import json
 import logging
 
@@ -6,31 +6,32 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from ia import llm_gateway
-from ia.prompts import construire_messages_explications_groupees, parser_explications_groupees
-
+from . import orientation
 from .models import Recommandation
 from .scoring import generer_recommandations
+from .serializers import OrientationEntreeSerializer
 
 logger = logging.getLogger(__name__)
 
 
 def _generer_explications(resultats, profil):
-    """Une explication par formation, en UN SEUL appel LLM (voir ia/prompts.py) : sur un LLM
-    local CPU, dix appels séquentiels prendraient plusieurs minutes."""
-    messages = construire_messages_explications_groupees(resultats, profil)
-    try:
-        # ~40 tokens/formation suffisent largement pour "1 phrase" et bornent le temps de
-        # génération sur un LLM local CPU (sans ça, le modèle peut partir dans de longues
-        # réponses malgré la consigne, avec un vrai risque de timeout HTTP en aval).
-        reponse = llm_gateway.generer_reponse_sync(
-            messages, temperature=0.4, max_tokens=40 * len(resultats)
-        )
-    except llm_gateway.LLMIndisponibleError as exc:
-        logger.warning('Explications LLM indisponibles : %s', exc)
-        return [None] * len(resultats)
-    return parser_explications_groupees(reponse, len(resultats))
+    """Une justification par formation, construite à partir du détail de son score
+    (série, moyenne, passions, région, bourse) : instantané et toujours exact.
+
+    Avant : le modèle local rédigeait ces explications. Mesuré le 18/10/2026 sur le PC de
+    démonstration : ~4 min pour 5 formations, alors que l'application n'attend que 30 s,
+    donc les recommandations n'arrivaient jamais après une mise à jour du profil."""
+    donnees = {
+        'serie_bac': profil.get('serie_bac') or '',
+        'moyenne': profil.get('moyenne_generale'),
+        'passions': list(profil.get('passions') or []),
+        'ville': profil.get('region_cible'),
+    }
+    contexte = {'mobilite': bool(profil.get('mobilite'))}
+    return [orientation.justifier_formation(r, donnees, contexte) for r in resultats]
 
 
 @csrf_exempt
@@ -96,3 +97,17 @@ def recommendations(request):
     Recommandation.objects.bulk_create(recommandations_a_creer)
 
     return JsonResponse({'data': donnees})
+
+
+# --------------------------------------------------------------------------
+# POST /api/ia/orientation/  (module 1 du service IA)
+# --------------------------------------------------------------------------
+
+class OrientationView(APIView):
+    """Recommandations personnalisées : métiers, formations et universités, chacun avec
+    une justification, un score de compatibilité 0-100 et un lien source."""
+
+    def post(self, request):
+        entree = OrientationEntreeSerializer(data=request.data)
+        entree.is_valid(raise_exception=True)
+        return Response(orientation.recommander(entree.validated_data))

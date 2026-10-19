@@ -27,4 +27,4 @@ echo.
 echo Veille IA demarree (worker + planification toutes les 2 h).
 echo Pour lancer une veille immediatement :
 echo     venv\Scripts\python.exe manage.py veiller --actualites
-echo     venv\Scripts\python.exe manage.py veiller --offres
+echo     venv\Scripts\python.exe manage.py veiller --opportunites

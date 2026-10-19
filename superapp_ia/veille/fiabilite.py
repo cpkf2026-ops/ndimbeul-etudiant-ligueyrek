@@ -42,7 +42,7 @@ _SUFFIXES_OFFICIELS = ('.gouv.sn', '.edu.sn')
 _DOMAINES_OFFICIELS = {
     'ucad.sn', 'ugb.sn', 'uasz.sn', 'uadb.sn', 'uam.sn', 'uvs.sn', 'unchk.sn',
     'ussein.sn', 'uidt.sn', 'esp.sn', 'ept.sn', 'isep-thies.sn', 'isepdiamniadio.sn',
-    'campusen.sn', 'officedubac.sn', 'education.sn', 'mesri.gouv.sn',
+    'campusen.sn', 'officedubac.sn', 'education.sn', 'mesri.gouv.sn', 'mesrisenegal.sn',
     'primature.sn', 'presidence.sn', 'sec.gouv.sn', 'fongip.sn', 'anpej.sn',
     'onfp.sn', '3fpt.sn', 'cesag.sn', 'campusfrance.org', 'unesco.org',
     'unicef.org', 'banquemondiale.org', 'worldbank.org', 'auf.org',
@@ -122,3 +122,9 @@ def nom_source_lisible(url, nom_fourni=None):
     if nom_fourni:
         return nom_fourni.strip()[:120]
     return domaine(url)
+
+
+def domaines_bloques():
+    """Domaines jamais acceptés comme source (réseaux sociaux, forums, agrégateurs) :
+    transmis à Tavily en `exclude_domains` quand la recherche n'est pas restreinte."""
+    return sorted(_DOMAINES_BLOQUES)

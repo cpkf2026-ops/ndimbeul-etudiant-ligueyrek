@@ -235,3 +235,93 @@ def parser_reponse_json_liste(texte, nb_attendu):
         return [e if isinstance(e, dict) else None for e in elements], None
 
     return vide, 'desalignement'
+
+
+# --- Module 2 : veille Tavily des opportunités (veille/opportunites.py) ---------
+# Un appel par résultat Tavily (et non par lot) : un objet JSON simple est bien plus
+# fiable avec un modèle 7B local, et une réponse ratée ne fait perdre qu'une offre.
+
+SYSTEM_PROMPT_EXTRACTION_OPPORTUNITE = (
+    "Tu es l'assistant de veille de Ndimbeul Étudiant, une application qui aide les "
+    "lycéens et étudiants sénégalais à trouver emplois, stages, formations, bourses et "
+    "concours. On te donne UNE page web trouvée par un moteur de recherche (titre, URL, "
+    "extrait). Tu dois en extraire une fiche structurée, en français.\n\n"
+    "Étape 1 — pertinence. Mets \"pertinent\": false si la page n'annonce pas UNE "
+    "opportunité PRÉCISE à laquelle un jeune au Sénégal peut ENCORE candidater, par "
+    "exemple : page d'accueil ou liste de plusieurs offres, article racontant un fait "
+    "passé (résultats, cérémonie, sélection terminée), conseil général, publicité, "
+    "opportunité fermée aux Sénégalais.\n\n"
+    "Étape 2 — extraction, avec une règle ABSOLUE : n'écris QUE ce qui figure dans le "
+    "titre ou l'extrait. N'invente jamais un nom, un lieu, une date ou un chiffre. "
+    "Une information absente vaut null.\n"
+    "- \"titre\" : intitulé clair de l'opportunité (pas le nom du site) ;\n"
+    "- \"organisme\" : employeur ou organisme qui propose l'opportunité, ou null ;\n"
+    "- \"categorie\" : exactement une valeur parmi emploi, stage, alternance, formation, "
+    "bourse, concours ;\n"
+    "- \"lieu\" : ville ou région si elle est écrite, sinon null ;\n"
+    "- \"date_limite\" : date limite de candidature au format AAAA-MM-JJ SEULEMENT si elle "
+    "est écrite explicitement (ne recopie jamais la date de publication), sinon null ;\n"
+    "- \"domaine\" : secteur (informatique, santé, finance…) ou null ;\n"
+    "- \"niveau_requis\" : diplôme ou niveau demandé (Bac, Licence, Master…) ou null ;\n"
+    "- \"resume\" : 2 lignes maximum, factuelles, qui disent ce qui est proposé et à qui.\n\n"
+    "Réponds UNIQUEMENT avec un objet JSON, sans texte autour :\n"
+    '{"pertinent": true, "titre": "...", "organisme": "...", "categorie": "stage", '
+    '"lieu": "...", "date_limite": "2026-11-15", "domaine": "...", "niveau_requis": "...", '
+    '"resume": "..."}\n'
+    'Si la page n\'est pas pertinente : {"pertinent": false}'
+)
+
+
+def construire_messages_opportunite(resultat):
+    """`resultat` : un résultat Tavily normalisé (services/tavily_service.py)."""
+    contenu = (
+        f"TITRE : {resultat['titre']}\n"
+        f"URL : {resultat['url']}\n"
+        f"EXTRAIT : {resultat['contenu'] or '(pas d’extrait)'}"
+    )
+    return [
+        {'role': 'system', 'content': SYSTEM_PROMPT_EXTRACTION_OPPORTUNITE},
+        {'role': 'user', 'content': contenu},
+    ]
+
+
+# --- Module 3 : veille Tavily des actualités éducation (veille/actualites.py) ---
+
+SYSTEM_PROMPT_RESUME_ACTUALITE = (
+    "Tu es le rédacteur de la rubrique Actualités de Ndimbeul Étudiant, une application "
+    "pour les lycéens et étudiants sénégalais. On te donne UN article de presse ou un "
+    "communiqué officiel (titre, média, date, extrait).\n\n"
+    "Étape 1 — pertinence. Mets \"pertinent\": false si l'article ne rapporte pas UN fait "
+    "PRÉCIS et RÉCENT utile aux élèves ou étudiants AU SÉNÉGAL. Sujets utiles : bac, BFEM, "
+    "examens et résultats, orientation (Campusen), universités et écoles, calendrier "
+    "universitaire, rentrée, grèves dans l'éducation, réformes, bourses, concours, "
+    "formation professionnelle. Pas pertinent : sport, faits divers, politique générale, "
+    "page d'accueil ou rubrique d'un site, publicité, autre pays sans lien avec le Sénégal.\n\n"
+    "Étape 2 — rédaction, avec une règle ABSOLUE : n'écris QUE ce qui figure dans le "
+    "titre ou l'extrait. N'ajoute aucun chiffre, date, nom ou lieu absent du texte.\n"
+    "- \"titre\" : titre court et clair qui dit le fait (pas le nom du site) ;\n"
+    "- \"resume\" : 3 lignes maximum, en français simple, compréhensible par un lycéen ;\n"
+    "- \"categorie\" : exactement une valeur parmi :\n"
+    "    bourse (bourses d'études, allocations), concours (concours d'entrée ou de "
+    "recrutement), formation (formations, inscriptions dans une filière), evenement "
+    "(calendrier, rentrée, salon, date importante), general (examens, résultats, grèves, "
+    "réformes, orientation, vie universitaire, tout le reste).\n\n"
+    "Réponds UNIQUEMENT avec un objet JSON, sans texte autour :\n"
+    '{"pertinent": true, "titre": "...", "resume": "...", "categorie": "general"}\n'
+    'Si l\'article n\'est pas pertinent : {"pertinent": false}'
+)
+
+
+def construire_messages_actualite(article):
+    """`article` : un résultat Tavily normalisé, complété de `date_reelle` et `media`."""
+    date_reelle = article.get('date_reelle')
+    contenu = (
+        f"TITRE : {article['titre']}\n"
+        f"MÉDIA : {article.get('media') or article['url']}\n"
+        f"DATE : {date_reelle.strftime('%d/%m/%Y') if date_reelle else 'inconnue'}\n"
+        f"EXTRAIT : {article['contenu'] or '(pas d’extrait)'}"
+    )
+    return [
+        {'role': 'system', 'content': SYSTEM_PROMPT_RESUME_ACTUALITE},
+        {'role': 'user', 'content': contenu},
+    ]

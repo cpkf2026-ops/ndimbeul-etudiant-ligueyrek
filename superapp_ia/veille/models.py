@@ -49,6 +49,8 @@ class Actualite(models.Model):
     STATUT_CHOICES = [('brouillon', 'brouillon'), ('publie', 'publie'), ('archive', 'archive')]
 
     id = models.CharField(max_length=36, primary_key=True, default=nouvel_uuid, editable=False)
+    # SHA-256 de l'URL et du titre normalisés : index unique anti-doublon (veille Tavily).
+    hash_dedoublonnage = models.CharField(max_length=64, unique=True, null=True, blank=True)
     titre = models.CharField(max_length=255)
     contenu = models.TextField()
     auteur_id = models.CharField(max_length=36, null=True, blank=True)
@@ -83,6 +85,8 @@ class OffreEmploi(models.Model):
     STATUT_CHOICES = [('active', 'active'), ('expiree', 'expiree')]
 
     id = models.CharField(max_length=36, primary_key=True, default=nouvel_uuid, editable=False)
+    # SHA-256 de l'URL et du titre normalisés : index unique anti-doublon (veille Tavily).
+    hash_dedoublonnage = models.CharField(max_length=64, unique=True, null=True, blank=True)
     intitule = models.CharField(max_length=255)
     entreprise = models.CharField(max_length=255)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
@@ -90,6 +94,8 @@ class OffreEmploi(models.Model):
     niveau_requis = models.CharField(max_length=255, null=True, blank=True)
     region = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    # Résumé de 2 lignes rédigé par le LLM à partir de l'extrait Tavily.
+    resume = models.TextField(null=True, blank=True)
     source_url = models.CharField(max_length=500)
     # Nom réel du média / de l'organisme d'origine, et niveau de fiabilité de la
     # source ('officiel' | 'presse' | 'plateforme'), voir veille/fiabilite.py.
@@ -99,6 +105,7 @@ class OffreEmploi(models.Model):
     date_limite = models.DateField(null=True, blank=True)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='active')
     date_indexation = models.DateTimeField()
+    date_collecte = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

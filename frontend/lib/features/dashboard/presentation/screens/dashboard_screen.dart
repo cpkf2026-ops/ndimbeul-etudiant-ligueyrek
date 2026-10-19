@@ -156,7 +156,7 @@ class DashboardScreen extends ConsumerWidget {
                       eyebrow: 'Agenda & tendances',
                       title: 'Préparez la rentrée',
                       subtitle:
-                          'Échéances clés et filières qui offrent le plus de débouchés',
+                          'Dates limites vérifiées et offres trouvées par la veille IA',
                     ),
                   ),
                   titleGap,
@@ -229,9 +229,10 @@ class DashboardScreen extends ConsumerWidget {
                   reveal(
                     DashboardSectionTitle(
                       eyebrow: 'Vie étudiante',
-                      title: 'Logements à proximité',
-                      subtitle: 'Chambres et studios près des campus',
-                      onSeeAll: () => context.go(RoutePaths.chat),
+                      title: 'Logement étudiant',
+                      subtitle:
+                          'Organismes officiels et dernières infos de la veille IA',
+                      onSeeAll: () => context.go(RoutePaths.news),
                     ),
                   ),
                   titleGap,

@@ -11,6 +11,7 @@ import '../../../../shared/widgets/region_dropdown_chip.dart';
 import '../../../../shared/widgets/search_bar_custom.dart';
 import '../../../../shared/widgets/skeleton_loader.dart';
 import '../../domain/entities/universite.dart';
+import '../ouvrir_universite.dart';
 import '../providers/university_provider.dart';
 
 class UniversityListScreen extends ConsumerWidget {
@@ -138,8 +139,12 @@ class UniversityListScreen extends ConsumerWidget {
                               width: double.infinity,
                               height: double.infinity,
                               trailingText: isSelected ? '✓ Sélection' : null,
-                              onTap: () =>
-                                  context.push(RoutePaths.universityDetailPath(u.id)),
+                              // Site officiel directement si connu, sinon la fiche.
+                              onTap: () => ouvrirUniversite(
+                                context,
+                                id: u.id,
+                                siteWebOfficiel: u.siteWebOfficiel,
+                              ),
                               onFavoriteTap: () {
                                 final notifier =
                                     ref.read(universityCompareSelectionProvider.notifier);

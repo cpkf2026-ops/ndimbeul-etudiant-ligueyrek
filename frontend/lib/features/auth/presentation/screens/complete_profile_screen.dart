@@ -97,7 +97,6 @@ class _StatutFormState extends ConsumerState<_StatutForm> {
   final _dernierDiplomeController = TextEditingController();
   final _domaineController = TextEditingController();
   String? _situationActuelle;
-  final _entrepriseController = TextEditingController();
 
   bool _isSubmitting = false;
 
@@ -117,7 +116,6 @@ class _StatutFormState extends ConsumerState<_StatutForm> {
     _formationController.dispose();
     _dernierDiplomeController.dispose();
     _domaineController.dispose();
-    _entrepriseController.dispose();
     super.dispose();
   }
 
@@ -158,7 +156,6 @@ class _StatutFormState extends ConsumerState<_StatutForm> {
             'dernier_diplome': _dernierDiplomeController.text.trim(),
             'domaine': _domaineController.text.trim().isEmpty ? null : _domaineController.text.trim(),
             'situation_actuelle': _situationActuelle,
-            'entreprise': _entrepriseController.text.trim().isEmpty ? null : _entrepriseController.text.trim(),
           },
         _ => const {},
       };
@@ -321,11 +318,6 @@ class _StatutFormState extends ConsumerState<_StatutForm> {
                 onSelected: (_) => setState(() => _situationActuelle = value),
               ),
           ],
-        ),
-        const SizedBox(height: 16),
-        AuthFormField(
-          label: 'Entreprise (optionnel)',
-          controller: _entrepriseController,
         ),
       ],
     );

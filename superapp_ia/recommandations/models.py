@@ -21,6 +21,7 @@ class Universite(models.Model):
     region = models.CharField(max_length=255, null=True, blank=True)
     commune = models.CharField(max_length=255, null=True, blank=True)
     type = models.CharField(max_length=10)  # public | prive
+    site_web_officiel = models.CharField(max_length=255, null=True, blank=True)
     statut_actif = models.BooleanField(default=True)
 
     class Meta:

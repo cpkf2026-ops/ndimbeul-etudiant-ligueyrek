@@ -57,6 +57,12 @@ class SecureStorageService {
 
   Future<String?> get role => _read(AppConstants.keyUserRole);
 
+  /// Dernier compte connu (JSON), relu quand le serveur ne répond pas à temps lors
+  /// d'une actualisation de page : la session reste ouverte au lieu d'être perdue.
+  Future<void> saveCachedUser(String json) => _write(AppConstants.keyCachedUser, json);
+
+  Future<String?> get cachedUser => _read(AppConstants.keyCachedUser);
+
   Future<void> clear() async {
     if (kIsWeb) {
       final prefs = await SharedPreferences.getInstance();
@@ -64,6 +70,7 @@ class SecureStorageService {
         prefs.remove(AppConstants.keyAccessToken),
         prefs.remove(AppConstants.keyRefreshToken),
         prefs.remove(AppConstants.keyUserRole),
+        prefs.remove(AppConstants.keyCachedUser),
       ]);
       return;
     }

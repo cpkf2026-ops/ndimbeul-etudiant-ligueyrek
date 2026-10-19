@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/network/api_endpoints.dart';
@@ -59,6 +61,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await _storage.saveTokens(accessToken: accessToken, refreshToken: accessToken);
       final user = UserModel.fromJson(data['utilisateur'] as Map<String, dynamic>);
       if (user.role != null) await _storage.saveRole(user.role!.name);
+      await _memoriser(user);
       return user;
     } on DioException catch (e) {
       // Laravel renvoie volontairement un 401 générique ("Identifiants
@@ -95,7 +98,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = response.data as Map<String, dynamic>;
       final accessToken = data['access_token'] as String;
       await _storage.saveTokens(accessToken: accessToken, refreshToken: accessToken);
-      return UserModel.fromJson(data['utilisateur'] as Map<String, dynamic>);
+      final user = UserModel.fromJson(data['utilisateur'] as Map<String, dynamic>);
+      await _memoriser(user);
+      return user;
     } on DioException catch (e) {
       throw _mapError(e);
     }
@@ -114,6 +119,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = response.data as Map<String, dynamic>;
       final user = UserModel.fromJson(data['utilisateur'] as Map<String, dynamic>);
       if (user.role != null) await _storage.saveRole(user.role!.name);
+      await _memoriser(user);
       return user;
     } on DioException catch (e) {
       throw _mapError(e);
@@ -137,12 +143,40 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     if (!hasSession) return null;
     try {
       final response = await _dio.get(ApiEndpoints.profileMe);
-      return UserModel.fromJson(
+      final user = UserModel.fromJson(
         (response.data as Map<String, dynamic>)['utilisateur']
             as Map<String, dynamic>,
       );
+      await _memoriser(user);
+      return user;
     } on DioException catch (e) {
-      throw _mapError(e);
+      final erreur = _mapError(e);
+      // Serveur lent, délai dépassé ou réseau coupé pendant une actualisation de page :
+      // la session (jeton) est toujours valide, on garde le dernier compte connu au lieu
+      // de déconnecter l'utilisateur. Seul un vrai 401 (session révoquée) déconnecte.
+      if (erreur is! UnauthorizedException) {
+        final enCache = await _compteMemorise();
+        if (enCache != null) return enCache;
+      }
+      throw erreur;
+    }
+  }
+
+  Future<void> _memoriser(UserModel user) async {
+    try {
+      await _storage.saveCachedUser(jsonEncode(user.toJson()));
+    } catch (_) {
+      // Mémorisation facultative : son échec ne doit jamais bloquer la connexion.
+    }
+  }
+
+  Future<UserModel?> _compteMemorise() async {
+    try {
+      final json = await _storage.cachedUser;
+      if (json == null) return null;
+      return UserModel.fromJson(jsonDecode(json) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
     }
   }
 
