@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../admin/presentation/widgets/bouton_ajout_admin.dart';
+import '../../../../app/router/route_paths.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,6 +18,7 @@ import '../../../../shared/widgets/skeleton_loader.dart';
 import '../../domain/entities/actualite.dart';
 import '../../domain/entities/app_notification.dart';
 import '../providers/news_provider.dart';
+import '../providers/veille_etat_provider.dart';
 
 /// Couleur + icône par catégorie d'actualité.
 extension _CategorieStyle on CategorieActualite {
@@ -74,11 +77,14 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
     final unread = ref.watch(notificationsProvider).valueOrNull?.nbNonLues ?? 0;
 
     return Scaffold(
+      // Visible seulement pour les administrateurs (ajout assisté par l'IA).
+      floatingActionButton: const BoutonAjoutAdmin(libelle: 'Ajouter une actualité', route: RoutePaths.adminAjoutActualite),
       backgroundColor: AppColors.background,
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: () async {
           if (_tab == 0) {
+            ref.invalidate(veilleEtatProvider);
             await ref.read(newsListProvider.notifier).refresh();
           } else {
             ref.invalidate(notificationsProvider);
@@ -957,12 +963,30 @@ class _GridNewsCard extends StatelessWidget {
 
 /// Bandeau en tête du fil : explique que les actualités sont collectées et
 /// vérifiées automatiquement par l'IA, et quand a eu lieu le dernier passage.
-class _AiWatchBanner extends StatelessWidget {
+class _AiWatchBanner extends ConsumerWidget {
   const _AiWatchBanner({required this.derniereMaj});
   final DateTime? derniereMaj;
 
+  /// « vérifiée il y a 20 min · aucune nouveauté · prochaine vers 03:20 » : montre que la
+  /// veille passe bien toutes les 2 h même quand elle ne trouve rien de neuf.
+  String _texte(EtatVeille? etat) {
+    if (etat?.derniereVerification == null) {
+      return derniereMaj == null
+          ? 'Sources officielles et presse reconnue uniquement, articles récents vérifiés.'
+          : 'Sources officielles et presse reconnue · dernier ajout ${_relativeDate(derniereMaj!)}';
+    }
+    final resultat = etat!.ajoutes == 0
+        ? 'aucune nouveauté'
+        : '${etat.ajoutes} nouveauté${etat.ajoutes > 1 ? 's' : ''}';
+    final prochaine = etat.prochainPassage == null
+        ? ''
+        : ' · prochaine vers ${DateFormat('HH:mm').format(etat.prochainPassage!)}';
+    return 'Vérifiée ${_relativeDate(etat.derniereVerification!)} · $resultat$prochaine';
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final etat = ref.watch(veilleEtatProvider).valueOrNull?['actualites'];
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 14, 10),
       decoration: BoxDecoration(
@@ -989,13 +1013,7 @@ class _AiWatchBanner extends StatelessWidget {
                     color: AppColors.primary,
                   ),
                 ),
-                Text(
-                  derniereMaj == null
-                      ? 'Sources officielles et presse reconnue uniquement, articles récents vérifiés.'
-                      : 'Sources officielles et presse reconnue · dernier ajout '
-                          '${_relativeDate(derniereMaj!)}',
-                  style: context.textTheme.labelSmall,
-                ),
+                Text(_texte(etat), style: context.textTheme.labelSmall),
               ],
             ),
           ),

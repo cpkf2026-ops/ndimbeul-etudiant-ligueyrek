@@ -17,7 +17,8 @@ class Universite extends Model
     protected $fillable = [
         'nom', 'code_unique', 'region', 'commune', 'type', 'site_web_officiel',
         'source', 'date_verification', 'description', 'image_url', 'email_contact',
-        'telephone_contact', 'statut_actif',
+        'telephone_contact', 'statut_actif', 'adresse', 'domaines', 'diplomes', 'admission',
+        'niveau_requis', 'pieces_a_fournir', 'source_infos',
     ];
 
     protected function casts(): array
@@ -25,6 +26,10 @@ class Universite extends Model
         return [
             'statut_actif' => 'boolean',
             'date_verification' => 'date',
+            'domaines' => 'array',
+            'diplomes' => 'array',
+            'niveau_requis' => 'array',
+            'pieces_a_fournir' => 'array',
         ];
     }
 

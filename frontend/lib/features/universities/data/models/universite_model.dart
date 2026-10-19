@@ -9,18 +9,19 @@ import 'logement_model.dart';
 part 'universite_model.freezed.dart';
 part 'universite_model.g.dart';
 
-EtablissementType _typeFromJson(String value) {
+// Statut absent ou inconnu -> null (non vérifié) : jamais « public » par défaut.
+EtablissementType? _typeFromJson(String? value) {
   switch (value) {
     case 'public':
       return EtablissementType.public;
     case 'prive':
       return EtablissementType.prive;
     default:
-      return EtablissementType.public;
+      return null;
   }
 }
 
-String _typeToJson(EtablissementType type) => type.name;
+String? _typeToJson(EtablissementType? type) => type?.name;
 
 @freezed
 sealed class UniversiteModel with _$UniversiteModel {
@@ -32,13 +33,22 @@ sealed class UniversiteModel with _$UniversiteModel {
     String? region,
     String? commune,
     // ignore: invalid_annotation_target
-    @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson) required EtablissementType type,
+    @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson) EtablissementType? type,
     // ignore: invalid_annotation_target
     @JsonKey(name: 'site_web_officiel') String? siteWebOfficiel,
     String? description,
     // ignore: invalid_annotation_target
     @JsonKey(name: 'image_url') String? imageUrl,
     ContactModel? contact,
+    @Default([]) List<String> domaines,
+    @Default([]) List<String> diplomes,
+    String? admission,
+    // ignore: invalid_annotation_target
+    @JsonKey(name: 'niveau_requis') @Default([]) List<String> niveauRequis,
+    // ignore: invalid_annotation_target
+    @JsonKey(name: 'pieces_a_fournir') @Default([]) List<String> piecesAFournir,
+    // ignore: invalid_annotation_target
+    @JsonKey(name: 'source_infos') String? sourceInfos,
     @Default([]) List<FormationModel> formations,
     @Default([]) List<BourseModel> bourses,
     @Default([]) List<LogementModel> logements,
@@ -62,6 +72,13 @@ sealed class UniversiteModel with _$UniversiteModel {
         imageUrl: imageUrl,
         emailContact: contact?.email,
         telephoneContact: contact?.telephone,
+        adresse: contact?.adresse,
+        domaines: domaines,
+        diplomes: diplomes,
+        admission: admission,
+        niveauRequis: niveauRequis,
+        piecesAFournir: piecesAFournir,
+        sourceInfos: sourceInfos,
         formations: formations.map((f) => f.toEntity()).toList(),
         bourses: bourses.map((b) => b.toEntity()).toList(),
         logements: logements.map((l) => l.toEntity()).toList(),

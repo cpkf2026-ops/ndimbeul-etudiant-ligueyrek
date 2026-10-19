@@ -286,7 +286,7 @@ def veille_opportunites(force=False):
     """Un passage complet de la veille des opportunités. Retourne ses statistiques.
     `force=True` ignore le rythme du mode réduit (commande manuelle `veiller`)."""
     if not commun.reserver_passage(NOM, force=force):
-        return {'mode': 'ignore', 'raison': 'mode réduit : dernier passage trop récent'}
+        return {'mode': 'ignore', 'raison': commun.raison_ignore()}
 
     requete = commun.rotation(REQUETES)
     try:
@@ -301,6 +301,7 @@ def veille_opportunites(force=False):
         stats = pipeline.veiller_offres()
         stats.update(mode='repli_sources_gratuites', raison=str(exc))
         stats['expirees'] = expirer_opportunites()
+        commun.enregistrer_resultat(NOM, stats)
         return stats
 
     stats = _nouvelles_stats(requete)
@@ -348,6 +349,7 @@ def veille_opportunites(force=False):
 
     stats['expirees'] = expirer_opportunites()
     logger.info('Veille opportunités : %s', stats)
+    commun.enregistrer_resultat(NOM, stats)
     return stats
 
 

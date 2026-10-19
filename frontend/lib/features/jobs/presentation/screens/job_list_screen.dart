@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../admin/presentation/widgets/bouton_ajout_admin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_paths.dart';
@@ -76,6 +77,8 @@ class _JobListScreenState extends ConsumerState<JobListScreen> {
     final horizontal = context.pageHorizontalPadding;
 
     return Scaffold(
+      // Visible seulement pour les administrateurs (ajout assisté par l'IA).
+      floatingActionButton: const BoutonAjoutAdmin(libelle: 'Ajouter une offre', route: RoutePaths.adminAjoutOffre),
       backgroundColor: AppColors.background,
       body: RefreshIndicator(
         color: AppColors.primary,

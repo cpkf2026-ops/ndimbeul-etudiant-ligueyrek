@@ -100,7 +100,7 @@ class _CompareTable extends StatelessWidget {
   String _valueFor(Universite u, _RowKind kind) {
     switch (kind) {
       case _RowKind.type:
-        return u.type.label;
+        return u.type?.label ?? 'Non vérifié';
       case _RowKind.localisation:
         return u.localisation.isEmpty ? '—' : u.localisation;
       case _RowKind.formationsCount:

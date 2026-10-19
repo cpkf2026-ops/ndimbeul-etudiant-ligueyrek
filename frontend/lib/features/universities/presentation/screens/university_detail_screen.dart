@@ -115,22 +115,25 @@ class _UniversityDetailBody extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.greenSoft,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Text(
-                        universite.type.label,
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
+                    // Statut affiché seulement s'il est vérifié (ANAQ-Sup, MESRI...).
+                    if (universite.type != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.greenSoft,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          universite.type!.label,
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
+                      const SizedBox(width: 10),
+                    ],
                     Icon(Icons.place_outlined, size: 15, color: AppColors.textSecondary),
                     const SizedBox(width: 4),
                     Expanded(
@@ -154,19 +157,84 @@ class _UniversityDetailBody extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 28),
-                _Section(
-                  title: 'Formations (${universite.formations.length})',
-                  child: universite.formations.isEmpty
-                      ? const Text('Aucune formation référencée pour le moment.')
-                      : Column(
-                          children: universite.formations
-                              .map((f) => _FormationTile(
-                                    formation: f,
-                                    universiteId: universite.id,
-                                  ))
-                              .toList(),
-                        ),
-                ),
+                if (universite.domaines.isNotEmpty)
+                  _Section(
+                    title: 'Domaines de formation',
+                    child: _Puces(valeurs: universite.domaines),
+                  ),
+                if (universite.diplomes.isNotEmpty)
+                  _Section(
+                    title: 'Diplômes préparés',
+                    child: _Puces(valeurs: universite.diplomes, accent: true),
+                  ),
+                // Sans formations détaillées, on n'affiche "aucune formation" que si la fiche
+                // ne donne pas non plus de domaines ni de diplômes (sinon la page dit déjà l'essentiel).
+                if (universite.formations.isNotEmpty ||
+                    (universite.domaines.isEmpty && universite.diplomes.isEmpty))
+                  _Section(
+                    title: 'Formations (${universite.formations.length})',
+                    child: universite.formations.isEmpty
+                        ? const Text('Aucune formation référencée pour le moment.')
+                        : Column(
+                            children: universite.formations
+                                .map((f) => _FormationTile(
+                                      formation: f,
+                                      universiteId: universite.id,
+                                    ))
+                                .toList(),
+                          ),
+                  ),
+                if (universite.admission != null ||
+                    universite.niveauRequis.isNotEmpty ||
+                    universite.piecesAFournir.isNotEmpty)
+                  _Section(
+                    title: 'Admission',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (universite.admission != null)
+                          Text(universite.admission!, style: context.textTheme.bodyMedium),
+                        if (universite.niveauRequis.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text('Niveau requis', style: context.textTheme.titleMedium),
+                          _Liste(lignes: universite.niveauRequis),
+                        ],
+                        if (universite.piecesAFournir.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text('Pièces à fournir', style: context.textTheme.titleMedium),
+                          _Liste(lignes: universite.piecesAFournir),
+                        ],
+                      ],
+                    ),
+                  ),
+                if (universite.adresse != null ||
+                    universite.telephoneContact != null ||
+                    universite.emailContact != null)
+                  _Section(
+                    title: 'Contact',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (universite.adresse != null)
+                          _LigneContact(icon: Icons.place_outlined, texte: universite.adresse!),
+                        if (universite.telephoneContact != null)
+                          _LigneContact(
+                            icon: Icons.phone_outlined,
+                            texte: universite.telephoneContact!,
+                            lien: Uri(
+                              scheme: 'tel',
+                              path: universite.telephoneContact!.replaceAll(RegExp(r'[^\d+]'), ''),
+                            ),
+                          ),
+                        if (universite.emailContact != null)
+                          _LigneContact(
+                            icon: Icons.mail_outline_rounded,
+                            texte: universite.emailContact!,
+                            lien: Uri(scheme: 'mailto', path: universite.emailContact!),
+                          ),
+                      ],
+                    ),
+                  ),
                 if (universite.bourses.isNotEmpty)
                   _Section(
                     title: 'Bourses',
@@ -223,12 +291,133 @@ class _UniversityDetailBody extends StatelessWidget {
                       }).toList(),
                     ),
                   ),
+                if (universite.sourceInfos != null) _SourceInfos(url: universite.sourceInfos!),
                 const SizedBox(height: 100),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Domaines / diplômes sous forme de pastilles.
+class _Puces extends StatelessWidget {
+  const _Puces({required this.valeurs, this.accent = false});
+  final List<String> valeurs;
+  final bool accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final v in valeurs)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: accent ? AppColors.amberSoft : AppColors.greenSoft,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Text(
+              v,
+              style: const TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _Liste extends StatelessWidget {
+  const _Liste({required this.lignes});
+  final List<String> lignes;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final l in lignes)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('•  '),
+                Expanded(child: Text(l, style: context.textTheme.bodyMedium)),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _LigneContact extends StatelessWidget {
+  const _LigneContact({required this.icon, required this.texte, this.lien});
+  final IconData icon;
+  final String texte;
+  final Uri? lien;
+
+  @override
+  Widget build(BuildContext context) {
+    final contenu = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: AppColors.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              texte,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: lien != null ? AppColors.primary : null,
+                fontWeight: lien != null ? FontWeight.w600 : null,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return lien == null ? contenu : InkWell(onTap: () => launchUrl(lien!), child: contenu);
+  }
+}
+
+/// D'où viennent les informations de la fiche (annuaire, article, site...).
+class _SourceInfos extends StatelessWidget {
+  const _SourceInfos({required this.url});
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    final hote = Uri.tryParse(url)?.host.replaceFirst('www.', '') ?? url;
+    return InkWell(
+      onTap: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline_rounded, size: 15, color: AppColors.textSecondary),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                'Informations publiques — source : $hote',
+                style: context.textTheme.labelSmall?.copyWith(
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

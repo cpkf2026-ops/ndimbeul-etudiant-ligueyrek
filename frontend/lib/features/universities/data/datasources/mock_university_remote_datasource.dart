@@ -18,7 +18,7 @@ class MockUniversityRemoteDataSource implements UniversityRemoteDataSource {
     await Future.delayed(const Duration(milliseconds: 500));
     var filtered = MockUniversityData.universites.where((u) {
       if (region != null && u.region != region) return false;
-      if (type != null && u.type.name != type) return false;
+      if (type != null && u.type?.name != type) return false;
       if (q != null && q.isNotEmpty) {
         final query = q.toLowerCase();
         if (!u.nom.toLowerCase().contains(query) &&

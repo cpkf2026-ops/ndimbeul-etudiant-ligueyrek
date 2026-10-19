@@ -18,7 +18,7 @@ class StoreUniversiteRequest extends FormRequest
             'code_unique' => ['required', 'string', 'max:50', 'unique:universites,code_unique'],
             'region' => ['nullable', 'string', 'max:100'],
             'commune' => ['nullable', 'string', 'max:100'],
-            'type' => ['required', 'in:public,prive'],
+            'type' => ['nullable', 'in:public,prive'],
             'site_web_officiel' => ['nullable', 'url', 'max:255'],
             'description' => ['nullable', 'string'],
             'image_url' => ['nullable', 'url', 'max:500'],

@@ -125,6 +125,33 @@ class DjangoAiClient
         return $this->client()->post('/api/ia/chat/', $payload);
     }
 
+    /**
+     * Back-office : recherche web d'un établissement (proposition à relire). Délai plus
+     * long que les autres appels : recherche Tavily + lecture du site officiel.
+     */
+    public function rechercherEtablissement(string $nom): Response
+    {
+        return $this->client()->timeout(90)->post('/api/ia/back-office/etablissement/', ['nom' => $nom]);
+    }
+
+    /** Back-office : lecture d'un lien d'actualité ou d'offre ($genre = actualite|offre). */
+    public function analyserLien(string $url, string $genre): Response
+    {
+        return $this->client()->timeout(60)->post('/api/ia/back-office/lien/', ['url' => $url, 'genre' => $genre]);
+    }
+
+    /** Back-office : enregistre la proposition relue ($genre = etablissement|actualite|offre). */
+    public function publier(string $genre, array $donnees): Response
+    {
+        return $this->client()->timeout(60)->post('/api/ia/back-office/publier/', ['genre' => $genre, 'donnees' => $donnees]);
+    }
+
+    /** Dernier passage de chaque veille (heure, trouvés, ajoutés) et prochain passage prévu. */
+    public function etatVeille(): Response
+    {
+        return $this->client()->get('/api/ia/veille/etat/');
+    }
+
     /** État d'Ollama, Redis, base et crédits Tavily restants. */
     public function sante(): Response
     {

@@ -33,7 +33,7 @@ class MockFormationRemoteDataSource implements FormationRemoteDataSource {
       }
       if (typeEtablissement != null) {
         final universite = MockUniversityData.universiteDe(f.universiteId);
-        if (universite.type.name != typeEtablissement) return false;
+        if (universite.type?.name != typeEtablissement) return false;
       }
       return true;
     }).map((f) => f.copyWith(estFavori: _favorites.contains(f.id))).toList();

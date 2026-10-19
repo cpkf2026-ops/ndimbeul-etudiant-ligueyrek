@@ -16,9 +16,13 @@ Toutes les VEILLE_INTERVAL_HOURS heures (tâche Celery `veille_actualites`) :
 Repli identique au module 2 : sources gratuites si Tavily est indisponible ou si la
 part « veille » du quota est épuisée.
 """
+import html
 import logging
+import re
 from datetime import timedelta
+from xml.etree import ElementTree
 
+import httpx
 from django.conf import settings
 from django.db import IntegrityError
 from django.utils import timezone
@@ -58,6 +62,20 @@ MOTS_EDUCATION = (
 )
 
 MAX_RESULTATS = 10
+
+# Flux RSS OFFICIELS (gratuits, aucun crédit Tavily), lus à chaque passage en plus de la
+# requête Tavily : une seule requête toutes les 2 h ramène souvent 10 articles déjà connus
+# ou hors sujet (observé le 18/10/2026 : 0 ajout de 17 h 54 à 1 h). Ces flux sont dédiés à
+# l'enseignement (MESRI) ou ont une rubrique Éducation (APS) ; leurs articles suivent
+# exactement la même chaîne de contrôles que ceux de Tavily.
+FLUX_OFFICIELS = [
+    'https://espaceuniversitaire.mesrisenegal.sn/public/rss.xml',
+    'https://mesrisenegal.sn/feed',
+    'https://aps.sn/category/education/feed/',
+]
+# Chaque article passe par le modèle local (~1 min) : on borne le nombre d'articles de
+# flux traités par passage ; les suivants le seront au passage d'après (ils restent récents).
+MAX_FLUX_PAR_PASSAGE = 6
 LLM_NUM_PREDICT = 250
 LLM_TIMEOUT_SECONDES = 300
 # La colonne actualites.source_url fait 255 caractères : une URL plus longue serait
@@ -204,9 +222,70 @@ def _enregistrer(article, champs):
     )
 
 
+def lire_flux_officiels():
+    """Articles récents des flux RSS officiels, au format des résultats Tavily."""
+    articles = []
+    for url_flux in FLUX_OFFICIELS:
+        try:
+            reponse = httpx.get(url_flux, headers=recherche_web.EN_TETES, timeout=15, follow_redirects=True)
+            reponse.raise_for_status()
+            racine = ElementTree.fromstring(reponse.content)
+        except (httpx.HTTPError, ElementTree.ParseError) as exc:
+            logger.warning('Flux %s illisible : %s', url_flux, exc)
+            continue
+        for item in racine.iter('item'):
+            titre = html.unescape((item.findtext('title') or '').strip())
+            lien = (item.findtext('link') or '').strip()
+            date = commun.parser_date_tavily(item.findtext('pubDate'))
+            if not titre or not lien or not fiabilite.est_recente(date):
+                continue
+            description = re.sub(r'<[^>]+>', ' ', html.unescape(item.findtext('description') or ''))
+            articles.append({
+                'url': lien, 'titre': titre, 'contenu': re.sub(r'\s+', ' ', description).strip()[:1500],
+                'date_publication': item.findtext('pubDate'), 'origine': 'flux',
+            })
+    # Certains flux (MESRI) mettent la MÊME description générique du site dans chaque article :
+    # ce n'est pas le contenu de l'article, on l'efface (la page sera lue à la place).
+    repetitions = {}
+    for a in articles:
+        repetitions[a['contenu']] = repetitions.get(a['contenu'], 0) + 1
+    for a in articles:
+        if a['contenu'] and repetitions[a['contenu']] >= 3:
+            a['contenu'] = ''
+    # Les plus récents d'abord : ce sont eux qu'on traite si la limite par passage est atteinte.
+    articles.sort(key=lambda a: commun.parser_date_tavily(a['date_publication']), reverse=True)
+    return articles
+
+
+def texte_article(url, titre):
+    """Texte réel d'un article (paragraphes de la page liés à son titre) quand le flux ne
+    fournit pas de résumé utilisable. '' si la page ne contient rien d'exploitable."""
+    try:
+        reponse = httpx.get(url, headers=recherche_web.EN_TETES, timeout=15, follow_redirects=True)
+        reponse.raise_for_status()
+    except httpx.HTTPError:
+        return ''
+    from bs4 import BeautifulSoup
+
+    soup = BeautifulSoup(reponse.text, 'html.parser')
+    paragraphes = [' '.join(p.get_text(' ').split()) for p in (soup.select('article p') or soup.select('main p')
+                                                                  or soup.find_all('p'))]
+    mots = pipeline._tokens_significatifs(titre)
+    utiles = [p for p in paragraphes if len(p) >= 80 and 'cookie' not in p.lower()]
+    # Le premier paragraphe qui reprend le sujet du titre ouvre l'article ; on garde la suite.
+    # Au moins la moitié des mots du titre (2 mots communs ne suffisent pas : « bourses
+    # d'études » se retrouve dans les autres articles de la colonne).
+    seuil = max(2, -(-len(mots) // 2))
+    for i, p in enumerate(utiles):
+        if len(pipeline._tokens_significatifs(p) & mots) >= min(seuil, len(mots)):
+            return ' '.join(utiles[i:i + 4])[:1500]
+    return ''
+
+
 def _nouvelles_stats(requete):
     return {
-        'mode': 'tavily', 'requete': requete, 'candidats': 0, 'doublon': 0, 'deja_rejete': 0, 'source': 0,
+        'mode': 'tavily', 'requete': requete, 'candidats': 0, 'flux_officiels': 0, 'doublon': 0,
+        'deja_rejete': 0, 'source': 0,
         'url_trop_longue': 0, 'titre_generique': 0, 'lien_mort': 0, 'reseau': 0, 'date': 0,
         'non_pertinent': 0, 'hors_education': 0, 'sans_contenu': 0, 'llm_invalide': 0, 'llm_timeout': 0,
         'llm_indisponible': 0, 'creees': 0, 'avertissements': {},
@@ -216,7 +295,7 @@ def _nouvelles_stats(requete):
 def veille_actualites(force=False):
     """Un passage complet de la veille des actualités. Retourne ses statistiques."""
     if not commun.reserver_passage(NOM, force=force):
-        return {'mode': 'ignore', 'raison': 'mode réduit : dernier passage trop récent'}
+        return {'mode': 'ignore', 'raison': commun.raison_ignore()}
 
     requete = commun.rotation(REQUETES)
     try:
@@ -230,12 +309,23 @@ def veille_actualites(force=False):
         stats = pipeline.veiller_actualites()
         pipeline.backfiller_metadonnees_actualites()
         stats.update(mode='repli_sources_gratuites', raison=str(exc))
+        commun.enregistrer_resultat(NOM, stats)
         return stats
 
     stats = _nouvelles_stats(requete)
     stats['candidats'] = len(resultats)
+    urls_tavily = {commun.normaliser_url(r['url']) for r in resultats}
+    flux = [a for a in lire_flux_officiels() if commun.normaliser_url(a['url']) not in urls_tavily]
+    stats['flux_officiels'] = len(flux)
 
-    a_traiter = [a for a in _ecarter_deja_connus(resultats, stats) if _verifier_page(a, stats)]
+    nouveaux = _ecarter_deja_connus(resultats + flux, stats)
+    nouveaux = ([a for a in nouveaux if a.get('origine') != 'flux']
+                + [a for a in nouveaux if a.get('origine') == 'flux'][:MAX_FLUX_PAR_PASSAGE])
+    a_traiter = [a for a in nouveaux if _verifier_page(a, stats)]
+    for article in a_traiter:
+        # Article de flux sans résumé utilisable : on lit la page (texte réel de l'article).
+        if article.get('origine') == 'flux' and len(article.get('contenu') or '') < 80:
+            article['contenu'] = texte_article(article['url'], article['titre']) or article.get('contenu') or ''
     if a_traiter:
         commun.precharger_modele_veille()
     for article in a_traiter:
@@ -268,4 +358,5 @@ def veille_actualites(force=False):
         stats['creees'] += 1
 
     logger.info('Veille actualités : %s', stats)
+    commun.enregistrer_resultat(NOM, stats)
     return stats

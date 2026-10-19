@@ -29,12 +29,22 @@ sealed class Universite with _$Universite {
     required String codeUnique,
     String? region,
     String? commune,
-    required EtablissementType type,
+    // Null = statut non vérifié (aucune source officielle) : on n'affiche alors rien.
+    EtablissementType? type,
     String? siteWebOfficiel,
     String? description,
     String? imageUrl,
     String? emailContact,
     String? telephoneContact,
+    String? adresse,
+    // Fiche enrichie (infos publiques collectées par le service IA, surtout pour les
+    // établissements sans site officiel) + page d'où elles viennent.
+    @Default([]) List<String> domaines,
+    @Default([]) List<String> diplomes,
+    String? admission,
+    @Default([]) List<String> niveauRequis,
+    @Default([]) List<String> piecesAFournir,
+    String? sourceInfos,
     @Default([]) List<Formation> formations,
     @Default([]) List<Bourse> bourses,
     @Default([]) List<Logement> logements,
@@ -43,6 +53,9 @@ sealed class Universite with _$Universite {
 
   const Universite._();
 
-  String get localisation =>
-      [commune, region].where((s) => s != null && s.isNotEmpty).join(', ');
+  /// « Point E, Dakar » ; « Dakar » (et non « Dakar, Dakar ») quand seule la ville est connue.
+  String get localisation => [commune, region]
+      .where((s) => s != null && s.isNotEmpty)
+      .toSet()
+      .join(', ');
 }

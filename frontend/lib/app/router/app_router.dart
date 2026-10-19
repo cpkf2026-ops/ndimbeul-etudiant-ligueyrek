@@ -21,6 +21,8 @@ import '../../features/jobs/presentation/screens/job_favorites_screen.dart';
 import '../../features/jobs/presentation/screens/job_list_screen.dart';
 import '../../features/news/presentation/screens/news_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/admin/presentation/screens/admin_ajout_contenu_screen.dart';
+import '../../features/admin/presentation/screens/admin_ajout_etablissement_screen.dart';
 import '../../features/admin/presentation/screens/admin_home_screen.dart';
 import '../../features/admin/presentation/screens/admin_news_screen.dart';
 import '../../features/admin/presentation/screens/admin_sources_screen.dart';
@@ -310,6 +312,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RoutePaths.adminNews,
         builder: (context, state) => const AdminNewsScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.adminAjoutEtablissement,
+        builder: (context, state) => const AdminAjoutEtablissementScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.adminAjoutActualite,
+        builder: (context, state) => const AdminAjoutContenuScreen(genre: 'actualite'),
+      ),
+      GoRoute(
+        path: RoutePaths.adminAjoutOffre,
+        builder: (context, state) => const AdminAjoutContenuScreen(genre: 'offre'),
       ),
     ],
   );

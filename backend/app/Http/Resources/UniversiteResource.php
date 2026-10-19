@@ -31,7 +31,16 @@ class UniversiteResource extends JsonResource
             'contact' => [
                 'email' => $this->email_contact,
                 'telephone' => $this->telephone_contact,
+                'adresse' => $this->adresse,
             ],
+            // Fiche enrichie (établissements sans site surtout) : infos publiques collectées
+            // par le service IA, avec la page d'où elles viennent.
+            'domaines' => $this->domaines ?? [],
+            'diplomes' => $this->diplomes ?? [],
+            'admission' => $this->admission,
+            'niveau_requis' => $this->niveau_requis ?? [],
+            'pieces_a_fournir' => $this->pieces_a_fournir ?? [],
+            'source_infos' => $this->source_infos,
             // Fiche complète (CDC §5.3/§7.3) : chargée uniquement si demandée explicitement (show),
             // pas sur la liste, pour ne pas alourdir /api/v1/universities.
             'formations' => FormationResource::collection($this->whenLoaded('formations')),

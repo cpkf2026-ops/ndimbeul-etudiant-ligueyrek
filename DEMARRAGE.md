@@ -263,3 +263,27 @@ Détail des routes et exemples JSON : `superapp_ia/API_IA.md`.
 Le code est dans `superapp_ia/services/` (Tavily, Ollama, crédits, cache, sources),
 `superapp_ia/veille/` (modules 2 et 3), `superapp_ia/recommandations/` (module 1)
 et `superapp_ia/ia/` (module 4).
+
+## Guide administrateur : ajouter un établissement, une actualité, un emploi / stage
+
+Connecté avec un compte administrateur, un bouton jaune **« + Ajouter… »** apparaît en bas
+des pages **Universités**, **Actualités** et **Emploi** (et trois raccourcis dans le
+tableau de bord admin). Le principe est toujours le même, en 3 étapes :
+
+1. **Donner l'information de départ**
+   - établissement : taper son nom (ex. « Institut Supérieur de Santé de Kaolack ») ;
+   - actualité / offre : coller le lien de la page (site officiel, presse, Senjob…).
+     Pour une annonce interne sans lien : « Remplir à la main ».
+2. **L'IA prépare une proposition** (20 à 40 s pour un établissement) :
+   site officiel vérifié, présentation tirée des pages trouvées, quartier/ville, statut
+   public/privé **seulement s'il est prouvé**, logos ; pour un lien : titre, résumé,
+   date, image, organisme, date limite. Elle signale aussi ce qui **existe déjà**
+   dans l'application (pour éviter les doublons).
+3. **Relire, corriger, publier** : rien n'est publié sans validation. Une fois publié,
+   le contenu s'affiche exactement comme ceux trouvés par la veille IA.
+
+Bonnes pratiques :
+- Statut public/privé : laisser « Non vérifié » en cas de doute (vérifier sur
+  anaqsup.sn ou espaceuniversitaire.mesrisenegal.sn).
+- Préférer les liens officiels (sites des écoles, mesrisenegal.sn, presse reconnue).
+- Chaque recherche d'établissement consomme 1 crédit Tavily (lecture d'un lien : 0).

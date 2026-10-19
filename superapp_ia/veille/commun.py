@@ -3,6 +3,7 @@ Outils partagés par la veille Tavily des modules 2 (opportunités) et 3 (actual
 dédoublonnage, lecture des dates Tavily, rythme d'exécution en mode réduit.
 """
 import hashlib
+import json
 import logging
 import time
 import urllib.parse
@@ -136,6 +137,56 @@ def reserver_passage(nom, force=False):
     except OSError as exc:
         logger.warning('Heure du passage %s non enregistrée : %s', nom, exc)
     return True
+
+
+def raison_ignore():
+    """Motif affiché quand un déclenchement trouve son créneau déjà traité."""
+    if credits.mode_reduit():
+        return f'mode réduit (crédits Tavily) : un passage toutes les {settings.VEILLE_INTERVAL_REDUIT_HOURS} h'
+    return 'créneau déjà traité par un autre déclencheur (Celery ou tâche Windows)'
+
+
+# --- Dernier résultat (affiché dans l'application : « vérifié il y a X min ») --------
+# Sans lui, l'application ne montrait que la date du dernier AJOUT : un passage qui ne
+# trouvait rien de nouveau était invisible et l'on croyait la veille arrêtée.
+
+def _fichier_resultat(nom):
+    return Path(settings.VEILLE_ETAT_DIR) / f'dernier_resultat_{nom}.json'
+
+
+def enregistrer_resultat(nom, stats):
+    resume = {
+        'heure': timezone.now().isoformat(),
+        'mode': stats.get('mode'),
+        'requete': stats.get('requete'),
+        'candidats': stats.get('candidats', 0),
+        'creees': stats.get('creees', 0),
+        'doublons': stats.get('doublon', 0),
+        'flux_officiels': stats.get('flux_officiels', 0),
+    }
+    try:
+        _fichier_resultat(nom).parent.mkdir(parents=True, exist_ok=True)
+        _fichier_resultat(nom).write_text(json.dumps(resume, ensure_ascii=False), encoding='utf-8')
+    except OSError as exc:
+        logger.warning('Résultat du passage %s non enregistré : %s', nom, exc)
+
+
+def etat(nom):
+    """Dernier passage terminé + heure prévue du prochain (pour l'application)."""
+    try:
+        resultat = json.loads(_fichier_resultat(nom).read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        resultat = None
+    dernier = _lire_dernier_passage(nom)
+    intervalle = (
+        settings.VEILLE_INTERVAL_REDUIT_HOURS if credits.mode_reduit() else settings.VEILLE_INTERVAL_HOURS
+    ) * 3600
+    prochain = datetime.fromtimestamp(dernier + intervalle, tz=timezone.get_current_timezone()) if dernier else None
+    return {
+        'dernier_passage': resultat,
+        'prochain_passage': prochain.isoformat() if prochain else None,
+        'intervalle_heures': intervalle // 3600,
+    }
 
 
 def rotation(options):

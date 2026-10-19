@@ -23,6 +23,7 @@ ContactModel _$ContactModelFromJson(Map<String, dynamic> json) {
 mixin _$ContactModel {
   String? get email => throw _privateConstructorUsedError;
   String? get telephone => throw _privateConstructorUsedError;
+  String? get adresse => throw _privateConstructorUsedError;
 
   /// Serializes this ContactModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -41,7 +42,7 @@ abstract class $ContactModelCopyWith<$Res> {
     $Res Function(ContactModel) then,
   ) = _$ContactModelCopyWithImpl<$Res, ContactModel>;
   @useResult
-  $Res call({String? email, String? telephone});
+  $Res call({String? email, String? telephone, String? adresse});
 }
 
 /// @nodoc
@@ -58,7 +59,11 @@ class _$ContactModelCopyWithImpl<$Res, $Val extends ContactModel>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? email = freezed, Object? telephone = freezed}) {
+  $Res call({
+    Object? email = freezed,
+    Object? telephone = freezed,
+    Object? adresse = freezed,
+  }) {
     return _then(
       _value.copyWith(
             email: freezed == email
@@ -68,6 +73,10 @@ class _$ContactModelCopyWithImpl<$Res, $Val extends ContactModel>
             telephone: freezed == telephone
                 ? _value.telephone
                 : telephone // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            adresse: freezed == adresse
+                ? _value.adresse
+                : adresse // ignore: cast_nullable_to_non_nullable
                       as String?,
           )
           as $Val,
@@ -84,7 +93,7 @@ abstract class _$$ContactModelImplCopyWith<$Res>
   ) = __$$ContactModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? email, String? telephone});
+  $Res call({String? email, String? telephone, String? adresse});
 }
 
 /// @nodoc
@@ -100,7 +109,11 @@ class __$$ContactModelImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? email = freezed, Object? telephone = freezed}) {
+  $Res call({
+    Object? email = freezed,
+    Object? telephone = freezed,
+    Object? adresse = freezed,
+  }) {
     return _then(
       _$ContactModelImpl(
         email: freezed == email
@@ -111,6 +124,10 @@ class __$$ContactModelImplCopyWithImpl<$Res>
             ? _value.telephone
             : telephone // ignore: cast_nullable_to_non_nullable
                   as String?,
+        adresse: freezed == adresse
+            ? _value.adresse
+            : adresse // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -119,7 +136,7 @@ class __$$ContactModelImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$ContactModelImpl implements _ContactModel {
-  const _$ContactModelImpl({this.email, this.telephone});
+  const _$ContactModelImpl({this.email, this.telephone, this.adresse});
 
   factory _$ContactModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$ContactModelImplFromJson(json);
@@ -128,10 +145,12 @@ class _$ContactModelImpl implements _ContactModel {
   final String? email;
   @override
   final String? telephone;
+  @override
+  final String? adresse;
 
   @override
   String toString() {
-    return 'ContactModel(email: $email, telephone: $telephone)';
+    return 'ContactModel(email: $email, telephone: $telephone, adresse: $adresse)';
   }
 
   @override
@@ -141,12 +160,13 @@ class _$ContactModelImpl implements _ContactModel {
             other is _$ContactModelImpl &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.telephone, telephone) ||
-                other.telephone == telephone));
+                other.telephone == telephone) &&
+            (identical(other.adresse, adresse) || other.adresse == adresse));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, email, telephone);
+  int get hashCode => Object.hash(runtimeType, email, telephone, adresse);
 
   /// Create a copy of ContactModel
   /// with the given fields replaced by the non-null parameter values.
@@ -163,8 +183,11 @@ class _$ContactModelImpl implements _ContactModel {
 }
 
 abstract class _ContactModel implements ContactModel {
-  const factory _ContactModel({final String? email, final String? telephone}) =
-      _$ContactModelImpl;
+  const factory _ContactModel({
+    final String? email,
+    final String? telephone,
+    final String? adresse,
+  }) = _$ContactModelImpl;
 
   factory _ContactModel.fromJson(Map<String, dynamic> json) =
       _$ContactModelImpl.fromJson;
@@ -173,6 +196,8 @@ abstract class _ContactModel implements ContactModel {
   String? get email;
   @override
   String? get telephone;
+  @override
+  String? get adresse;
 
   /// Create a copy of ContactModel
   /// with the given fields replaced by the non-null parameter values.

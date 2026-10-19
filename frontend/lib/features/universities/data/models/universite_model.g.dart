@@ -14,13 +14,31 @@ _$UniversiteModelImpl _$$UniversiteModelImplFromJson(
   codeUnique: json['code_unique'] as String,
   region: json['region'] as String?,
   commune: json['commune'] as String?,
-  type: _typeFromJson(json['type'] as String),
+  type: _typeFromJson(json['type'] as String?),
   siteWebOfficiel: json['site_web_officiel'] as String?,
   description: json['description'] as String?,
   imageUrl: json['image_url'] as String?,
   contact: json['contact'] == null
       ? null
       : ContactModel.fromJson(json['contact'] as Map<String, dynamic>),
+  domaines:
+      (json['domaines'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  diplomes:
+      (json['diplomes'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  admission: json['admission'] as String?,
+  niveauRequis:
+      (json['niveau_requis'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  piecesAFournir:
+      (json['pieces_a_fournir'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  sourceInfos: json['source_infos'] as String?,
   formations:
       (json['formations'] as List<dynamic>?)
           ?.map((e) => FormationModel.fromJson(e as Map<String, dynamic>))
@@ -56,6 +74,12 @@ Map<String, dynamic> _$$UniversiteModelImplToJson(
   'description': instance.description,
   'image_url': instance.imageUrl,
   'contact': instance.contact,
+  'domaines': instance.domaines,
+  'diplomes': instance.diplomes,
+  'admission': instance.admission,
+  'niveau_requis': instance.niveauRequis,
+  'pieces_a_fournir': instance.piecesAFournir,
+  'source_infos': instance.sourceInfos,
   'formations': instance.formations,
   'bourses': instance.bourses,
   'logements': instance.logements,

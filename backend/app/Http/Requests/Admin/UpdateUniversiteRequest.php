@@ -21,7 +21,7 @@ class UpdateUniversiteRequest extends FormRequest
             'code_unique' => ['sometimes', 'string', 'max:50', Rule::unique('universites', 'code_unique')->ignore($universite?->id)],
             'region' => ['sometimes', 'nullable', 'string', 'max:100'],
             'commune' => ['sometimes', 'nullable', 'string', 'max:100'],
-            'type' => ['sometimes', 'in:public,prive'],
+            'type' => ['sometimes', 'nullable', 'in:public,prive'],
             'site_web_officiel' => ['sometimes', 'nullable', 'url', 'max:255'],
             'description' => ['sometimes', 'nullable', 'string'],
             'image_url' => ['sometimes', 'nullable', 'url', 'max:500'],

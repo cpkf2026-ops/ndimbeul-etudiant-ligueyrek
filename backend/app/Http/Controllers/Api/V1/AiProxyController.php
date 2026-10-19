@@ -8,6 +8,7 @@ use App\Models\ConversationIa;
 use App\Services\DjangoAiClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -127,5 +128,25 @@ class AiProxyController extends Controller
             ->firstOrFail();
 
         return response()->json(['data' => $conversation]);
+    }
+
+    /**
+     * GET /api/v1/veille/etat (publique) — quand la veille IA a vérifié pour la dernière fois
+     * (actualités, offres) et ce qu'elle a trouvé. Mis en cache 1 min ; si le service IA ne
+     * répond pas, on renvoie null plutôt qu'une erreur (le bandeau garde son texte par défaut).
+     */
+    public function veilleEtat(): JsonResponse
+    {
+        $etat = Cache::remember('veille_etat', 60, function () {
+            try {
+                $reponse = $this->django->etatVeille();
+
+                return $reponse->successful() ? $reponse->json() : null;
+            } catch (\Throwable) {
+                return null;
+            }
+        });
+
+        return response()->json(['data' => $etat]);
     }
 }

@@ -36,6 +36,7 @@ abstract final class ApiEndpoints {
 
   // News
   static const String news = '/news';
+  static const String veilleEtat = '/veille/etat';
   static String newsDetail(String id) => '/news/$id';
 
   // Alerts / notifications

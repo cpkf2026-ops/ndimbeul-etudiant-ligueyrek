@@ -30,7 +30,7 @@ mixin _$UniversiteModel {
   String? get commune =>
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson)
-  EtablissementType get type => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  EtablissementType? get type => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'site_web_officiel')
   String? get siteWebOfficiel => throw _privateConstructorUsedError;
   String? get description =>
@@ -38,6 +38,16 @@ mixin _$UniversiteModel {
   @JsonKey(name: 'image_url')
   String? get imageUrl => throw _privateConstructorUsedError;
   ContactModel? get contact => throw _privateConstructorUsedError;
+  List<String> get domaines => throw _privateConstructorUsedError;
+  List<String> get diplomes => throw _privateConstructorUsedError;
+  String? get admission =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'niveau_requis')
+  List<String> get niveauRequis => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'pieces_a_fournir')
+  List<String> get piecesAFournir => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'source_infos')
+  String? get sourceInfos => throw _privateConstructorUsedError;
   List<FormationModel> get formations => throw _privateConstructorUsedError;
   List<BourseModel> get bourses => throw _privateConstructorUsedError;
   List<LogementModel> get logements =>
@@ -70,11 +80,17 @@ abstract class $UniversiteModelCopyWith<$Res> {
     String? region,
     String? commune,
     @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson)
-    EtablissementType type,
+    EtablissementType? type,
     @JsonKey(name: 'site_web_officiel') String? siteWebOfficiel,
     String? description,
     @JsonKey(name: 'image_url') String? imageUrl,
     ContactModel? contact,
+    List<String> domaines,
+    List<String> diplomes,
+    String? admission,
+    @JsonKey(name: 'niveau_requis') List<String> niveauRequis,
+    @JsonKey(name: 'pieces_a_fournir') List<String> piecesAFournir,
+    @JsonKey(name: 'source_infos') String? sourceInfos,
     List<FormationModel> formations,
     List<BourseModel> bourses,
     List<LogementModel> logements,
@@ -104,11 +120,17 @@ class _$UniversiteModelCopyWithImpl<$Res, $Val extends UniversiteModel>
     Object? codeUnique = null,
     Object? region = freezed,
     Object? commune = freezed,
-    Object? type = null,
+    Object? type = freezed,
     Object? siteWebOfficiel = freezed,
     Object? description = freezed,
     Object? imageUrl = freezed,
     Object? contact = freezed,
+    Object? domaines = null,
+    Object? diplomes = null,
+    Object? admission = freezed,
+    Object? niveauRequis = null,
+    Object? piecesAFournir = null,
+    Object? sourceInfos = freezed,
     Object? formations = null,
     Object? bourses = null,
     Object? logements = null,
@@ -136,10 +158,10 @@ class _$UniversiteModelCopyWithImpl<$Res, $Val extends UniversiteModel>
                 ? _value.commune
                 : commune // ignore: cast_nullable_to_non_nullable
                       as String?,
-            type: null == type
+            type: freezed == type
                 ? _value.type
                 : type // ignore: cast_nullable_to_non_nullable
-                      as EtablissementType,
+                      as EtablissementType?,
             siteWebOfficiel: freezed == siteWebOfficiel
                 ? _value.siteWebOfficiel
                 : siteWebOfficiel // ignore: cast_nullable_to_non_nullable
@@ -156,6 +178,30 @@ class _$UniversiteModelCopyWithImpl<$Res, $Val extends UniversiteModel>
                 ? _value.contact
                 : contact // ignore: cast_nullable_to_non_nullable
                       as ContactModel?,
+            domaines: null == domaines
+                ? _value.domaines
+                : domaines // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            diplomes: null == diplomes
+                ? _value.diplomes
+                : diplomes // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            admission: freezed == admission
+                ? _value.admission
+                : admission // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            niveauRequis: null == niveauRequis
+                ? _value.niveauRequis
+                : niveauRequis // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            piecesAFournir: null == piecesAFournir
+                ? _value.piecesAFournir
+                : piecesAFournir // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            sourceInfos: freezed == sourceInfos
+                ? _value.sourceInfos
+                : sourceInfos // ignore: cast_nullable_to_non_nullable
+                      as String?,
             formations: null == formations
                 ? _value.formations
                 : formations // ignore: cast_nullable_to_non_nullable
@@ -208,11 +254,17 @@ abstract class _$$UniversiteModelImplCopyWith<$Res>
     String? region,
     String? commune,
     @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson)
-    EtablissementType type,
+    EtablissementType? type,
     @JsonKey(name: 'site_web_officiel') String? siteWebOfficiel,
     String? description,
     @JsonKey(name: 'image_url') String? imageUrl,
     ContactModel? contact,
+    List<String> domaines,
+    List<String> diplomes,
+    String? admission,
+    @JsonKey(name: 'niveau_requis') List<String> niveauRequis,
+    @JsonKey(name: 'pieces_a_fournir') List<String> piecesAFournir,
+    @JsonKey(name: 'source_infos') String? sourceInfos,
     List<FormationModel> formations,
     List<BourseModel> bourses,
     List<LogementModel> logements,
@@ -242,11 +294,17 @@ class __$$UniversiteModelImplCopyWithImpl<$Res>
     Object? codeUnique = null,
     Object? region = freezed,
     Object? commune = freezed,
-    Object? type = null,
+    Object? type = freezed,
     Object? siteWebOfficiel = freezed,
     Object? description = freezed,
     Object? imageUrl = freezed,
     Object? contact = freezed,
+    Object? domaines = null,
+    Object? diplomes = null,
+    Object? admission = freezed,
+    Object? niveauRequis = null,
+    Object? piecesAFournir = null,
+    Object? sourceInfos = freezed,
     Object? formations = null,
     Object? bourses = null,
     Object? logements = null,
@@ -274,10 +332,10 @@ class __$$UniversiteModelImplCopyWithImpl<$Res>
             ? _value.commune
             : commune // ignore: cast_nullable_to_non_nullable
                   as String?,
-        type: null == type
+        type: freezed == type
             ? _value.type
             : type // ignore: cast_nullable_to_non_nullable
-                  as EtablissementType,
+                  as EtablissementType?,
         siteWebOfficiel: freezed == siteWebOfficiel
             ? _value.siteWebOfficiel
             : siteWebOfficiel // ignore: cast_nullable_to_non_nullable
@@ -294,6 +352,30 @@ class __$$UniversiteModelImplCopyWithImpl<$Res>
             ? _value.contact
             : contact // ignore: cast_nullable_to_non_nullable
                   as ContactModel?,
+        domaines: null == domaines
+            ? _value._domaines
+            : domaines // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        diplomes: null == diplomes
+            ? _value._diplomes
+            : diplomes // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        admission: freezed == admission
+            ? _value.admission
+            : admission // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        niveauRequis: null == niveauRequis
+            ? _value._niveauRequis
+            : niveauRequis // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        piecesAFournir: null == piecesAFournir
+            ? _value._piecesAFournir
+            : piecesAFournir // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        sourceInfos: freezed == sourceInfos
+            ? _value.sourceInfos
+            : sourceInfos // ignore: cast_nullable_to_non_nullable
+                  as String?,
         formations: null == formations
             ? _value._formations
             : formations // ignore: cast_nullable_to_non_nullable
@@ -324,17 +406,28 @@ class _$UniversiteModelImpl extends _UniversiteModel {
     @JsonKey(name: 'code_unique') required this.codeUnique,
     this.region,
     this.commune,
-    @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson) required this.type,
+    @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson) this.type,
     @JsonKey(name: 'site_web_officiel') this.siteWebOfficiel,
     this.description,
     @JsonKey(name: 'image_url') this.imageUrl,
     this.contact,
+    final List<String> domaines = const [],
+    final List<String> diplomes = const [],
+    this.admission,
+    @JsonKey(name: 'niveau_requis') final List<String> niveauRequis = const [],
+    @JsonKey(name: 'pieces_a_fournir')
+    final List<String> piecesAFournir = const [],
+    @JsonKey(name: 'source_infos') this.sourceInfos,
     final List<FormationModel> formations = const [],
     final List<BourseModel> bourses = const [],
     final List<LogementModel> logements = const [],
     @JsonKey(name: 'frais_scolarite')
     final List<FraisScolariteModel> fraisScolarite = const [],
-  }) : _formations = formations,
+  }) : _domaines = domaines,
+       _diplomes = diplomes,
+       _niveauRequis = niveauRequis,
+       _piecesAFournir = piecesAFournir,
+       _formations = formations,
        _bourses = bourses,
        _logements = logements,
        _fraisScolarite = fraisScolarite,
@@ -358,7 +451,7 @@ class _$UniversiteModelImpl extends _UniversiteModel {
   // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson)
-  final EtablissementType type;
+  final EtablissementType? type;
   // ignore: invalid_annotation_target
   @override
   @JsonKey(name: 'site_web_officiel')
@@ -371,6 +464,52 @@ class _$UniversiteModelImpl extends _UniversiteModel {
   final String? imageUrl;
   @override
   final ContactModel? contact;
+  final List<String> _domaines;
+  @override
+  @JsonKey()
+  List<String> get domaines {
+    if (_domaines is EqualUnmodifiableListView) return _domaines;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_domaines);
+  }
+
+  final List<String> _diplomes;
+  @override
+  @JsonKey()
+  List<String> get diplomes {
+    if (_diplomes is EqualUnmodifiableListView) return _diplomes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_diplomes);
+  }
+
+  @override
+  final String? admission;
+  // ignore: invalid_annotation_target
+  final List<String> _niveauRequis;
+  // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'niveau_requis')
+  List<String> get niveauRequis {
+    if (_niveauRequis is EqualUnmodifiableListView) return _niveauRequis;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_niveauRequis);
+  }
+
+  // ignore: invalid_annotation_target
+  final List<String> _piecesAFournir;
+  // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'pieces_a_fournir')
+  List<String> get piecesAFournir {
+    if (_piecesAFournir is EqualUnmodifiableListView) return _piecesAFournir;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_piecesAFournir);
+  }
+
+  // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'source_infos')
+  final String? sourceInfos;
   final List<FormationModel> _formations;
   @override
   @JsonKey()
@@ -411,7 +550,7 @@ class _$UniversiteModelImpl extends _UniversiteModel {
 
   @override
   String toString() {
-    return 'UniversiteModel(id: $id, nom: $nom, codeUnique: $codeUnique, region: $region, commune: $commune, type: $type, siteWebOfficiel: $siteWebOfficiel, description: $description, imageUrl: $imageUrl, contact: $contact, formations: $formations, bourses: $bourses, logements: $logements, fraisScolarite: $fraisScolarite)';
+    return 'UniversiteModel(id: $id, nom: $nom, codeUnique: $codeUnique, region: $region, commune: $commune, type: $type, siteWebOfficiel: $siteWebOfficiel, description: $description, imageUrl: $imageUrl, contact: $contact, domaines: $domaines, diplomes: $diplomes, admission: $admission, niveauRequis: $niveauRequis, piecesAFournir: $piecesAFournir, sourceInfos: $sourceInfos, formations: $formations, bourses: $bourses, logements: $logements, fraisScolarite: $fraisScolarite)';
   }
 
   @override
@@ -433,6 +572,20 @@ class _$UniversiteModelImpl extends _UniversiteModel {
             (identical(other.imageUrl, imageUrl) ||
                 other.imageUrl == imageUrl) &&
             (identical(other.contact, contact) || other.contact == contact) &&
+            const DeepCollectionEquality().equals(other._domaines, _domaines) &&
+            const DeepCollectionEquality().equals(other._diplomes, _diplomes) &&
+            (identical(other.admission, admission) ||
+                other.admission == admission) &&
+            const DeepCollectionEquality().equals(
+              other._niveauRequis,
+              _niveauRequis,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._piecesAFournir,
+              _piecesAFournir,
+            ) &&
+            (identical(other.sourceInfos, sourceInfos) ||
+                other.sourceInfos == sourceInfos) &&
             const DeepCollectionEquality().equals(
               other._formations,
               _formations,
@@ -450,7 +603,7 @@ class _$UniversiteModelImpl extends _UniversiteModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     id,
     nom,
@@ -462,11 +615,17 @@ class _$UniversiteModelImpl extends _UniversiteModel {
     description,
     imageUrl,
     contact,
+    const DeepCollectionEquality().hash(_domaines),
+    const DeepCollectionEquality().hash(_diplomes),
+    admission,
+    const DeepCollectionEquality().hash(_niveauRequis),
+    const DeepCollectionEquality().hash(_piecesAFournir),
+    sourceInfos,
     const DeepCollectionEquality().hash(_formations),
     const DeepCollectionEquality().hash(_bourses),
     const DeepCollectionEquality().hash(_logements),
     const DeepCollectionEquality().hash(_fraisScolarite),
-  );
+  ]);
 
   /// Create a copy of UniversiteModel
   /// with the given fields replaced by the non-null parameter values.
@@ -493,11 +652,17 @@ abstract class _UniversiteModel extends UniversiteModel {
     final String? region,
     final String? commune,
     @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson)
-    required final EtablissementType type,
+    final EtablissementType? type,
     @JsonKey(name: 'site_web_officiel') final String? siteWebOfficiel,
     final String? description,
     @JsonKey(name: 'image_url') final String? imageUrl,
     final ContactModel? contact,
+    final List<String> domaines,
+    final List<String> diplomes,
+    final String? admission,
+    @JsonKey(name: 'niveau_requis') final List<String> niveauRequis,
+    @JsonKey(name: 'pieces_a_fournir') final List<String> piecesAFournir,
+    @JsonKey(name: 'source_infos') final String? sourceInfos,
     final List<FormationModel> formations,
     final List<BourseModel> bourses,
     final List<LogementModel> logements,
@@ -522,7 +687,7 @@ abstract class _UniversiteModel extends UniversiteModel {
   String? get commune; // ignore: invalid_annotation_target
   @override
   @JsonKey(fromJson: _typeFromJson, toJson: _typeToJson)
-  EtablissementType get type; // ignore: invalid_annotation_target
+  EtablissementType? get type; // ignore: invalid_annotation_target
   @override
   @JsonKey(name: 'site_web_officiel')
   String? get siteWebOfficiel;
@@ -533,6 +698,21 @@ abstract class _UniversiteModel extends UniversiteModel {
   String? get imageUrl;
   @override
   ContactModel? get contact;
+  @override
+  List<String> get domaines;
+  @override
+  List<String> get diplomes;
+  @override
+  String? get admission; // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'niveau_requis')
+  List<String> get niveauRequis; // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'pieces_a_fournir')
+  List<String> get piecesAFournir; // ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'source_infos')
+  String? get sourceInfos;
   @override
   List<FormationModel> get formations;
   @override

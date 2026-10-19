@@ -131,8 +131,28 @@ class AdminHomeScreen extends ConsumerWidget {
             _AdminMenuTile(
               icon: Icons.newspaper_outlined,
               title: 'Actualités',
-              subtitle: 'Consultation des publications (lecture seule)',
+              subtitle: 'Consultation des publications',
               onTap: () => context.push(RoutePaths.adminNews),
+            ),
+            const SizedBox(height: 12),
+            // Ajout assisté par l'IA : recherche web / lecture du lien -> relecture -> publication.
+            _AdminMenuTile(
+              icon: Icons.school_outlined,
+              title: 'Ajouter un établissement',
+              subtitle: "Tapez le nom : l'IA cherche site, présentation, lieu, statut et logo",
+              onTap: () => context.push(RoutePaths.adminAjoutEtablissement),
+            ),
+            _AdminMenuTile(
+              icon: Icons.post_add_rounded,
+              title: 'Ajouter une actualité',
+              subtitle: "Collez le lien de l'article : l'IA prépare titre, résumé, image",
+              onTap: () => context.push(RoutePaths.adminAjoutActualite),
+            ),
+            _AdminMenuTile(
+              icon: Icons.work_outline_rounded,
+              title: 'Ajouter un emploi / stage',
+              subtitle: "Collez le lien de l'offre : l'IA prépare intitulé, organisme, date limite",
+              onTap: () => context.push(RoutePaths.adminAjoutOffre),
             ),
           ],
         ),

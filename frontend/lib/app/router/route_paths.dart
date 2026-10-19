@@ -49,4 +49,8 @@ abstract final class RoutePaths {
   static const String adminSources = '/admin/sources';
   static const String adminUsers = '/admin/users';
   static const String adminNews = '/admin/news';
+  // Ajout assisté par l'IA (sous /admin : protégé par la garde des administrateurs).
+  static const String adminAjoutEtablissement = '/admin/ajout/etablissement';
+  static const String adminAjoutActualite = '/admin/ajout/actualite';
+  static const String adminAjoutOffre = '/admin/ajout/offre';
 }

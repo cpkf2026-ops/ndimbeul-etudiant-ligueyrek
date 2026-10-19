@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Admin\FicheAdminController;
 use App\Http\Controllers\Api\V1\Admin\FormationAdminController;
 use App\Http\Controllers\Api\V1\Admin\QualityController;
 use App\Http\Controllers\Api\V1\Admin\SourceController;
+use App\Http\Controllers\Api\V1\Admin\AssistantAdminController;
 use App\Http\Controllers\Api\V1\Admin\UniversityAdminController;
 use App\Http\Controllers\Api\V1\Admin\UserAdminController;
 use App\Http\Controllers\Api\V1\AiProxyController;
@@ -98,6 +99,8 @@ Route::prefix('v1')->group(function () {
     // --- Actualités (publique) ---
     Route::get('/news', [NewsController::class, 'index']);
     Route::get('/news/{actualite}', [NewsController::class, 'show']);
+    // État de la veille IA (dernière vérification, nouveautés trouvées) — publique.
+    Route::get('/veille/etat', [AiProxyController::class, 'veilleEtat']);
 
     // --- Alertes personnalisées, notifications, IA (authentifié) ---
     Route::middleware(['auth:sanctum', 'profil.complete'])->group(function () {
@@ -119,6 +122,13 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'role:admin_etablissement,super_admin'])
         ->prefix('admin')
         ->group(function () {
+            // Ajout assisté par l'IA : recherche web -> proposition relue -> publication.
+            Route::post('/universities/recherche', [AssistantAdminController::class, 'rechercherEtablissement']);
+            Route::post('/universities/publier', [AssistantAdminController::class, 'publierEtablissement']);
+            Route::post('/contenus/analyser', [AssistantAdminController::class, 'analyserLien']);
+            Route::post('/news', [AssistantAdminController::class, 'publierActualite']);
+            Route::post('/jobs', [AssistantAdminController::class, 'publierOffre']);
+
             Route::apiResource('universities', UniversityAdminController::class)
                 ->parameters(['universities' => 'universite'])
                 ->only(['index', 'store', 'update', 'destroy']);

@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from services import llm_service, tavily_service
 from services.models import CreditTavily
-from veille import actualites
+from veille import actualites, commun
 from veille.models import Actualite
 from veille.tasks import veille_actualites
 
@@ -44,7 +44,15 @@ def _faux_mistral(messages, **kwargs):
         # Chiffre inventé (« 15 000 étudiants ») : le résumé doit être remplacé par la source.
         return json.dumps({'pertinent': True, 'titre': 'UCAD : reprise des cours le 3 novembre',
                            'resume': 'Les 15 000 étudiants reprennent les cours.', 'categorie': 'evenement'})
+    if "Bourses d'excellence" in page:
+        return json.dumps({'pertinent': True, 'titre': "Bourses d'excellence de la Suisse : appel à candidatures",
+                           'resume': "Le ministère annonce l'ouverture des candidatures aux bourses d'excellence.",
+                           'categorie': 'bourse'})
     return json.dumps({'pertinent': False})
+
+
+def _date_flux(heures=5):
+    return (timezone.now() - timedelta(hours=heures)).strftime('%a, %d %b %Y %H:%M:%S GMT')
 
 
 PAGE_VIVANTE = {'accessible': True, 'image': 'https://www.aps.sn/img.jpg', 'date_publication': None}
@@ -65,7 +73,44 @@ class VeilleActualitesTests(TestCase):
             'veille.recherche_web.telecharger_image_locale', return_value='/storage/actualites/abc.jpg',
         ).start()
         mock.patch('veille.commun.precharger_modele_veille').start()
+        # Flux RSS officiels : vides par défaut (aucun appel réseau dans les tests).
+        self.flux = mock.patch('veille.actualites.lire_flux_officiels', return_value=[]).start()
+        mock.patch('veille.actualites.texte_article', return_value='').start()
         self.addCleanup(mock.patch.stopall)
+
+    def test_articles_des_flux_officiels_traites_comme_ceux_de_tavily(self):
+        self.tavily.search.return_value = {'results': []}
+        self.flux.return_value = [{
+            'url': 'https://mesrisenegal.sn/actualites/bourses-suisse-2027',
+            'titre': "Bourses d'excellence de la Suisse : appel à candidatures pour les étudiants",
+            'contenu': "Le ministère annonce l'ouverture des candidatures aux bourses d'excellence.",
+            'date_publication': _date_flux(), 'origine': 'flux',
+        }]
+        stats = actualites.veille_actualites()
+        self.assertEqual(stats['flux_officiels'], 1)
+        self.assertEqual(stats['creees'], 1)
+        self.assertTrue(Actualite.objects.filter(source_url__contains='bourses-suisse-2027').exists())
+
+    def test_flux_limite_par_passage_et_sans_doublon_avec_tavily(self):
+        urls_tavily = [r['url'] for r in _resultats_tavily()['results']]
+        articles = [{
+            'url': f'https://mesrisenegal.sn/actualites/bourse-{i}', 'titre': f"Bourse d'études numéro {i} pour les étudiants",
+            'contenu': f"Appel à candidatures pour la bourse d'études {i}.", 'date_publication': _date_flux(),
+            'origine': 'flux',
+        } for i in range(actualites.MAX_FLUX_PAR_PASSAGE + 3)]
+        # Le même article que Tavily (même URL) ne compte qu'une fois.
+        articles.append(dict(articles[0], url=urls_tavily[0]))
+        self.flux.return_value = articles
+        self.tavily.search.return_value = {'results': []}
+        stats = actualites.veille_actualites()
+        self.assertLessEqual(stats['creees'], actualites.MAX_FLUX_PAR_PASSAGE)
+
+    def test_le_resultat_du_passage_est_enregistre_pour_l_application(self):
+        actualites.veille_actualites()
+        etat = commun.etat(actualites.NOM)
+        self.assertIsNotNone(etat['dernier_passage'])
+        self.assertIn('creees', etat['dernier_passage'])
+        self.assertIsNotNone(etat['prochain_passage'])
 
     def test_un_passage_publie_les_actualites_pertinentes(self):
         stats = actualites.veille_actualites()

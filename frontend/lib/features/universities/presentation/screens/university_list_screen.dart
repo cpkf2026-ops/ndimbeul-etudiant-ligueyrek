@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../admin/presentation/widgets/bouton_ajout_admin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_paths.dart';
@@ -24,6 +25,8 @@ class UniversityListScreen extends ConsumerWidget {
     final selection = ref.watch(universityCompareSelectionProvider);
 
     return Scaffold(
+      // Visible seulement pour les administrateurs (ajout assisté par l'IA).
+      floatingActionButton: const BoutonAjoutAdmin(libelle: 'Ajouter un établissement', route: RoutePaths.adminAjoutEtablissement),
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Universités'),
@@ -135,7 +138,8 @@ class UniversityListScreen extends ConsumerWidget {
                               imageUrl: u.imageUrl ?? '',
                               title: u.nom,
                               subtitle: u.localisation,
-                              badge: u.type.label,
+                              // Statut non vérifié -> pas de pastille (jamais de statut deviné).
+                              badge: u.type?.label,
                               width: double.infinity,
                               height: double.infinity,
                               trailingText: isSelected ? '✓ Sélection' : null,
