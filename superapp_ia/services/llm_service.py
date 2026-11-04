@@ -63,7 +63,7 @@ def _timeout(secondes):
 
 
 def _corps(messages, modele, temperature, num_predict, num_ctx, format_json, stream,
-           keep_alive='30m', num_thread=None):
+           keep_alive=None, num_thread=None):
     options = {'temperature': temperature, 'num_ctx': num_ctx}
     if num_predict is not None:
         options['num_predict'] = num_predict
@@ -74,7 +74,9 @@ def _corps(messages, modele, temperature, num_predict, num_ctx, format_json, str
         'messages': messages,
         'stream': stream,
         'think': False,
-        'keep_alive': keep_alive,  # durée pendant laquelle le modèle reste en mémoire
+        # Durée pendant laquelle le modèle reste en RAM après usage (défaut : OLLAMA_KEEP_ALIVE,
+        # 5 min). Il occupe ~2-3 Go : au-delà, il est déchargé et rechargé à la demande (~10 s).
+        'keep_alive': keep_alive or settings.OLLAMA_KEEP_ALIVE,
         'options': options,
     }
     if format_json:
@@ -91,7 +93,7 @@ def _message_indisponible(modele, exc):
 
 
 def generer(messages, *, modele, temperature=0.2, num_predict=300, num_ctx=4096,
-            timeout=None, format_json=False, keep_alive='30m', num_thread=None):
+            timeout=None, format_json=False, keep_alive=None, num_thread=None):
     """Appel bloquant : retourne le texte complet généré par le modèle.
 
     `timeout` (secondes) : None = attendre autant que nécessaire (veille) ;
@@ -182,7 +184,7 @@ def generer_stream(messages, *, modele, temperature=0.3, num_predict=150, num_ct
         raise LLMIndisponibleError(_message_indisponible(modele, exc)) from exc
 
 
-def precharger(modele, keep_alive='30m', timeout=120):
+def precharger(modele, keep_alive=None, timeout=120):
     """Charge le modèle en mémoire avant la première vraie demande, pour qu'elle ne paie
     pas le temps de chargement (10-20 s pour un 2B, bien plus pour Mistral 7B quand la
     RAM est occupée par d'autres programmes)."""

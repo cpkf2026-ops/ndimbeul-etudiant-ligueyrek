@@ -17,6 +17,7 @@ class GradientPageHeader extends StatelessWidget {
     this.actions = const [],
     this.bottom,
     this.leading,
+    this.imageFond,
   });
 
   final String eyebrow;
@@ -26,6 +27,10 @@ class GradientPageHeader extends StatelessWidget {
   final List<Widget> actions;
   final Widget? bottom;
   final Widget? leading;
+
+  /// Image (asset) en fond, comme la bannière de l'accueil, recouverte d'un voile vert
+  /// pour que le texte reste lisible. Sans image : dégradé et cercles décoratifs.
+  final String? imageFond;
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +49,38 @@ class GradientPageHeader extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            const Positioned(top: -60, right: -40, child: _Halo(size: 200, alpha: 0.07)),
-            const Positioned(bottom: -70, left: -50, child: _Halo(size: 170, alpha: 0.05)),
-            Positioned(
-              top: topInset + 30,
-              right: 36,
-              child: const _Halo(size: 44, alpha: 0.9, color: AppColors.accent, ring: true),
-            ),
+            if (imageFond != null) ...[
+              Positioned.fill(
+                child: Image.asset(
+                  imageFond!,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
+                  errorBuilder: (context, error, stack) => const SizedBox.shrink(),
+                ),
+              ),
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        AppColors.primary.withValues(alpha: 0.88),
+                        AppColors.primary.withValues(alpha: 0.35),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ] else ...[
+              const Positioned(top: -60, right: -40, child: _Halo(size: 200, alpha: 0.07)),
+              const Positioned(bottom: -70, left: -50, child: _Halo(size: 170, alpha: 0.05)),
+              Positioned(
+                top: topInset + 30,
+                right: 36,
+                child: const _Halo(size: 44, alpha: 0.9, color: AppColors.accent, ring: true),
+              ),
+            ],
             Padding(
               padding: EdgeInsets.fromLTRB(horizontal, topInset + 14, horizontal, 22),
               child: Column(

@@ -27,19 +27,27 @@ const bool kUseMockJobs = bool.fromEnvironment('USE_MOCK_JOBS', defaultValue: fa
 /// Fréquence à laquelle les fils Actualités et Emploi & Stages se rechargent tout
 /// seuls tant que l'app est ouverte. La veille IA côté serveur passe toutes les
 /// 2 h : avec 15 min, une nouveauté apparaît au plus 15 min après son ajout.
-const Duration kRafraichissementFils = Duration(minutes: 15);
+const Duration kRafraichissementFils = Duration(minutes: 5);
 
 abstract final class AppConstants {
   static const String appName = 'Ndimbeul-Etudiant';
 
   static const String _baseUrlDefini = String.fromEnvironment('API_BASE_URL');
 
-  /// `--dart-define=API_BASE_URL=...` si fourni ; sinon `localhost` sur le web
-  /// (navigateur sur la même machine que Laravel) et `10.0.2.2` ailleurs
-  /// (alias de la machine hôte depuis l'émulateur Android).
-  static String get baseUrl => _baseUrlDefini.isNotEmpty
-      ? _baseUrlDefini
-      : (kIsWeb ? 'http://localhost:8000/api/v1' : 'http://10.0.2.2:8000/api/v1');
+  /// `--dart-define=API_BASE_URL=...` si fourni (APK pour un vrai téléphone : adresse du
+  /// PC sur le Wi-Fi ou serveur en ligne) ; sinon, sur le web, la MÊME machine que celle
+  /// qui sert la page (localhost sur le PC, 192.168.x.x depuis un téléphone sur le Wi-Fi),
+  /// et `10.0.2.2` ailleurs (alias de la machine hôte depuis l'émulateur Android).
+  ///
+  /// Sur le web, l'application est servie par Laravel lui-même (`/app/`) : l'API est
+  /// alors sur la MÊME origine (`/api/v1`), ce qui marche en local, sur le Wi-Fi et via
+  /// un lien public (tunnel HTTPS). Seul l'ancien serveur de dev (port 8090) appelle le 8000.
+  static String get baseUrl {
+    if (_baseUrlDefini.isNotEmpty) return _baseUrlDefini;
+    if (!kIsWeb) return 'http://10.0.2.2:8000/api/v1';
+    if (Uri.base.port == 8090) return 'http://${Uri.base.host}:8000/api/v1';
+    return '${Uri.base.origin}/api/v1';
+  }
 
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);

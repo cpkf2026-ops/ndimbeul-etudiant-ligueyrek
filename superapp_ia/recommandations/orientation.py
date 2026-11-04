@@ -89,19 +89,37 @@ def justifier_formation(resultat, donnees, profil):
     instantanée (aucun appel au modèle). Utilisée aussi par /internal/recommendations."""
     formation, details = resultat['formation'], resultat['details']
     morceaux = []
-    if formation.series_acceptees:
+    # 1. Le lien avec le PROJET de l'élève, d'abord (c'est la raison de la proposition).
+    termes, communs = resultat.get('termes_profil') or [], resultat.get('domaines_communs') or []
+    voisins = resultat.get('voisins') or []
+    if termes and communs:
+        morceaux.append(f"en lien avec ton projet ({', '.join(termes[:2])}) : {communs[0].lower()}")
+    elif voisins:
+        v = voisins[0]
+        morceaux.append(f"domaine voisin de ton projet ({', '.join(v['termes'][:2])} : {v['projet'].lower()})"
+                        + (" — nous n'avons pas encore de formation dans ce domaine exact" if v.get('aucune_exacte')
+                           else " — peu de formations existent dans ce domaine exact"))
+    elif resultat.get('passion_forte', details['domaine_passions'] >= scoring.POIDS_DOMAINE_PASSIONS / 2) \
+            and donnees['passions']:
+        morceaux.append(f"proche de tes centres d'intérêt ({', '.join(donnees['passions'][:2])})")
+    # 2. Les conditions d'admission CONNUES (rien d'affirmé quand la fiche ne dit rien).
+    if getattr(formation, 'est_domaine', False):
+        morceaux.append("domaine proposé par l'établissement d'après sa fiche (conditions d'admission à vérifier)")
+    elif formation.series_acceptees:
         morceaux.append(f"ouverte aux bacheliers de la série {donnees['serie_bac']}")
     else:
-        morceaux.append('ouverte à toutes les séries du bac')
+        morceaux.append('aucune série exigée sur sa fiche')
     if formation.moyenne_minimale is not None and donnees.get('moyenne') is not None:
         morceaux.append(
             f"ta moyenne ({float(donnees['moyenne']):g}/20) atteint le minimum demandé "
             f"({float(formation.moyenne_minimale):g}/20)"
         )
-    if details['domaine_passions'] >= scoring.POIDS_DOMAINE_PASSIONS / 2 and donnees['passions']:
-        morceaux.append(f"proche de tes centres d'intérêt ({', '.join(donnees['passions'][:2])})")
+    # 3. Les préférences respectées.
     if details['region'] and not profil['mobilite'] and donnees.get('ville'):
         morceaux.append(f"située à {donnees['ville']}")
+    if details.get('statut') == scoring.POIDS_STATUT:
+        morceaux.append(f"établissement {'public' if formation.universite.type == 'public' else 'privé'} "
+                        "comme tu le préfères")
     if details['bourse']:
         morceaux.append('une bourse est disponible')
     phrase = ', '.join(morceaux)

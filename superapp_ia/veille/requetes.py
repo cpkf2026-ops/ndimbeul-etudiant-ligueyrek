@@ -43,8 +43,8 @@ REQUETES_ACTUALITES = [
 #
 # La recherche web générale (DuckDuckGo HTML) n'est plus utilisée : son robots.txt
 # interdit /html et /lite, et le service bloque désormais ces requêtes (HTTP 202).
-# emploisenegal.com reste EXCLU (challenge anti-bot Cloudflare) : le contourner irait
-# à l'encontre des conditions d'utilisation du site.
+# emploisenegal.com n'est jamais lu directement (challenge anti-bot Cloudflare, qu'on ne
+# contourne pas) : il est seulement interrogé via Tavily (voir services/sources.py).
 REQUETES_OFFRES = [
     'recrutement Sénégal',
     'avis de recrutement Sénégal',

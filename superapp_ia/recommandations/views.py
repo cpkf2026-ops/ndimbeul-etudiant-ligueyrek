@@ -2,6 +2,7 @@
 import json
 import logging
 
+from django.db import DatabaseError
 from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -47,7 +48,9 @@ def recommendations(request):
     if not utilisateur_id:
         return JsonResponse({'error': 'Le champ "utilisateur_id" est requis.'}, status=400)
 
-    resultats = generer_recommandations(profil, limite=5)
+    # Catalogue élargi : formations détaillées + établissements qui proposent un domaine d'après
+    # leur fiche ; au plus 2 propositions par établissement pour garder de la variété.
+    resultats = generer_recommandations(profil, limite=8, inclure_domaines=True, max_par_etablissement=2)
     if not resultats:
         return JsonResponse({'data': [], 'message': 'Aucune formation disponible pour le moment.'})
 
@@ -59,15 +62,19 @@ def recommendations(request):
 
     for resultat, explication in zip(resultats, explications):
         formation = resultat['formation']
+        est_domaine = getattr(formation, 'est_domaine', False)
 
-        recommandations_a_creer.append(Recommandation(
-            utilisateur_id=utilisateur_id,
-            formation_id=formation.id,
-            score_correspondance=resultat['score'],
-            explication_llm=explication,
-            sources_infos={'details_score': resultat['details']},
-            date_generation=maintenant,
-        ))
+        # L'historique (table recommandations) référence une vraie formation : un domaine de
+        # fiche n'y est pas enregistré, il est seulement renvoyé à l'application.
+        if not est_domaine:
+            recommandations_a_creer.append(Recommandation(
+                utilisateur_id=utilisateur_id,
+                formation_id=formation.id,
+                score_correspondance=resultat['score'],
+                explication_llm=explication,
+                sources_infos={'details_score': resultat['details']},
+                date_generation=maintenant,
+            ))
 
         donnees.append({
             'formation_id': str(formation.id),
@@ -92,9 +99,18 @@ def recommendations(request):
             'score_correspondance': resultat['score'],
             'details_score': resultat['details'],
             'explication': explication,
+            # « formation » (programme détaillé en base) ou « domaine » (domaine affiché sur la
+            # fiche de l'établissement, conditions d'admission à vérifier).
+            'type_proposition': 'domaine' if est_domaine else 'formation',
+            'domaines_communs': resultat.get('domaines_communs', []),
         })
 
-    Recommandation.objects.bulk_create(recommandations_a_creer)
+    # L'historique est un plus : s'il ne peut pas être enregistré, l'élève reçoit quand même
+    # ses recommandations (avant : erreur 500 et page Orientation vide).
+    try:
+        Recommandation.objects.bulk_create(recommandations_a_creer)
+    except DatabaseError as exc:
+        logger.warning('Historique des recommandations non enregistré (%s) : %s', utilisateur_id, exc)
 
     return JsonResponse({'data': donnees})
 

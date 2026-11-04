@@ -29,6 +29,8 @@ _CATEGORIES_ACTUALITES = {
 _TYPES_OFFRES = {
     'stage': 'stage', 'stages': 'stage', 'stagiaire': 'stage',
     'emploi': 'emploi', 'emplois': 'emploi', 'job': 'emploi', 'jobs': 'emploi', 'travail': 'emploi',
+    # Fautes fréquentes (« des emploie disponible à Thiès », observé le 29/10/2026).
+    'emploie': 'emploi', 'emploies': 'emploi', 'emplooi': 'emploi', 'stagee': 'stage',
     'concours': 'concours', 'alternance': 'alternance',
 }
 _MOTS_OFFRES = {'offre', 'offres', 'recrutement', 'recrute', 'opportunite', 'opportunites', 'poste', 'postes'}
@@ -54,7 +56,18 @@ _MOTS_NEUTRES_OFFRES = {
     'recent', 'recents', 'recentes', 'dernieres', 'derniers', 'nouvelles', 'nouveaux', 'je',
     'cherche', 'veux', 'voir', 'trouver', 'senegal', 'moi', 'stp', 'svp', 'est', 'ce', 'qu',
     'avez', 'vous', 'as', 'tu', 'actuellement', 'en', 'ce', 'moment', 'existe', 'ya', 'quoi',
+    'savoir', 'si', 'sais', 'connais', 'dans', 'region', 'ville', 'autour', 'pres', 'vers',
 }
+
+
+def _region_citee(message, texte):
+    """Région citée dans la question (« à Thiès », « vers Mbour » -> Thiès), ou None."""
+    region = next((r for r in REGIONS if f' {normaliser_texte(r)} ' in f' {texte.replace("-", " ")} '), None)
+    if region is None:
+        from veille.lieux import ville_dans
+        ville = ville_dans(message)
+        region = ville[1] if ville else None
+    return region
 
 
 def _date_courte(valeur):
@@ -98,11 +111,36 @@ def offres(message, mots, texte):
     if type_offre:
         actives = actives.filter(type=type_offre)
 
+    # Ville ou région demandée (« emplois à Thiès ») : un FILTRE de lieu, pas un domaine.
+    region = _region_citee(message, texte)
+    mots_du_lieu = set(normaliser_texte(region).replace('-', ' ').split()) if region else set()
+    from veille.lieux import ville_dans
+    ville = ville_dans(message)
+    if ville:
+        mots_du_lieu |= set(normaliser_texte(ville[0]).replace('-', ' ').split())
+
     # Mots restants = domaine recherché (« comptabilité », « informatique »…).
     domaine = [
         m for m in mots
         if len(m) >= 4 and m not in _MOTS_NEUTRES_OFFRES and m not in _TYPES_OFFRES and m not in _MOTS_OFFRES
+        and m not in mots_du_lieu
     ]
+    if region:
+        dans_la_region = actives.filter(region__icontains=region)
+        if not dans_la_region.exists():
+            nature = {'stage': 'de stage', 'emploi': "d'emploi"}.get(type_offre, '')
+            ailleurs = list(actives.order_by(F('date_collecte').desc(nulls_last=True), '-date_indexation')[:NB_ELEMENTS])
+            lignes = [f"• {o.intitule}" + (f" ({o.region})" if o.region and not o.region.startswith('Non précis') else '')
+                      + f" [{i}]" for i, o in enumerate(ailleurs, start=1)]
+            return {
+                'reponse': f"Je n'ai aucune offre {nature} située à {region} en ce moment dans nos données "
+                           "(la veille en cherche de nouvelles toutes les 2 h).".replace('  ', ' ')
+                           + ("\nVoici les plus récentes, ailleurs ou sans lieu précisé :\n" + '\n'.join(lignes)
+                              if lignes else '')
+                           + "\nPour les offres à " + region + ", consulte aussi senjob.com et l'ANPEJ (anpej.sn).",
+                'sources': [{'titre': o.intitule, 'url': o.source_url} for o in ailleurs],
+            }
+        actives = dans_la_region
     trouvees = actives
     if domaine:
         condition = Q()
@@ -130,7 +168,7 @@ def offres(message, mots, texte):
         details = ', '.join(filter(None, [lieu, limite]))
         lignes.append(f"• {o.intitule}{f' ({details})' if details else ''} [{i}]")
     return {
-        'reponse': f"Voici les offres {nature} les plus récentes :\n".replace('  ', ' ')
+        'reponse': f"Voici les offres {nature} les plus récentes{f' à {region}' if region else ''} :\n".replace('  ', ' ')
                    + '\n'.join(lignes)
                    + "\nToutes les offres sont dans l'onglet Emplois.",
         'sources': [{'titre': o.intitule, 'url': o.source_url} for o in liste],

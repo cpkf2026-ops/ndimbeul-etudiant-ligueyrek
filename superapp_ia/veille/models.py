@@ -7,9 +7,24 @@ Ce sont les tables que Flutter lit déjà (features/news, features/jobs) : la
 veille internet n'a donc RIEN à changer côté app mobile, elle se contente d'y
 écrire de nouvelles lignes.
 """
+import unicodedata
+
 from ia.models import nouvel_uuid
 
 from django.db import models
+
+
+def texte_lisible(texte):
+    """Lettres « stylisées » des réseaux sociaux (𝐔𝐍𝐈𝐕𝐄𝐑𝐒𝐈𝐓𝐄́, 𝗥𝗘́𝗦𝗨𝗟𝗧𝗔𝗧𝗦) -> lettres normales.
+    Observé le 29/10/2026 sur des titres du site du MESRI : la police de l'application ne
+    les affiche pas (carrés à la place). NFKC les ramène aux lettres latines, NFC recolle
+    les accents ; les guillemets et tirets typographiques sont conservés."""
+    if not texte or all(ord(c) < 0x1D400 for c in texte):
+        return texte
+    morceaux = []
+    for c in texte:
+        morceaux.append(unicodedata.normalize('NFKC', c) if 0x1D400 <= ord(c) <= 0x1D7FF else c)
+    return unicodedata.normalize('NFC', ''.join(morceaux))
 
 
 class Universite(models.Model):
@@ -84,6 +99,11 @@ class Actualite(models.Model):
     def __str__(self):
         return self.titre
 
+    def save(self, *args, **kwargs):
+        self.titre = texte_lisible(self.titre)
+        self.contenu = texte_lisible(self.contenu)
+        super().save(*args, **kwargs)
+
 
 class OffreEmploi(models.Model):
     TYPE_CHOICES = [
@@ -124,3 +144,9 @@ class OffreEmploi(models.Model):
 
     def __str__(self):
         return self.intitule
+
+    def save(self, *args, **kwargs):
+        self.intitule = texte_lisible(self.intitule)
+        self.description = texte_lisible(self.description)
+        self.resume = texte_lisible(self.resume)
+        super().save(*args, **kwargs)

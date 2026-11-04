@@ -20,7 +20,34 @@ AU_REVOIR = 'au_revoir'
 HORS_SUJET = 'hors_sujet'
 AIDE = 'aide'
 PAS_COMPRIS = 'pas_compris'
+# « Est-ce que cette info est fiable ? » : porte sur la RÉPONSE PRÉCÉDENTE (ses sources),
+# pas sur un nouveau sujet à rechercher (le chatbot cherchait « info fiable » sur le web).
+FIABILITE = 'fiabilite'
+# Remarque sur l'assistant lui-même (« tes réponses n'ont pas de logique », « tu as des
+# limites ? ») : réponse honnête sur ce qu'il sait faire, au lieu d'une recherche.
+AVIS = 'avis'
 QUESTION = 'question'
+
+# Observé le 29/10/2026 : « ok je vois merci pour votre réponse », « on dirait que y'a des
+# limites à tes réponses ? », « est-ce que cette info est fiable ? » partaient tous dans la
+# recherche et recevaient une réponse hors sujet.
+_RENVOI_REPONSE = re.compile(
+    r"\b(cet+e?s?|ces|ta|tes|votre|vos|la|cette|ton|tes) (info|infos|information|informations|reponse|reponses|"
+    r"donnee|donnees|chiffre|chiffres)\b|\bc est (vrai|juste|exact|sur|fiable)\b|\best ce (vrai|juste|exact|sur)\b"
+)
+_MOTS_FIABILITE = {
+    'fiable', 'fiables', 'vrai', 'vrais', 'vraie', 'vraies', 'verifie', 'verifiee', 'verifiees',
+    'verifiable', 'verifiables', 'source', 'sources', 'exact', 'exacte', 'juste', 'sur', 'sure',
+    'confirme', 'confirmer', 'prouve', 'officiel', 'officielle',
+}
+_AVIS = re.compile(
+    r"\b(tes|vos|ta|votre) (reponses?|limites?)\b.*\b(logique|concord\w*|coheren\w*|limit\w*|bizarre|faux|fausses?|"
+    r"rapport|hors sujet|repond\w* pas|nimporte|n importe)\b"
+    r"|\b(logique|concord\w*|coheren\w*|limit\w*|n importe quoi|hors sujet|rien a voir)\b.*\b(tes|vos|ta|votre|tu|vous)\b"
+    r"|\btu (ne )?(comprends|reponds|repond) (pas|rien|jamais|mal)\b"
+    r"|\b(tes|vos) reponses? (sont|est) (limitee?s?|fausses?|bizarres?)\b"
+)
+_MOTS_QUESTION = {'quel', 'quelle', 'quels', 'quelles', 'comment', 'combien', 'ou', 'quand', 'pourquoi'}
 
 # Formules complètes, après normalisation (minuscules, sans accents ni ponctuation).
 _SALUTATIONS = {
@@ -108,6 +135,14 @@ _REPONSES = {
         "clés : l'établissement, la filière ou le sujet. Par exemple : « conditions d'admission "
         "licence informatique UCAD », « bourses master 2026 » ou « stage comptabilité Dakar ».",
     ],
+    AVIS: [
+        "Merci pour ta remarque, elle m'aide à m'améliorer. Je réponds à partir des données de "
+        "Ndimbeul (établissements, formations, offres, actualités vérifiées) et des sites officiels. "
+        "Quand je ne trouve pas d'information fiable, je préfère le dire plutôt que d'inventer. "
+        "Je comprends mieux une question précise avec l'établissement, la filière ou la ville : "
+        "par exemple « frais d'inscription à l'UGB », « licences en informatique à Thiès » ou "
+        "« stages en comptabilité à Dakar ». Repose-moi ta question ainsi, je ferai de mon mieux.",
+    ],
     AIDE: [
         "Bien sûr ! Je peux t'aider à :\n"
         "• trouver une formation ou une université (« Quelles licences en informatique à Dakar ? ») ;\n"
@@ -173,6 +208,16 @@ def detecter(message):
 
     texte = ' '.join(mots)
     dans_le_perimetre = any(mot in _MOTS_DU_PERIMETRE for mot in mots)
+
+    if _RENVOI_REPONSE.search(texte) and set(mots) & _MOTS_FIABILITE:
+        return FIABILITE
+    if _AVIS.search(texte):
+        return AVIS
+    # « ok je vois, merci pour votre réponse », « j'ai dit merci pour ta réponse » : un merci
+    # sans nouvelle demande (pas de « ? », ni mot interrogatif, ni sujet d'études).
+    if (set(mots) & {'merci', 'jerejef', 'thanks'} and len(mots) <= 16 and '?' not in message
+            and not dans_le_perimetre and not set(mots) & _MOTS_QUESTION):
+        return REMERCIEMENT
     hors_sujet = any(f' {sujet} ' in f' {texte} ' for sujet in _MOTS_HORS_SUJET)
     if hors_sujet and not dans_le_perimetre:
         return HORS_SUJET

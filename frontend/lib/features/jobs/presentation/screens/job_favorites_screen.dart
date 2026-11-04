@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_paths.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../shared/constants/app_images.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/content_max_width.dart';
@@ -29,6 +30,7 @@ class JobFavoritesScreen extends ConsumerWidget {
         slivers: [
           SliverToBoxAdapter(
             child: GradientPageHeader(
+              imageFond: AppImages.dashboardHero,
               leading: HeaderIconButton(
                 icon: Icons.arrow_back_rounded,
                 tooltip: 'Retour',

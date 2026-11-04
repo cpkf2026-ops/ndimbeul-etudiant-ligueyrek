@@ -10,7 +10,7 @@ import '../../shared/widgets/welcome_snackbar.dart';
 import '../router/route_paths.dart';
 import '../theme/page_transitions.dart';
 
-/// Shell principal — bascule bottom nav (mobile, 4 onglets) / sidebar
+/// Shell principal — bascule bottom nav (mobile, 5 onglets max selon le statut) / sidebar
 /// (tablette-desktop, 8 entrées) et héberge le bouton flottant assistant IA.
 /// Les 8 branches (Accueil, Orientation, Écosystème, Profil, Universités,
 /// Emploi & Stages, Actualités, Assistant IA) vivent toutes dans le même

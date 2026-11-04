@@ -30,7 +30,7 @@ from django.utils import timezone
 
 from services import cache, llm_service, sources, tavily_service, texte
 
-from . import commun, fiabilite, pipeline
+from . import commun, emploidakar, fiabilite, pipeline, senjob
 from .models import OffreEmploi
 from .prompts import construire_messages_opportunite
 
@@ -42,10 +42,14 @@ CATEGORIES = tuple(valeur for valeur, _ in OffreEmploi.TYPE_CHOICES)
 # Requêtes combinées, utilisées à tour de rôle (une par passage, voir commun.rotation).
 # Requêtes COURTES, testées sur Tavily le 18/10/2026 avec les sources « emploi » : une
 # longue liste de mots-clés renvoie souvent 0 résultat quand include_domains est rempli.
+# Un thème par passage, dans cet ordre (compteur, voir commun.rotation) : emploi et stage
+# reviennent deux fois plus souvent, ce sont les offres les plus nombreuses et attendues.
 REQUETES = [
     "offre d'emploi Sénégal",                     # 10 résultats (senjob.com)
     "offre de stage Sénégal",                     # 10 résultats (senjob.com)
     "concours bourse Sénégal",                    # 9 résultats (mesrisenegal.sn, campusfrance.org…)
+    "recrutement Sénégal",
+    "stage jeunes diplômés Sénégal",
     "appel à candidatures formation Sénégal",     # 10 résultats (mesrisenegal.sn), surtout des pages
                                                   # institutionnelles : MOTS_CANDIDATURE les écarte
 ]
@@ -285,13 +289,17 @@ def _nouvelles_stats(requete):
 def veille_opportunites(force=False):
     """Un passage complet de la veille des opportunités. Retourne ses statistiques.
     `force=True` ignore le rythme du mode réduit (commande manuelle `veiller`)."""
+    fenetre = commun.fenetre_recherche(NOM, 'week')
     if not commun.reserver_passage(NOM, force=force):
         return {'mode': 'ignore', 'raison': commun.raison_ignore()}
+    hors_ligne = commun.passage_hors_ligne(NOM)
+    if hors_ligne:
+        return hors_ligne
 
-    requete = commun.rotation(REQUETES)
+    requete = commun.rotation(REQUETES, nom=NOM)
     try:
         resultats = tavily_service.rechercher(
-            requete, module=NOM, topic='general', time_range='week',
+            requete, module=NOM, topic='general', time_range=fenetre,
             include_domains=sources.domaines(sources.EMPLOI), max_results=MAX_RESULTATS,
             timeout=TAVILY_TIMEOUT_VEILLE_SECONDES,
         )
@@ -346,6 +354,27 @@ def veille_opportunites(force=False):
             stats['doublon'] += 1
             continue
         stats['creees'] += 1
+
+    # Sources gratuites (Google Actualités : recrutements, concours, stages, ANPEJ…) à CHAQUE
+    # passage, et plus seulement quand Tavily est indisponible : une seule recherche Tavily
+    # par passage ramenait trop peu d'offres. Aucun crédit Tavily consommé.
+    try:
+        if stats['llm_indisponible']:
+            raise RuntimeError('Ollama indisponible')
+        gratuites = pipeline.veiller_offres()
+        stats['creees_sources_gratuites'] = gratuites.get('creees', 0)
+        stats['creees'] += gratuites.get('creees', 0)
+        stats['candidats'] += gratuites.get('candidats', 0)
+    except Exception as exc:  # noqa: BLE001 — la partie Tavily reste enregistrée
+        logger.warning('Veille opportunités : sources gratuites en échec (%s)', exc)
+
+    # Sites d'emploi lus directement (robots.txt autorisant les pages d'offres) : nombreuses
+    # offres à jour, données déjà structurées, sans modèle d'IA (voir offres_directes.py).
+    for site in (emploidakar, senjob):
+        try:
+            stats['creees'] += site.veiller(stats)
+        except Exception as exc:  # noqa: BLE001 — une panne d'un site n'arrête pas la veille
+            logger.warning('Veille opportunités : %s en échec (%s)', site.__name__, exc)
 
     stats['expirees'] = expirer_opportunites()
     logger.info('Veille opportunités : %s', stats)

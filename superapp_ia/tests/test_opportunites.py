@@ -58,7 +58,23 @@ class VeilleOpportunitesTests(TestCase):
         patch_date = mock.patch('django.utils.timezone.localdate', return_value=date(2026, 10, 18))
         patch_date.start()
         mock.patch('veille.commun.precharger_modele_veille').start()
+        # Sources gratuites (Google Actualités) : simulées, aucun appel réseau dans les tests.
+        self.gratuites = mock.patch(
+            'veille.pipeline.veiller_offres', return_value={'candidats': 0, 'creees': 0},
+        ).start()
+        self.emploidakar = mock.patch('veille.emploidakar.veiller', return_value=0).start()
+        mock.patch('veille.senjob.veiller', return_value=0).start()
         self.addCleanup(mock.patch.stopall)
+
+    def test_les_sources_gratuites_completent_chaque_passage(self):
+        self.gratuites.return_value = {'candidats': 6, 'creees': 3}
+        stats = opportunites.veille_opportunites()
+        self.gratuites.assert_called_once()
+        self.assertEqual(stats['creees_sources_gratuites'], 3)
+
+    def test_rotation_change_de_theme_a_chaque_passage(self):
+        themes = [commun.rotation(opportunites.REQUETES, nom='test_rotation') for _ in opportunites.REQUETES]
+        self.assertEqual(sorted(themes), sorted(opportunites.REQUETES))
 
     def test_un_passage_cree_les_offres_avec_une_seule_requete_tavily(self):
         stats = opportunites.veille_opportunites()

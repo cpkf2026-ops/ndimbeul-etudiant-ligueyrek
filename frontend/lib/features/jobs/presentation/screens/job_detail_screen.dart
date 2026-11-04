@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../shared/constants/app_images.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../../shared/widgets/content_max_width.dart';
@@ -275,13 +276,27 @@ class _DetailHeader extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            Positioned(
-              top: -50,
-              right: -30,
-              child: Icon(
-                job.type.icon,
-                size: 190,
-                color: Colors.white.withValues(alpha: 0.05),
+            // Même fond que les en-têtes Actualités et Emplois : l'image à la lampe, sous un
+            // voile vert qui garde le texte lisible.
+            Positioned.fill(
+              child: Image.asset(
+                AppImages.dashboardHero,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stack) => const SizedBox.shrink(),
+              ),
+            ),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      AppColors.primary.withValues(alpha: 0.88),
+                      AppColors.primary.withValues(alpha: 0.35),
+                    ],
+                  ),
+                ),
               ),
             ),
             ContentMaxWidth(

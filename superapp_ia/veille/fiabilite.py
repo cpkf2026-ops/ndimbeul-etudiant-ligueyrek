@@ -32,7 +32,7 @@ OFFRES_AGE_MAX_JOURS = int(os.getenv('VEILLE_OFFRES_AGE_MAX_JOURS', '30'))
 # Plateformes d'offres reconnues (sites spécialisés emploi/concours/bourses qui
 # autorisent l'indexation dans leur robots.txt). Acceptées pour les OFFRES
 # uniquement — pas comme source d'actualités.
-_PLATEFORMES_OFFRES = {'senjob.com', 'concoursn.com', 'anpej.sn'}
+_PLATEFORMES_OFFRES = {'senjob.com', 'anpej.sn', 'emploidakar.com', 'emploisenegal.com'}
 
 # Suffixes de domaines institutionnels sénégalais (ministères, universités…).
 _SUFFIXES_OFFICIELS = ('.gouv.sn', '.edu.sn')

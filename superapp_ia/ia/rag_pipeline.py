@@ -6,11 +6,12 @@ meta.json), pour survivre aux redémarrages du serveur Django.
 import json
 import threading
 
-import faiss
-import numpy as np
 from django.conf import settings
 
-from .embeddings import encoder_texte, encoder_textes
+# faiss (~650 Mo de RAM à l'import) et numpy ne sont importés QU'AU MOMENT de s'en servir
+# (indexation ou recherche dans les documents PDF). Importés en tête de module, ils étaient
+# chargés par chaque processus au démarrage — Django, worker et beat Celery — sans servir :
+# ~2,4 Go de RAM perdus au total sur ce PC.
 
 _lock = threading.Lock()
 _index = None
@@ -52,6 +53,8 @@ def _chemin_meta():
 
 
 def _index_vide():
+    import faiss
+
     from .embeddings import get_model
 
     dimension = get_model().get_sentence_embedding_dimension()
@@ -62,6 +65,8 @@ def _charger():
     global _index, _meta
     if _index is not None:
         return _index, _meta
+
+    import faiss
 
     settings.FAISS_INDEX_DIR.mkdir(parents=True, exist_ok=True)
     if _chemin_index().exists() and _chemin_meta().exists():
@@ -75,6 +80,8 @@ def _charger():
 
 
 def _sauvegarder():
+    import faiss
+
     settings.FAISS_INDEX_DIR.mkdir(parents=True, exist_ok=True)
     faiss.write_index(_index, str(_chemin_index()))
     with open(_chemin_meta(), 'w', encoding='utf-8') as f:
@@ -83,6 +90,10 @@ def _sauvegarder():
 
 def indexer_document(document_rag, texte, categorie=None):
     """Chunke + encode + ajoute au FAISS. Retourne la liste des ids FAISS créés."""
+    import numpy as np
+
+    from .embeddings import encoder_textes
+
     with _lock:
         index, meta = _charger()
 
@@ -111,6 +122,8 @@ def indexer_document(document_rag, texte, categorie=None):
 
 def rechercher(question, top_k=None):
     """Top-k documents pertinents (score cosinus >= seuil), triés par score décroissant."""
+    from .embeddings import encoder_texte
+
     top_k = top_k or settings.RAG_TOP_K
     with _lock:
         index, meta = _charger()
@@ -138,13 +151,22 @@ def rechercher(question, top_k=None):
     return resultats
 
 
+def _meta_seule():
+    """Métadonnées de l'index (pour les compteurs) SANS charger faiss : on lit meta.json."""
+    if _meta is not None:
+        return _meta
+    try:
+        with open(_chemin_meta(), encoding='utf-8') as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {'next_id': 0, 'chunks': {}}
+
+
 def nb_documents_indexes():
     with _lock:
-        _, meta = _charger()
-        return len({c['document_id'] for c in meta['chunks'].values()})
+        return len({c['document_id'] for c in _meta_seule()['chunks'].values()})
 
 
 def nb_chunks_indexes():
     with _lock:
-        _, meta = _charger()
-        return len(meta['chunks'])
+        return len(_meta_seule()['chunks'])

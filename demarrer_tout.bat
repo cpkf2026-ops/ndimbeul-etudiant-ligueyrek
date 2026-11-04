@@ -33,7 +33,7 @@ tasklist /fi "imagename eq ollama.exe" | find /i "ollama.exe" >nul
 if errorlevel 1 (start "Ndimbeul - Ollama (IA)" /min cmd /k ""%OLLAMA%" serve") else (echo       deja demarre)
 
 echo [3/6] API Laravel (port 8000)...
-start "Ndimbeul - Laravel (8000)" /min /d "%RACINE%\backend" cmd /k "set PHP_CLI_SERVER_WORKERS=4&& "%PHP%" artisan serve --port=8000"
+start "Ndimbeul - Laravel (8000)" /min /d "%RACINE%\backend" cmd /k "set PHP_CLI_SERVER_WORKERS=4&& "%PHP%" artisan serve --host=0.0.0.0 --port=8000"
 
 echo [4/6] Service IA Django (port 8001)...
 start "Ndimbeul - Django IA (8001)" /min /d "%RACINE%\superapp_ia" cmd /k "set PYTHONIOENCODING=utf-8&& "%PYTHON_IA%" manage.py runserver 8001 --noreload"
@@ -42,20 +42,21 @@ echo [5/6] Veille IA automatique (Celery, toutes les 2 h)...
 timeout /t 5 /nobreak >nul
 call "%RACINE%\superapp_ia\demarrer_veille.bat" >nul
 
-echo [6/6] Application dans Chrome (port 8090)...
-if exist "%RACINE%\frontend\build\web\index.html" goto version_compilee
+echo [6/6] Application dans Chrome (servie par Laravel sur /app/)...
+if exist "%RACINE%\backend\public\app\index.html" goto version_compilee
 start "Ndimbeul - Flutter (Chrome)" /d "%RACINE%\frontend" cmd /k flutter run -d chrome --web-port 8090
 echo       version compilee absente : mode developpement, 1 a 2 minutes de compilation.
 goto fin
 
 :version_compilee
-start "Ndimbeul - Application (8090)" /min /d "%RACINE%\frontend\build\web" cmd /k ""%PYTHON_IA%" -m http.server 8090"
-timeout /t 3 /nobreak >nul
-start "" chrome http://localhost:8090
+timeout /t 8 /nobreak >nul
+start "" chrome http://localhost:8000/app/
 echo       version compilee (legere).
 
 :fin
 echo.
 echo Tout est lance. L'application est sur :
-echo     http://localhost:8090
+echo     sur ce PC          : http://localhost:8000/app/
+echo     sur le Wi-Fi       : http://ADRESSE-IP-DU-PC:8000/app/  (voir ipconfig)
+echo     lien public        : lancer partager_lien.bat
 timeout /t 10 >nul

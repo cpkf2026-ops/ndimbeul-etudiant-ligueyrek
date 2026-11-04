@@ -23,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
         
         $middleware->redirectGuestsTo(fn () => null);
 
+        // Accès public via un tunnel HTTPS (Cloudflare) : on fait confiance à l'en-tête
+        // X-Forwarded-Proto pour générer des URLs en https:// (images, médias), sinon le
+        // navigateur les bloque (contenu mixte).
+        $middleware->trustProxies(at: '*');
+
         // API stateless : pas de session/CSRF sur /api/* (auth via Sanctum Bearer token).
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,

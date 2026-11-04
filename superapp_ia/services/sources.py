@@ -7,8 +7,13 @@ back-office Laravel. Les valeurs ci-dessous servent :
   - de repli pour une catégorie qui n'a encore aucune ligne en base.
 
 Choix éditoriaux (cohérents avec veille/fiabilite.py) :
-  - emploisenegal.com est volontairement ABSENT : le site protège ses pages par un
-    challenge anti-robots, les contourner irait contre ses conditions d'utilisation ;
+  - emploisenegal.com protège ses pages par un challenge anti-robots : on ne le contourne
+    jamais. Il est seulement interrogé VIA Tavily (moteur de recherche), ce que son robots.txt
+    autorise (« search=yes, use=reference ») : titre, extrait et lien vers l'annonce d'origine ;
+  - emploidakar.com et senjob.com sont aussi lus directement (veille/emploidakar.py, senjob.py),
+    leurs robots.txt autorisant les pages d'offres ;
+  - concoursn.com reste exclu (agrégateur qui republie les offres d'autres sites, voir
+    veille/fiabilite.py) ;
   - réseaux sociaux, blogs et agrégateurs ne sont jamais des sources de confiance.
 """
 import logging
@@ -46,6 +51,8 @@ SOURCES_PAR_DEFAUT = {
     ],
     EMPLOI: [
         ('senjob.com', 'Senjob — offres d\'emploi et de stage'),
+        ('emploisenegal.com', "EmploiSenegal — offres d'emploi (via le moteur de recherche)"),
+        ('emploidakar.com', "Emploi Dakar — offres d'emploi et de stage"),
         ('anpej.sn', "Agence nationale pour la promotion de l'emploi des jeunes"),
         ('fonctionpublique.gouv.sn', 'Ministère de la Fonction publique (concours)'),
         ('onfp.sn', 'Office national de formation professionnelle'),

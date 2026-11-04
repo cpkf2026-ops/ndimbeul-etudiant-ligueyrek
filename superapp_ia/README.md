@@ -58,17 +58,12 @@ Le port **8001** est volontaire, pour ne jamais entrer en conflit avec Laravel
 > MySQL, créées par les migrations Laravel. Les modèles Django correspondants sont
 > `managed = False` : Django lit/écrit des lignes, jamais le schéma.
 
-## 4. Indexer les documents de démonstration (RAG)
+## 4. Documents de la base de connaissances (RAG)
 
-8 fiches "université sénégalaise" de test sont fournies dans `ia/sample_docs/`
-(UCAD, UGB, ISEP, ISM, UN-CHK, UASZ, UADB, USSEIN — formations, séries acceptées,
-frais, bourses, région). Pour les indexer dans FAISS :
-
-```
-python manage.py seed_rag_demo
-```
-
-(`--reset` pour ré-indexer proprement si vous relancez la commande plusieurs fois.)
+Les fiches de démonstration (`ia/sample_docs/`, commande `seed_rag_demo`) ont été supprimées :
+leurs chiffres (frais, moyennes, séries) n'étaient pas vérifiés. La base de connaissances se
+remplit avec des documents réels, importés depuis le back-office (`/internal/documents/index`)
+et par la veille automatique.
 
 Le premier appel télécharge automatiquement le modèle d'embeddings
 (`paraphrase-multilingual-MiniLM-L12-v2`, ~470 Mo, mis en cache par

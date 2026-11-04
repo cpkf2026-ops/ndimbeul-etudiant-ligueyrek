@@ -1,8 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Accès à l'API Laravel (sans lui, l'application installée ne peut joindre aucun serveur). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- usesCleartextTraffic : le serveur local (PC sur le Wi-Fi) est en HTTP, bloqué par défaut
+         depuis Android 9. À retirer quand l'API sera en ligne en HTTPS. -->
     <application
         android:label="Ndimbeul-Etudiant"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

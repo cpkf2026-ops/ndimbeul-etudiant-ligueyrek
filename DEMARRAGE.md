@@ -287,3 +287,27 @@ Bonnes pratiques :
   anaqsup.sn ou espaceuniversitaire.mesrisenegal.sn).
 - Préférer les liens officiels (sites des écoles, mesrisenegal.sn, presse reconnue).
 - Chaque recherche d'établissement consomme 1 crédit Tavily (lecture d'un lien : 0).
+
+## Web et mobile en même temps
+
+Le même code Flutter sert le web et Android. Le PC fait office de serveur sur le Wi-Fi :
+`demarrer_tout.bat` lance l'API Laravel sur toutes les interfaces (`--host=0.0.0.0`).
+
+**Sur le PC** : http://localhost:8090
+
+**Sur un téléphone connecté au même Wi-Fi** :
+- dans le navigateur du téléphone : `http://<IP-du-PC>:8090` (la version web appelle
+  automatiquement l'API de la machine qui sert la page) ;
+- ou l'application Android (APK) : `frontend\build\app\outputs\flutter-apk\app-release.apk`,
+  à copier sur le téléphone et installer (autoriser « sources inconnues »).
+
+L'APK contient l'adresse du PC. Si l'adresse change (autre Wi-Fi), reconstruire :
+```
+ipconfig                      (lire « Adresse IPv4 », ex. 192.168.1.27)
+cd frontend
+flutter build apk --release --dart-define=API_BASE_URL=http://192.168.1.27:8000/api/v1
+```
+Quand l'API sera hébergée en ligne (HTTPS), reconstruire avec son adresse : l'application
+fonctionnera alors partout, sans le PC.
+
+iPhone : la construction iOS nécessite un Mac (impossible depuis Windows).

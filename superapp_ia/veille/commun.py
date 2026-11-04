@@ -139,6 +139,85 @@ def reserver_passage(nom, force=False):
     return True
 
 
+# --- Connexion Internet ------------------------------------------------------------
+# Observé le 27/10/2026 : le passage de 19:26 a tourné au démarrage du PC, AVANT que le
+# Wi-Fi soit connecté (« Failed to resolve api.tavily.com »). Il comptait quand même comme
+# un passage : les déclenchements suivants étaient ignorés pendant 2 h et l'application
+# affichait « aucune nouveauté ». Désormais un passage sans Internet libère son créneau et
+# un nouvel essai a lieu RETRY_HORS_LIGNE_MINUTES plus tard.
+RETRY_HORS_LIGNE_MINUTES = 15
+_HOTES_TEST = ('api.tavily.com', 'news.google.com', 'www.google.com')
+
+
+def internet_disponible(timeout=5):
+    """Vrai si au moins un hôte de test répond (résolution DNS + connexion TCP 443)."""
+    import socket
+    for hote in _HOTES_TEST:
+        try:
+            with socket.create_connection((hote, 443), timeout=timeout):
+                return True
+        except OSError:
+            continue
+    return False
+
+
+def reporter_passage(nom, minutes=RETRY_HORS_LIGNE_MINUTES):
+    """Annule la réservation du créneau : le prochain déclenchement passera dans `minutes`."""
+    intervalle = (
+        settings.VEILLE_INTERVAL_REDUIT_HOURS if credits.mode_reduit() else settings.VEILLE_INTERVAL_HOURS
+    ) * 3600
+    horodatage = time.time() - (intervalle - _TOLERANCE_SECONDES) + minutes * 60
+    try:
+        _fichier_passage(nom).write_text(str(horodatage), encoding='ascii')
+    except OSError as exc:
+        logger.warning('Report du passage %s non enregistré : %s', nom, exc)
+
+
+def passage_hors_ligne(nom):
+    """À appeler juste après `reserver_passage` : si Internet est coupé, libère le créneau,
+    enregistre l'état « hors ligne » (affiché dans l'application) et retourne les stats."""
+    if not getattr(settings, 'VEILLE_VERIFIER_INTERNET', True) or internet_disponible():
+        return None
+    logger.warning('Veille %s : pas de connexion Internet, nouvel essai dans %d min.',
+                   nom, RETRY_HORS_LIGNE_MINUTES)
+    reporter_passage(nom)
+    stats = {'mode': 'hors_ligne', 'raison': 'pas de connexion Internet', 'candidats': 0, 'creees': 0}
+    enregistrer_resultat(nom, stats)
+    return stats
+
+
+# --- Rattrapage après une longue coupure ----------------------------------------------
+# La veille ne tourne que PC allumé. Avec une fenêtre de recherche fixe (« day » pour les
+# actualités), un PC éteint 3 jours perdait les articles de ces 3 jours. La fenêtre est donc
+# élargie selon l'ancienneté du dernier passage RÉUSSI (les filtres d'âge de fiabilite.py
+# — 21 jours actualités, 30 jours offres — s'appliquent toujours).
+_ORDRE_FENETRES = ('day', 'week', 'month')
+
+
+def fenetre_recherche(nom, normale):
+    """`time_range` Tavily pour ce passage : `normale`, ou plus large après une coupure.
+    À appeler AVANT `reserver_passage` (qui réécrit l'heure du passage)."""
+    try:
+        resultat = json.loads(_fichier_resultat(nom).read_text(encoding='utf-8'))
+        dernier = datetime.fromisoformat(resultat['heure'])
+        reussi = resultat.get('mode') not in ('hors_ligne', None)
+    except (OSError, ValueError, KeyError, TypeError):
+        return normale
+    if not reussi:
+        # Dernier passage hors ligne : on s'appuie sur l'heure du passage réservé précédent.
+        heure = _lire_dernier_passage(nom)
+        if heure is None:
+            return normale
+        dernier = datetime.fromtimestamp(heure, tz=timezone.get_current_timezone())
+    coupure = timezone.now() - dernier
+    besoin = 'day' if coupure.total_seconds() < 20 * 3600 else 'week' if coupure.days < 7 else 'month'
+    choisie = max(normale, besoin, key=_ORDRE_FENETRES.index)
+    if choisie != normale:
+        logger.info('Veille %s : rattrapage après %s sans passage, recherche sur « %s ».',
+                    nom, str(coupure).split('.')[0], choisie)
+    return choisie
+
+
 def raison_ignore():
     """Motif affiché quand un déclenchement trouve son créneau déjà traité."""
     if credits.mode_reduit():
@@ -189,8 +268,25 @@ def etat(nom):
     }
 
 
-def rotation(options):
-    """Choisit un élément différent à chaque créneau de veille (sans état stocké) :
-    créneau 0 -> options[0], créneau 1 -> options[1]… puis on recommence."""
-    creneau = int(time.time() // (settings.VEILLE_INTERVAL_HOURS * 3600))
-    return options[creneau % len(options)]
+def rotation(options, nom=None):
+    """Choisit un élément différent à chaque passage de veille.
+
+    Avec `nom`, un compteur (fichier) avance d'un cran à chaque passage : les thèmes
+    s'enchaînent sans répétition même si le PC a été éteint (avec le créneau horaire seul,
+    « concours bourse » était tombé deux passages de suite, observé le 29/10/2026).
+    Sans `nom` : créneau horaire (créneau 0 -> options[0], créneau 1 -> options[1]…)."""
+    if nom is None:
+        creneau = int(time.time() // (settings.VEILLE_INTERVAL_HOURS * 3600))
+        return options[creneau % len(options)]
+    fichier = Path(settings.VEILLE_ETAT_DIR) / f'rotation_{nom}.txt'
+    try:
+        compteur = int(fichier.read_text(encoding='ascii').strip())
+    except (OSError, ValueError):
+        compteur = -1
+    compteur = (compteur + 1) % len(options)
+    try:
+        fichier.parent.mkdir(parents=True, exist_ok=True)
+        fichier.write_text(str(compteur), encoding='ascii')
+    except OSError as exc:
+        logger.warning('Rotation %s non enregistrée : %s', nom, exc)
+    return options[compteur]

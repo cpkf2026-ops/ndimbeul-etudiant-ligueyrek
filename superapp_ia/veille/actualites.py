@@ -294,13 +294,17 @@ def _nouvelles_stats(requete):
 
 def veille_actualites(force=False):
     """Un passage complet de la veille des actualités. Retourne ses statistiques."""
+    fenetre = commun.fenetre_recherche(NOM, 'day')
     if not commun.reserver_passage(NOM, force=force):
         return {'mode': 'ignore', 'raison': commun.raison_ignore()}
+    hors_ligne = commun.passage_hors_ligne(NOM)
+    if hors_ligne:
+        return hors_ligne
 
     requete = commun.rotation(REQUETES)
     try:
         resultats = tavily_service.rechercher(
-            requete, module=NOM, topic='news', time_range='day',
+            requete, module=NOM, topic='news', time_range=fenetre,
             include_domains=sources.domaines(sources.ACTUALITES, sources.ORIENTATION),
             max_results=MAX_RESULTATS, timeout=TAVILY_TIMEOUT_VEILLE_SECONDES,
         )

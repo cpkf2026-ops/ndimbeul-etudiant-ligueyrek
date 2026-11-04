@@ -9,6 +9,8 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../../shared/widgets/skeleton_loader.dart';
+import '../../../ai_assistant/presentation/providers/chat_provider.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../jobs/presentation/widgets/job_type_style.dart';
 import '../providers/dashboard_insights_provider.dart';
 import 'dashboard_mock_data.dart';
@@ -975,8 +977,19 @@ class _CardHeader extends StatelessWidget {
 // Assistant IA — panneau avec questions suggérées
 // -----------------------------------------------------------------------------
 
-class AiAssistantPanel extends StatelessWidget {
+class AiAssistantPanel extends ConsumerWidget {
   const AiAssistantPanel({super.key});
+
+  /// Clic sur une question fréquente : ouvre le chat et l'envoie à l'IA (la question
+  /// apparaît comme message de l'utilisateur, la réponse arrive comme d'habitude).
+  /// Visiteur non connecté : on ouvre seulement le chat, qui demande de se connecter.
+  static void _poser(BuildContext context, WidgetRef ref, String question) {
+    final connecte = ref.read(authProvider).valueOrNull != null;
+    context.go(RoutePaths.chat);
+    if (connecte) {
+      ref.read(chatControllerProvider).sendMessage(question);
+    }
+  }
 
   static const _suggestions = [
     'Quelles filières avec un bac S2 et 13 de moyenne ?',
@@ -986,7 +999,7 @@ class AiAssistantPanel extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final desktop = context.isDesktop;
 
     final intro = Column(
@@ -1071,7 +1084,7 @@ class AiAssistantPanel extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               child: InkWell(
                 borderRadius: BorderRadius.circular(14),
-                onTap: () => context.go(RoutePaths.chat),
+                onTap: () => _poser(context, ref, q),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,

@@ -421,3 +421,161 @@ class BaseSuffisanteTests(SimpleTestCase):
         mots = chatbot._mots_importants("Conditions pour la licence informatique à l'UCAD ?")
         fiche = {'titre': 'Licence Informatique (UCAD)', 'texte': 'Licence Informatique — à UCAD. Séries S1, S2.'}
         self.assertTrue(chatbot._base_suffisante([fiche], mots))
+
+
+class LogiqueDesReponsesTests(TestCase):
+    """Cas réels relevés le 21/10/2026 : le chatbot répondait, mais pas à la question posée."""
+
+    def setUp(self):
+        cache_django.clear()
+        self.uadb = Universite.objects.create(
+            nom='Université Alioune Diop de Bambey', code_unique='UADB', type='public', region='Diourbel',
+            commune='Bambey', site_web_officiel='https://www.uadb.edu.sn', statut_actif=True)
+        Universite.objects.create(nom='Dakar Institute of Technology (DIT)', code_unique='DIOTD', type='prive',
+                                  region='Dakar', site_web_officiel='https://dit.sn', statut_actif=True)
+
+    def test_le_verbe_dit_n_est_pas_le_sigle_dit(self):
+        r = chatbot._site_demande("j'ai dit je veux le lien du site de l'université de Bambey")
+        self.assertIn('Alioune Diop de Bambey', r['reponse'])
+        self.assertIn('uadb.edu.sn', r['reponse'])
+
+    def test_cette_universite_reprend_l_etablissement_de_la_conversation(self):
+        historique = [
+            {'role': 'user', 'contenu': 'Quelles filières avec un bac S2 ?'},
+            {'role': 'assistant', 'contenu': 'Voici…', 'sources': [{'titre': self.uadb.nom, 'url': None}]},
+        ]
+        r = chatbot._site_demande('le lien du site de cet université', historique)
+        self.assertIn('uadb.edu.sn', r['reponse'])
+
+    def test_etablissement_sans_site_reponse_honnete(self):
+        Universite.objects.create(nom='Université Kocc Barma', code_unique='UKB', type='prive', statut_actif=True)
+        r = chatbot._site_demande('le site de l université Kocc Barma')
+        self.assertIn("pas de site officiel", r['reponse'])
+
+    def test_filieres_par_serie_et_moyenne(self):
+        Formation.objects.create(id=str(uuid.uuid4()), universite_id=self.uadb.id, intitule='Licence Agronomie', niveau='licence',
+                                 series_acceptees=['S2'], moyenne_minimale=Decimal('11'))
+        Formation.objects.create(id=str(uuid.uuid4()), universite_id=self.uadb.id, intitule='Licence Lettres', niveau='licence',
+                                 series_acceptees=['L'], moyenne_minimale=Decimal('10'))
+        Formation.objects.create(id=str(uuid.uuid4()), universite_id=self.uadb.id, intitule='Médecine', niveau='doctorat',
+                                 series_acceptees=['S2'], moyenne_minimale=Decimal('15'))
+        r = chatbot._formations_pour_bac('Quelles filières avec un bac S2 et 13 de moyenne ?', {})
+        self.assertIn('Licence Agronomie', r['reponse'])
+        self.assertNotIn('Licence Lettres', r['reponse'])   # série L seulement
+        self.assertNotIn('Médecine', r['reponse'])          # 15 demandé, 13 obtenu
+
+    def test_question_sans_serie_ni_moyenne_non_concernee(self):
+        self.assertIsNone(chatbot._formations_pour_bac('Comment obtenir une bourse ?', {}))
+
+
+class FiabiliteDesReponsesTests(TestCase):
+    """Sujet sensible sans information vérifiée : on le dit et on donne les contacts."""
+
+    def setUp(self):
+        cache_django.clear()
+        self.ugb = Universite.objects.create(
+            nom='Université Gaston Berger de Saint-Louis (UGB)', code_unique='UGB', type='public',
+            region='Saint-Louis', commune='Saint-Louis', telephone_contact='+221 33 961 23 56',
+            email_contact='contact@ugb.edu.sn', statut_actif=True)
+        Universite.objects.create(nom='Université Assane Seck de Ziguinchor (UASZ)', code_unique='UASZ',
+                                  type='public', region='Ziguinchor', statut_actif=True)
+
+    def test_frais_sans_info_verifiee_renvoi_vers_l_etablissement(self):
+        r = chatbot._question_factuelle("Frais d'inscription à l'UGB ?", [], 10 ** 12, [])
+        self.assertIn("pas d'information vérifiée", r['reponse'])
+        self.assertIn('+221 33 961 23 56', r['reponse'])
+        self.assertIn('contact@ugb.edu.sn', r['reponse'])
+        self.assertNotIn('Ziguinchor', r['reponse'])
+
+    def test_question_de_contact(self):
+        r = chatbot._question_factuelle("Comment contacter l'UGB ?", [], 10 ** 12, [])
+        self.assertIn('Coordonnées', r['reponse'])
+        self.assertIn('contact@ugb.edu.sn', r['reponse'])
+
+    def test_question_sans_etablissement_non_concernee(self):
+        self.assertIsNone(chatbot._question_factuelle("Quels sont les frais d'inscription en général ?", [], 10 ** 12, []))
+
+
+class EtablissementsParDomaineTests(TestCase):
+    """« Où étudier X ? » : tous les établissements du domaine, pas toujours les mêmes."""
+
+    def setUp(self):
+        cache_django.clear()
+        self.ecole_dakar = Universite.objects.create(nom='École de Journalisme de Dakar', code_unique='EJD1',
+                                                     type='prive', region='Dakar', commune='Dakar', statut_actif=True,
+                                                     domaines=['Journalisme et reportage'])
+        self.ecole_thies = Universite.objects.create(nom='Institut Médias de Thiès', code_unique='IMT1',
+                                                     type='public', region='Thiès', commune='Thiès', statut_actif=True,
+                                                     domaines=['Communication', 'Techniques audiovisuelles'])
+        self.autre = Universite.objects.create(nom='Grande Université de Dakar', code_unique='GUD1', type='public',
+                                               region='Dakar', commune='Dakar', statut_actif=True,
+                                               domaines=['Médecine'])
+
+    def test_domaine_demande_et_variete(self):
+        r = chatbot._etablissements_pour_un_domaine('Quelles écoles de journalisme au Sénégal ?')
+        self.assertIn('École de Journalisme de Dakar', r['reponse'])
+        self.assertIn('Institut Médias de Thiès', r['reponse'])
+        self.assertNotIn('Grande Université de Dakar', r['reponse'])   # médecine : hors sujet
+
+    def test_ville_et_statut_respectes(self):
+        r = chatbot._etablissements_pour_un_domaine('Écoles de journalisme privées à Dakar')
+        self.assertIn('École de Journalisme de Dakar', r['reponse'])
+        self.assertNotIn('Thiès', r['reponse'])
+
+    def test_question_sans_domaine_non_concernee(self):
+        self.assertIsNone(chatbot._etablissements_pour_un_domaine('Bonjour, comment ça va ?'))
+
+
+class ConversationReelle29OctobreTests(TestCase):
+    """Conversation réelle du 29/10/2026 : merci, remarques et « est-ce fiable ? » partaient
+    dans la recherche ; « pour » faisait croire à une question sur Iprosi."""
+
+    def setUp(self):
+        cache_django.clear()
+        Universite.objects.create(
+            nom='Institut Professionnel pour la Sécurité Informatique (Iprosi Dakar)', code_unique='IPROSI',
+            region='Dakar', statut_actif=True)
+        Universite.objects.create(
+            nom='Université Gaston Berger de Saint-Louis (UGB)', code_unique='UGB', type='public',
+            region='Saint-Louis', site_web_officiel='https://www.ugb.sn', statut_actif=True)
+
+    def test_intentions_des_messages_de_la_conversation(self):
+        cas = {
+            'ok je vois merci pour votre reponse': intentions.REMERCIEMENT,
+            "j'ais dit merci pour ta reponse precedent je n'est pas poser un autre question": intentions.REMERCIEMENT,
+            'est ce que cet infos est fiable et vrais': intentions.FIABILITE,
+            "bon je vois que y'as pas de concordence genre de logique au reponse que tu me donne": intentions.AVIS,
+            "ont dirait que y'a des limites a tes reponses ?": intentions.AVIS,
+            'merci, et pour les bourses ?': intentions.QUESTION,
+            'Quelles sont les sources officielles pour les bourses ?': intentions.QUESTION,
+            "limite d'âge pour la bourse ?": intentions.QUESTION,
+        }
+        for message, attendu in cas.items():
+            with self.subTest(message=message):
+                self.assertEqual(intentions.detecter(message), attendu)
+
+    def test_pour_n_est_pas_un_mot_distinctif(self):
+        from ia import etablissements_chat
+        self.assertIsNone(etablissements_chat.trouver('ok je vois merci pour votre reponse'))
+        self.assertIsNotNone(etablissements_chat.trouver("frais d'inscription chez Iprosi"))
+
+    def test_est_ce_fiable_indique_la_source_de_la_reponse_precedente(self):
+        historique = [
+            {'role': 'user', 'contenu': "Frais d'inscription à l'UGB ?"},
+            {'role': 'assistant', 'contenu': 'Inscription : 25.000 F',
+             'sources': [{'titre': 'Certificat de Capacité en Droit | UGB', 'url': 'https://www.ugb.sn/fr/capacite'}]},
+        ]
+        r = chatbot.repondre('est ce que cet infos est fiable et vrais', historique=historique)
+        self.assertEqual(r['intention'], intentions.FIABILITE)
+        self.assertIn("site officiel de l'établissement", r['reponse'])
+        self.assertIn('https://www.ugb.sn/fr/capacite', r['reponse'])
+
+    def test_offres_dans_une_ville_sans_offre(self):
+        from django.utils import timezone
+        from veille.models import OffreEmploi
+        OffreEmploi.objects.create(intitule='Comptable', entreprise='X', type='emploi', region='Dakar',
+                                   source_url='https://senjob.com/c', statut='active',
+                                   date_indexation=timezone.now(), date_collecte=timezone.now())
+        r = chatbot.repondre('je veux savoir si ya des emploie disponible actuellement a thies')
+        self.assertIn('Thiès', r['reponse'])
+        self.assertIn('Comptable', r['reponse'])

@@ -4,7 +4,10 @@ from rest_framework import serializers
 
 class MessageHistoriqueSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=['user', 'assistant'])
-    contenu = serializers.CharField(max_length=4000)
+    # Assez long pour une liste complète d'établissements (jusqu'à ~100 lignes) renvoyée en historique.
+    contenu = serializers.CharField(max_length=20000)
+    # Sources de la réponse : permettent de comprendre « le site de CETTE université ».
+    sources = serializers.ListField(child=serializers.DictField(), required=False)
 
 
 class ChatEntreeSerializer(serializers.Serializer):

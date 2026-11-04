@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../shared/constants/app_images.dart';
 import '../../../../shared/extensions/context_extensions.dart';
 import '../../../../shared/widgets/content_max_width.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -97,27 +98,32 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
             SliverToBoxAdapter(
               child: SectionReveal(
                 child: GradientPageHeader(
-                  eyebrow: 'Infos & alertes',
-                  straightTitle: 'Restez',
-                  accentTitle: 'informé.',
-                  subtitle: 'Bourses, concours, événements : l\'essentiel de la vie '
-                      'étudiante au Sénégal.',
+                  // Même image que la bannière de l'accueil (la lampe).
+                  imageFond: AppImages.dashboardHero,
+                  eyebrow: _tab == 0 ? 'Infos & alertes' : 'Notifications',
+                  straightTitle: _tab == 0 ? 'Restez' : 'Vos',
+                  accentTitle: _tab == 0 ? 'informé.' : 'alertes.',
+                  subtitle: _tab == 0
+                      ? 'Bourses, concours, événements : l\'essentiel de la vie '
+                          'étudiante au Sénégal.'
+                      : 'Les alertes qui correspondent à votre profil.',
+                  // Dans les notifications, une flèche ramène au fil d'actualités.
+                  leading: _tab == 1
+                      ? HeaderIconButton(
+                          icon: Icons.arrow_back_rounded,
+                          tooltip: "Retour au fil d'actualités",
+                          onTap: () => setState(() => _tab = 0),
+                        )
+                      : null,
                   actions: [
+                    // La cloche ouvre les notifications (et y revient au fil si on y est déjà).
                     HeaderIconButton(
                       icon: Icons.notifications_rounded,
-                      tooltip: 'Notifications',
+                      tooltip: _tab == 0 ? 'Notifications' : "Fil d'actualités",
                       badgeCount: unread,
-                      onTap: () => setState(() => _tab = 1),
+                      onTap: () => setState(() => _tab = _tab == 0 ? 1 : 0),
                     ),
                   ],
-                  bottom: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
-                    child: _SegmentedTabs(
-                      index: _tab,
-                      unread: unread,
-                      onChanged: (i) => setState(() => _tab = i),
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -442,104 +448,6 @@ class _NewsScreenState extends ConsumerState<NewsScreen> {
 // -----------------------------------------------------------------------------
 // Widgets
 // -----------------------------------------------------------------------------
-
-class _SegmentedTabs extends StatelessWidget {
-  const _SegmentedTabs({required this.index, required this.unread, required this.onChanged});
-  final int index;
-  final int unread;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final half = constraints.maxWidth / 2;
-          return Stack(
-            children: [
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 260),
-                curve: Curves.easeOutCubic,
-                left: index * half,
-                top: 0,
-                bottom: 0,
-                width: half,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.12),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  _segment(0, Icons.newspaper_rounded, 'Fil d\'actualités'),
-                  _segment(1, Icons.notifications_rounded, 'Notifications', badge: unread),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _segment(int i, IconData icon, String label, {int badge = 0}) {
-    final selected = index == i;
-    final fg = selected ? AppColors.primary : Colors.white;
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => onChanged(i),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 17, color: fg),
-            const SizedBox(width: 6),
-            Flexible(
-              child: AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: fg),
-                child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-            ),
-            if (badge > 0) ...[
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: AppColors.accent,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(
-                  '$badge',
-                  style: const TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _CategoryPill extends StatelessWidget {
   const _CategoryPill({
@@ -975,7 +883,13 @@ class _AiWatchBanner extends ConsumerWidget {
           ? 'Sources officielles et presse reconnue uniquement, articles récents vérifiés.'
           : 'Sources officielles et presse reconnue · dernier ajout ${_relativeDate(derniereMaj!)}';
     }
-    final resultat = etat!.ajoutes == 0
+    if (etat!.horsLigne) {
+      final essai = etat.prochainPassage == null
+          ? ''
+          : ' · nouvel essai vers ${DateFormat('HH:mm').format(etat.prochainPassage!)}';
+      return 'Pas de connexion Internet ${_relativeDate(etat.derniereVerification!)}$essai';
+    }
+    final resultat = etat.ajoutes == 0
         ? 'aucune nouveauté'
         : '${etat.ajoutes} nouveauté${etat.ajoutes > 1 ? 's' : ''}';
     final prochaine = etat.prochainPassage == null

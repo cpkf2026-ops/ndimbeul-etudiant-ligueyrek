@@ -13,3 +13,5 @@ celery>=5.4
 redis>=4.5,<5
 beautifulsoup4>=4.12
 tavily-python==0.7.12
+# Vérification des certificats par Windows (sites au certificat incomplet, ex. senjob.com)
+truststore>=0.10

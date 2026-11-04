@@ -29,3 +29,12 @@ LOGGING = {'version': 1, 'disable_existing_loggers': False, 'root': {'level': 'C
 
 # Heure des derniers passages de veille : dossier temporaire, vidé avant chaque test de veille.
 VEILLE_ETAT_DIR = tempfile.mkdtemp(prefix='ndimbeul_veille_')
+
+# Pas de report de la veille au démarrage dans les tests (voir veille/tasks.py).
+VEILLE_DELAI_DEMARRAGE_MINUTES = 0
+
+# Les tests simulent le réseau : pas de vraie vérification de la connexion Internet.
+VEILLE_VERIFIER_INTERNET = False
+
+# Gemini : jamais appelé pour de vrai dans les tests (simulé dans tests/test_agent.py).
+GEMINI_API_KEY = ""

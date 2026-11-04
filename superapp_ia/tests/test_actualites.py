@@ -112,6 +112,37 @@ class VeilleActualitesTests(TestCase):
         self.assertIn('creees', etat['dernier_passage'])
         self.assertIsNotNone(etat['prochain_passage'])
 
+    def test_rattrapage_apres_plusieurs_jours_pc_eteint(self):
+        def dernier_passage_il_y_a(**ecart):
+            commun.enregistrer_resultat(actualites.NOM, {'mode': 'tavily'})
+            fichier = Path(settings.VEILLE_ETAT_DIR) / f'dernier_resultat_{actualites.NOM}.json'
+            resultat = json.loads(fichier.read_text(encoding='utf-8'))
+            resultat['heure'] = (timezone.now() - timedelta(**ecart)).isoformat()
+            fichier.write_text(json.dumps(resultat), encoding='utf-8')
+
+        dernier_passage_il_y_a(hours=2)
+        self.assertEqual(commun.fenetre_recherche(actualites.NOM, 'day'), 'day')
+        dernier_passage_il_y_a(days=3)
+        self.assertEqual(commun.fenetre_recherche(actualites.NOM, 'day'), 'week')
+        actualites.veille_actualites()
+        self.assertEqual(self.tavily.search.call_args.kwargs['time_range'], 'week')
+        dernier_passage_il_y_a(days=10)
+        self.assertEqual(commun.fenetre_recherche(actualites.NOM, 'day'), 'month')
+
+    def test_sans_internet_le_creneau_est_libere_et_reessaye_dans_15_min(self):
+        with self.settings(VEILLE_VERIFIER_INTERNET=True), \
+                mock.patch('veille.commun.internet_disponible', return_value=False):
+            stats = actualites.veille_actualites()
+            # Le déclenchement suivant (tâche Windows, 15 min plus tard) ne doit pas être bloqué 2 h.
+            etat = commun.etat(actualites.NOM)
+        self.assertEqual(stats['mode'], 'hors_ligne')
+        self.tavily.search.assert_not_called()
+        self.assertEqual(etat['dernier_passage']['mode'], 'hors_ligne')
+        attente = datetime.fromisoformat(etat['prochain_passage']) - timezone.now()
+        self.assertLess(attente, timedelta(minutes=commun.RETRY_HORS_LIGNE_MINUTES + 11))
+        with mock.patch('time.time', return_value=commun.time.time() + 16 * 60):
+            self.assertNotEqual(actualites.veille_actualites()['mode'], 'ignore')
+
     def test_un_passage_publie_les_actualites_pertinentes(self):
         stats = actualites.veille_actualites()
 
@@ -251,3 +282,20 @@ class ReglesQualiteActualitesTests(TestCase):
         self.assertIsNone(motif)
         self.assertEqual(champs['contenu'], 'Le ministère annonce une réforme du baccalauréat.')
         self.assertIn('phrase_non_sourcee_retiree', avertissements)
+
+
+class ReportAuDemarrageTests(TestCase):
+    """Au lancement de l'application, la veille attend que le PC ait fini de démarrer."""
+
+    def test_veille_reportee_juste_apres_le_demarrage(self):
+        from django.test import override_settings
+
+        from veille import tasks
+
+        with override_settings(VEILLE_DELAI_DEMARRAGE_MINUTES=10), \
+                mock.patch.object(tasks.veille_actualites, 'apply_async') as replanifier, \
+                mock.patch('veille.actualites.veille_actualites') as passage:
+            resultat = tasks.veille_actualites.run()
+        self.assertEqual(resultat['mode'], 'reporte')
+        passage.assert_not_called()
+        self.assertGreater(replanifier.call_args.kwargs['countdown'], 0)

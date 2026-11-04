@@ -126,6 +126,12 @@ OLLAMA_MODEL_RAPIDE = os.getenv('OLLAMA_MODEL_RAPIDE', 'qwen3.5:2b')
 # La veille partage le CPU avec le chat : elle n'utilise que N cœurs (0 = tous) et
 # libère la RAM peu après son passage (Mistral 7B occupe ~4,5 Go).
 OLLAMA_VEILLE_NUM_THREAD = int(os.getenv('OLLAMA_VEILLE_NUM_THREAD', '4'))
+# Temps de présence du modèle en RAM après une réponse (chat, orientation) : court pour
+# libérer ~2-3 Go dès que personne ne s'en sert.
+OLLAMA_KEEP_ALIVE = os.getenv('OLLAMA_KEEP_ALIVE', '5m')
+# Délai avant la première veille après le lancement de l'application (laisse le PC
+# finir de démarrer ; voir veille/tasks.py).
+VEILLE_DELAI_DEMARRAGE_MINUTES = int(os.getenv('VEILLE_DELAI_DEMARRAGE_MINUTES', '10'))
 OLLAMA_VEILLE_KEEP_ALIVE = os.getenv('OLLAMA_VEILLE_KEEP_ALIVE', '5m')
 
 # --- Tavily (recherche web — voir services/tavily_service.py et services/credits.py) ---
@@ -134,6 +140,20 @@ TAVILY_MONTHLY_LIMIT = int(os.getenv('TAVILY_MONTHLY_LIMIT', '1000'))
 # Part du quota réservée au chatbot et à l'orientation (la veille s'arrête avant).
 TAVILY_RESERVE_INTERACTIF = int(os.getenv('TAVILY_RESERVE_INTERACTIF', '200'))
 TAVILY_TIMEOUT_SECONDES = int(os.getenv('TAVILY_TIMEOUT_SECONDES', '8'))
+
+# --- Google Gemini (chatbot à outils — voir services/gemini_service.py et ia/agent.py) ---
+# Sans clé, le chatbot fonctionne comme avant (règles + modèle local).
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-3.5-flash')
+# Secours si le principal est surchargé (503), trop lent ou à court de quota.
+GEMINI_MODEL_SECOURS = os.getenv('GEMINI_MODEL_SECOURS', 'gemini-flash-lite-latest')
+# Après un quota atteint (offre gratuite) : pause avant de réessayer, le repli local répond.
+GEMINI_PAUSE_MINUTES = int(os.getenv('GEMINI_PAUSE_MINUTES', '10'))
+# Nombre maximal d'appels d'outils successifs pour une question.
+GEMINI_MAX_ETAPES = int(os.getenv('GEMINI_MAX_ETAPES', '5'))
+# Temps maximal laissé à Gemini : avec le repli local éventuel (8 s), la réponse reste sous
+# les 30 s d'attente de Laravel (DJANGO_IA_TIMEOUT).
+GEMINI_DELAI_SECONDES = int(os.getenv('GEMINI_DELAI_SECONDES', '18'))
 
 # --- Redis (broker Celery + cache des réponses fréquentes) ---
 REDIS_URL = os.getenv('REDIS_URL') or os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')

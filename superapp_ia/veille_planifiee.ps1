@@ -30,6 +30,18 @@ function Attendre([int]$Port, [int]$Secondes) {
 
 Ecrire '--- Debut de la veille planifiee'
 
+# 0. Laisser le PC finir de demarrer : la tache rattrape un passage manque des l'allumage
+#    (StartWhenAvailable) ; tout lancer en meme temps que Windows figeait la machine.
+#    Tout ce script tourne en priorite inferieure a la normale (le python lance plus bas
+#    en herite) : la veille ne prend que le processeur que l'utilisateur n'utilise pas.
+try { (Get-Process -Id $PID).PriorityClass = 'BelowNormal' } catch {}
+$depuisDemarrage = (Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime
+if ($depuisDemarrage.TotalMinutes -lt 15) {
+    $attente = [int](15 - $depuisDemarrage.TotalMinutes) * 60
+    Ecrire "PC demarre il y a $([int]$depuisDemarrage.TotalMinutes) min : veille reportee de $([int]($attente / 60)) min."
+    Start-Sleep -Seconds $attente
+}
+
 # 1. MySQL (base partagee avec Laravel)
 if (-not (Ecoute 3306)) {
     $mysqld = Get-ChildItem 'C:\laragon\bin\mysql\*\bin\mysqld.exe' -ErrorAction SilentlyContinue | Select-Object -First 1

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_paths.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../shared/constants/app_images.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../shared/extensions/context_extensions.dart';
@@ -90,6 +91,7 @@ class _JobListScreenState extends ConsumerState<JobListScreen> {
             SliverToBoxAdapter(
               child: SectionReveal(
                 child: GradientPageHeader(
+                  imageFond: AppImages.dashboardHero,
                   eyebrow: 'Carrière',
                   straightTitle: 'Emplois, stages',
                   accentTitle: '& bourses',

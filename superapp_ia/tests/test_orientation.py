@@ -6,7 +6,7 @@ from unittest import mock
 
 import numpy as np
 from django.core.cache import cache as cache_django
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from recommandations import orientation
 from recommandations.models import Formation, Recommandation
@@ -226,3 +226,79 @@ class RecommandationsApplicationTests(TestCase):
         explication = reponse.json()['data'][0]['explication']
         self.assertIn('série S2', explication)
         self.assertIn('ta moyenne (14/20) atteint le minimum demandé (12/20)', explication)
+
+
+class ExpansionMetiersTests(SimpleTestCase):
+    """Métiers mal connus du modèle d'embeddings : le profil est enrichi des domaines qui y mènent."""
+
+    def test_douanier_enrichi_avec_ses_domaines(self):
+        from recommandations.scoring import _texte_profil
+
+        texte = _texte_profil({'passions': ['Douane'], 'metiers_envisages': ['douanier']})
+        self.assertIn('commerce international', texte)
+        self.assertIn('logistique', texte)
+
+    def test_metier_connu_non_modifie(self):
+        from recommandations.scoring import _texte_profil
+
+        self.assertEqual(_texte_profil({'passions': ['informatique'], 'metiers_envisages': []}), 'informatique')
+
+
+class ThesaurusDomainesTests(SimpleTestCase):
+    """Les métiers, passions et matières sont traduits en domaines d'études."""
+
+    def test_metiers_courants(self):
+        from recommandations.domaines import domaines_du_texte
+
+        attendus = {'douanier': 'douane_commerce_international', 'médecin': 'sante', 'avocate': 'droit',
+                    'développeur web': 'informatique', 'journaliste': 'communication_journalisme',
+                    'agronome': 'agriculture_environnement', 'pilote': 'aeronautique', 'comptable': 'finance_comptabilite'}
+        for terme, domaine in attendus.items():
+            self.assertIn(domaine, domaines_du_texte(terme), terme)
+
+    def test_pas_de_faux_rapprochement(self):
+        from recommandations.domaines import domaines_du_texte
+
+        self.assertNotIn('securite_defense', domaines_du_texte('Licence Qualité, Hygiène, Sécurité & Environnement'))
+        self.assertEqual(domaines_du_texte('jeux vidéo'), {'informatique'})
+
+
+class ClassementParDomaineTests(TestCase):
+    """Le classement suit le projet de l'élève (et non plus la seule région)."""
+
+    def setUp(self):
+        from recommandations.models import Formation
+        from veille.models import Universite as U
+
+        self.thies = U.objects.create(nom='Institut de Thiès', code_unique='IT1', region='Thiès', commune='Thiès',
+                                      type='prive', statut_actif=True)
+        self.dakar = U.objects.create(nom='École de Dakar', code_unique='ED1', region='Dakar', commune='Dakar',
+                                      type='public', statut_actif=True)
+        for u, intitule in [(self.thies, 'Infirmier d\'État'), (self.thies, 'Puériculteur'),
+                            (self.dakar, 'Licence Commerce International'), (self.dakar, 'Licence Transport Logistique')]:
+            Formation.objects.create(id=str(uuid.uuid4()), universite_id=u.id, intitule=intitule, niveau='licence')
+
+    def _profil(self, **autres):
+        return {'serie_bac': 'S2', 'moyenne_generale': 13, 'region_cible': 'Thiès', 'mobilite': False,
+                'pref_public_prive': 'indifferent', 'passions': [], 'matieres_fortes': [], **autres}
+
+    def test_le_metier_passe_avant_la_region(self):
+        from recommandations.scoring import generer_recommandations
+
+        r = generer_recommandations(self._profil(metiers_envisages=['douanier']), limite=4)
+        self.assertEqual(r[0]['formation'].intitule, 'Licence Commerce International')
+        self.assertIn('Douane, transit et commerce international', r[0]['domaines_communs'])
+
+    def test_domaine_voisin_quand_le_domaine_exact_manque(self):
+        from recommandations.scoring import generer_recommandations
+
+        r = generer_recommandations(self._profil(metiers_envisages=['pilote']), limite=4)
+        self.assertEqual(r[0]['formation'].intitule, 'Licence Transport Logistique')
+        self.assertTrue(r[0]['voisins'])
+        self.assertTrue(r[0]['voisins'][0]['aucune_exacte'])
+
+    def test_preference_public_prise_en_compte(self):
+        from recommandations.scoring import POIDS_STATUT, generer_recommandations
+
+        r = generer_recommandations(self._profil(metiers_envisages=['douanier'], pref_public_prive='public'), limite=1)
+        self.assertEqual(r[0]['details']['statut'], POIDS_STATUT)
