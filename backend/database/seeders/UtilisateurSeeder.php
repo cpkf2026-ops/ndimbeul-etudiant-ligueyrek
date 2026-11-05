@@ -9,17 +9,19 @@ use App\Models\Universite;
 use App\Models\Utilisateur;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
- * Comptes de démonstration pour la soutenance — un compte par rôle,
- * mot de passe identique pour simplifier les tests en direct devant le jury.
+ * Comptes de démonstration pour la soutenance — un compte par rôle, même mot de passe.
+ * Ce mot de passe n'est jamais dans le code (dépôt GitHub public) : il est lu dans
+ * backend/.env (DEMO_MOT_DE_PASSE) ; sans valeur, un mot de passe aléatoire est utilisé.
  * ATTENTION : à ne jamais exécuter tel quel en production (voir README).
  */
 class UtilisateurSeeder extends Seeder
 {
     public function run(): void
     {
-        $motDePasseDemo = Hash::make('***MOT-DE-PASSE-RETIRE***');
+        $motDePasseDemo = Hash::make(env('DEMO_MOT_DE_PASSE') ?: Str::random(32));
 
         $lyceen = Utilisateur::create([
             'nom' => 'Diop', 'prenom' => 'Aminata', 'email' => 'lyceen@demo.sn',

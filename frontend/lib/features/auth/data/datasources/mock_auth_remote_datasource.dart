@@ -20,16 +20,21 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   /// écriture, dans la même session de page).
   static UserModel? _currentSessionUser;
 
+  /// Mode hors ligne (tests de l'interface sans serveur) uniquement. Ce n'est PAS le
+  /// mot de passe des vrais comptes : ceux-ci ne figurent jamais dans le code (dépôt
+  /// public, application web téléchargeable) et sont définis dans backend/.env.
+  static const String _motDePasseHorsLigne = 'mode-hors-ligne';
+
   static final Map<String, String> _passwords = {
-    'moussa.diop@ucad.edu.sn': 'password',
-    'lyceen@demo.sn': '***MOT-DE-PASSE-RETIRE***',
-    'etudiant@demo.sn': '***MOT-DE-PASSE-RETIRE***',
-    'superadmin@demo.sn': '***MOT-DE-PASSE-RETIRE***',
-    'admin.ucad@demo.sn': '***MOT-DE-PASSE-RETIRE***',
-    'paya@ndimbeul-etudiant.sn': '***MOT-DE-PASSE-RETIRE***',
-    'khady@ndimbeul-etudiant.sn': '***MOT-DE-PASSE-RETIRE***',
-    'coumba@ndimbeul-etudiant.sn': '***MOT-DE-PASSE-RETIRE***',
-    'fatou@ndimbeul-etudiant.sn': '***MOT-DE-PASSE-RETIRE***',
+    'moussa.diop@ucad.edu.sn': _motDePasseHorsLigne,
+    'lyceen@demo.sn': _motDePasseHorsLigne,
+    'etudiant@demo.sn': _motDePasseHorsLigne,
+    'superadmin@demo.sn': _motDePasseHorsLigne,
+    'admin.ucad@demo.sn': _motDePasseHorsLigne,
+    'paya@ndimbeul-etudiant.sn': _motDePasseHorsLigne,
+    'khady@ndimbeul-etudiant.sn': _motDePasseHorsLigne,
+    'coumba@ndimbeul-etudiant.sn': _motDePasseHorsLigne,
+    'fatou@ndimbeul-etudiant.sn': _motDePasseHorsLigne,
   };
 
   // Comptes alignés sur UtilisateurSeeder.php / AdminUsersSeeder.php côté
